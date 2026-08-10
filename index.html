@@ -175,10 +175,11 @@
             font-size: 0.8rem;
             color: #888;
             font-weight: 400;
-            transition: color 0.2s;
+            transition: color 0.2s ease;
         }
+        /* 折叠文字悬停变蓝 */
         .section-header:hover .toggle-label {
-            color: #555;
+            color: #0366d6;
         }
         .toggle-btn {
             font-size: 1.5rem;
@@ -213,7 +214,7 @@
             margin: 0;
         }
 
-        /* 网站条目 */
+        /* ===== 网站条目（主页面） ===== */
         li {
             display: flex;
             align-items: center;
@@ -234,6 +235,11 @@
             transform: translateY(-1px);
             padding-left: 18px;
         }
+        /* 网站名称悬停变蓝 */
+        li:hover .site-name {
+            color: #0366d6;
+            transition: color 0.2s ease;
+        }
 
         .site-name {
             font-size: 1.1rem;
@@ -242,6 +248,7 @@
             min-width: 100px;
             flex: 0 0 auto;
             pointer-events: none;
+            transition: color 0.2s ease;
         }
 
         .site-url {
@@ -331,6 +338,17 @@
             pointer-events: none;
         }
 
+        /* 搜索图标悬停时线条变蓝，文字变蓝 */
+        .search-bottom:hover .search-icon-svg circle,
+        .search-bottom:hover .search-icon-svg line {
+            stroke: #0366d6;
+            transition: stroke 0.2s ease;
+        }
+        .search-bottom:hover .search-label {
+            color: #0366d6;
+            transition: color 0.2s ease;
+        }
+
         .search-icon-svg {
             width: 30px;
             height: 30px;
@@ -341,11 +359,13 @@
             stroke: #333;
             stroke-width: 2.5;
             stroke-linecap: round;
+            transition: stroke 0.2s ease;
         }
         .search-icon-svg line {
             stroke: #333;
             stroke-width: 2.5;
             stroke-linecap: round;
+            transition: stroke 0.2s ease;
         }
 
         .search-label {
@@ -354,9 +374,10 @@
             letter-spacing: 0.5px;
             font-weight: 500;
             line-height: 1;
+            transition: color 0.2s ease;
         }
 
-        /* ----- 侧边导航栏（整行可点） ----- */
+        /* ----- 侧边导航栏（悬停动画，非选中） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -398,15 +419,13 @@
             font-size: 1.2rem;
             font-weight: 500;
             padding: 14px 24px;
-            transition: color 0.15s, background 0.15s;
+            transition: color 0.25s ease, padding-left 0.25s ease, background 0.15s;
             pointer-events: none; /* 让 li 统一处理点击，避免 a 干扰 */
         }
-        .sidenav a:hover {
+        /* 悬停时文字变蓝并向右移动（不是点击选中） */
+        .sidenav li:hover a {
             color: #0366d6;
-            background: transparent;
-        }
-        .sidenav li:active {
-            background: #e0ebff;
+            padding-left: 32px;
         }
 
         .overlay {
@@ -696,9 +715,12 @@
     <nav class="sidenav" id="sidenav">
         <ul>
             <li><a href="#community">社区网站</a></li>
+            <li><a href="#ai-tools">AI工具</a></li>
             <li><a href="#tools">实用工具</a></li>
             <li><a href="#shopping">购物网站</a></li>
             <li><a href="#email">常用邮箱</a></li>
+            <li><a href="#science">科学上网</a></li>
+            <li><a href="#guli">GuLi网站</a></li>
         </ul>
     </nav>
 
@@ -754,7 +776,7 @@
 
     <script>
         // ================================================================
-        // 1. 卡片数据
+        // 1. 卡片数据（已更新）
         // ================================================================
         const cardData = [
             {
@@ -763,6 +785,14 @@
                 items: [
                     { name: 'B站', url: 'https://www.bilibili.com' },
                     { name: '油管', url: 'https://www.youtube.com' }
+                ]
+            },
+            {
+                id: 'ai-tools',
+                title: 'AI工具',
+                items: [
+                    { name: 'DeepSeek API', url: 'https://platform.deepseek.com' },
+                    { name: 'DeepSeek 对话', url: 'https://chat.deepseek.com' }
                 ]
             },
             {
@@ -787,6 +817,22 @@
                     { name: '谷歌Gmail', url: 'https://mail.google.com' },
                     { name: '网易163邮箱', url: 'https://mail.163.com' },
                     { name: 'QQ邮箱', url: 'https://mail.qq.com' }
+                ]
+            },
+            {
+                id: 'science',
+                title: '科学上网',
+                items: [
+                    { name: '良心云', url: 'https://良心云.com' }
+                ]
+            },
+            {
+                id: 'guli',
+                title: 'GuLi网站',
+                items: [
+                    { name: 'GuLi官网', url: 'https://662506.xyz' },
+                    { name: 'CloudFlare', url: 'https://cloudflare.com' },
+                    { name: 'Spaceship域名', url: 'https://www.spaceship.com' }
                 ]
             }
         ];
@@ -901,7 +947,7 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // ===== 侧边栏导航：绑定到 li，实现整行点击跳转 =====
+        // ===== 侧边栏导航：点击整行跳转（移除 active 类，仅靠 hover） =====
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
@@ -910,7 +956,7 @@
                 if (targetId && targetId.startsWith('#')) {
                     const target = document.querySelector(targetId);
                     if (target) {
-                        e.preventDefault(); // 阻止 a 的默认跳转（虽然 a 已 pointer-events: none，但依然保留）
+                        e.preventDefault();
                         closeNav();
                         setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
                     }
