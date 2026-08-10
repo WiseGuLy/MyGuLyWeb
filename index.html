@@ -64,19 +64,17 @@
             display: flex;
         }
 
-        /* 滑块背景 */
         .switch-slider {
             position: absolute;
             top: 3px;
             left: 3px;
-            width: calc(50% - 3px);  /* 总宽度一半减去内边距 */
+            width: calc(50% - 3px);
             height: calc(100% - 6px);
             border-radius: 30px;
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
         }
-        /* 当双列选中时，滑块移到右侧 */
         .layout-switch.double .switch-slider {
             left: calc(50%);
         }
@@ -94,7 +92,7 @@
             text-align: center;
         }
         .switch-option.active {
-            color: #ffffff; /* 选中文字白色 */
+            color: #ffffff;
         }
         .switch-option:not(.active) {
             color: #666;
@@ -113,7 +111,7 @@
         }
 
         /* ============================================================
-           栏目网格容器（由 JS 动态控制布局）
+           栏目网格容器
            ============================================================ */
         .sections-grid {
             display: block;
@@ -133,7 +131,6 @@
             gap: 28px;
         }
 
-        /* 每个分类卡片 */
         .section {
             background: #fafafa;
             border-radius: 16px;
@@ -169,7 +166,6 @@
             color: #222;
         }
 
-        /* 折叠标签 + 三角形 */
         .toggle-group {
             display: flex;
             align-items: center;
@@ -217,7 +213,7 @@
             margin: 0;
         }
 
-        /* ===== 网站条目 ===== */
+        /* 网站条目 */
         li {
             display: flex;
             align-items: center;
@@ -295,7 +291,6 @@
         .hamburger:active {
             transform: scale(0.92);
         }
-        /* 侧边栏打开时汉堡变蓝 */
         .hamburger.active {
             color: #0366d6;
         }
@@ -361,7 +356,7 @@
             line-height: 1;
         }
 
-        /* ----- 侧边导航栏（修改整行可点） ----- */
+        /* ----- 侧边导航栏（整行可点） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -372,7 +367,7 @@
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
             transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 999;
-            padding: 80px 0 30px;  /* 去掉左右内边距，由 a 控制 */
+            padding: 80px 0 30px;
             overflow-y: auto;
             border-right: 1px solid #f0f0f0;
         }
@@ -404,12 +399,12 @@
             font-weight: 500;
             padding: 14px 24px;
             transition: color 0.15s, background 0.15s;
+            pointer-events: none; /* 让 li 统一处理点击，避免 a 干扰 */
         }
         .sidenav a:hover {
             color: #0366d6;
             background: transparent;
         }
-        /* 点击后的高亮（短暂显示） */
         .sidenav li:active {
             background: #e0ebff;
         }
@@ -510,7 +505,6 @@
             transform: rotate(90deg);
         }
 
-        /* 搜索结果两栏 */
         .search-results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -592,7 +586,6 @@
             text-align: center;
         }
 
-        /* 底部版权 */
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -643,7 +636,6 @@
             .section { padding: 16px 16px 8px; }
             .site-name { min-width: 70px; font-size: 1rem; }
             li { gap: 6px; padding: 10px 12px; }
-
             .hamburger {
                 top: 16px;
                 left: 16px;
@@ -741,7 +733,7 @@
     <div class="container">
         <h1>GuLi 网站导航/收藏</h1>
 
-        <!-- 布局切换胶囊（带滑块） -->
+        <!-- 布局切换胶囊 -->
         <div class="layout-switch" id="layoutSwitch">
             <span class="switch-slider"></span>
             <span class="switch-option active" id="optionSingle" data-mode="single">单列</span>
@@ -762,7 +754,7 @@
 
     <script>
         // ================================================================
-        // 1. 定义卡片数据
+        // 1. 卡片数据
         // ================================================================
         const cardData = [
             {
@@ -814,13 +806,12 @@
             titleSpan.className = 'section-title';
             titleSpan.textContent = data.title;
 
-            // 右侧：折叠标签 + 三角形
             const toggleGroup = document.createElement('div');
             toggleGroup.className = 'toggle-group';
 
             const labelSpan = document.createElement('span');
             labelSpan.className = 'toggle-label';
-            labelSpan.textContent = collapsed ? '展开' : '折叠';  // 初始状态
+            labelSpan.textContent = collapsed ? '展开' : '折叠';
 
             const toggleBtn = document.createElement('span');
             toggleBtn.className = 'toggle-btn';
@@ -832,12 +823,10 @@
             header.appendChild(titleSpan);
             header.appendChild(toggleGroup);
 
-            // 点击头部切换折叠
             header.addEventListener('click', function(e) {
                 const sec = this.closest('.section');
                 if (!sec) return;
                 sec.classList.toggle('collapsed');
-                // 更新标签文字
                 const label = this.querySelector('.toggle-label');
                 if (label) {
                     label.textContent = sec.classList.contains('collapsed') ? '展开' : '折叠';
@@ -869,7 +858,6 @@
             section.appendChild(header);
             section.appendChild(wrapper);
 
-            // 条目点击跳转
             section.querySelectorAll('li').forEach(li => {
                 li.addEventListener('click', function(e) {
                     const url = this.dataset.url;
@@ -883,13 +871,7 @@
         }
 
         // ================================================================
-        // 3. 折叠函数（保留作为备用，但已用内联事件）
-        // ================================================================
-        // 由于我们使用 header.addEventListener，不再需要全局 toggleSection，但保留以防其他调用
-        // 但为了兼容，保留空函数
-
-        // ================================================================
-        // 4. 汉堡菜单 + 侧边栏
+        // 3. 汉堡菜单 + 侧边栏
         // ================================================================
         const hamburger = document.getElementById('hamburgerBtn');
         const sidenav = document.getElementById('sidenav');
@@ -901,7 +883,7 @@
             overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
             searchBottom.classList.add('hidden');
-            hamburger.classList.add('active');  // 变蓝
+            hamburger.classList.add('active');
         }
         function closeNav() {
             sidenav.classList.remove('open');
@@ -919,14 +901,16 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // 侧边栏链接点击：关闭并平滑滚动
-        document.querySelectorAll('.sidenav a').forEach(link => {
-            link.addEventListener('click', function(e) {
-                const targetId = this.getAttribute('href');
+        // ===== 侧边栏导航：绑定到 li，实现整行点击跳转 =====
+        document.querySelectorAll('.sidenav li').forEach(li => {
+            li.addEventListener('click', function(e) {
+                const anchor = this.querySelector('a');
+                if (!anchor) return;
+                const targetId = anchor.getAttribute('href');
                 if (targetId && targetId.startsWith('#')) {
                     const target = document.querySelector(targetId);
                     if (target) {
-                        e.preventDefault();
+                        e.preventDefault(); // 阻止 a 的默认跳转（虽然 a 已 pointer-events: none，但依然保留）
                         closeNav();
                         setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
                     }
@@ -935,7 +919,7 @@
         });
 
         // ================================================================
-        // 5. 搜索功能
+        // 4. 搜索功能
         // ================================================================
         const searchModal = document.getElementById('searchModal');
         const searchClose = document.getElementById('searchClose');
@@ -1036,14 +1020,14 @@
         urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
 
         // ================================================================
-        // 6. 布局切换（带滑块动画）
+        // 5. 布局切换
         // ================================================================
         const sectionsGrid = document.getElementById('sectionsGrid');
         const optionSingle = document.getElementById('optionSingle');
         const optionDouble = document.getElementById('optionDouble');
         const layoutSwitch = document.getElementById('layoutSwitch');
 
-        let desiredMode = 'single'; // 'single' 或 'grid'
+        let desiredMode = 'single';
 
         function getCollapsedStates() {
             const states = {};
@@ -1069,7 +1053,6 @@
                 newSections.forEach(s => sectionsGrid.appendChild(s));
                 sectionsGrid.style.display = 'block';
                 sectionsGrid.classList.remove('grid-mode');
-                // 更新开关状态
                 layoutSwitch.classList.remove('double');
                 optionSingle.classList.add('active');
                 optionDouble.classList.remove('active');
@@ -1090,7 +1073,6 @@
                 sectionsGrid.style.flexDirection = 'row';
                 sectionsGrid.style.gap = '28px';
                 sectionsGrid.classList.add('grid-mode');
-                // 更新开关状态
                 layoutSwitch.classList.add('double');
                 optionSingle.classList.remove('active');
                 optionDouble.classList.add('active');
