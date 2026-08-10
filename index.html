@@ -38,63 +38,232 @@
         }
 
         /* ============================================================
-           布局切换胶囊（仅桌面端显示）
+           布局切换胶囊（带滑动滑块）
            ============================================================ */
         .layout-switch {
-            display: none; /* 默认隐藏，由 JS 根据宽度显示 */
+            display: none;
             justify-content: center;
             align-items: center;
-            gap: 12px;
             margin-bottom: 30px;
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #555;
+            user-select: none;
+            border: 1.5px solid #d0d0d0;
+            border-radius: 40px;
+            padding: 3px;
+            background: #f9f9f9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            min-width: 160px;
         }
         .layout-switch.visible {
             display: flex;
         }
 
-        .switch-track {
-            position: relative;
-            width: 80px;
-            height: 34px;
-            background: #e8e8e8;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: background 0.25s;
-            flex-shrink: 0;
-            border: 1px solid #d0d0d0;
-        }
-        .switch-track.active {
-            background: #d0ddf5;
-        }
-        .switch-thumb {
+        /* 滑块背景 */
+        .switch-slider {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 28px;
-            height: 28px;
-            background: #ffffff;
-            border-radius: 50%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-            transition: left 0.25s ease, background 0.25s;
-        }
-        .switch-track.active .switch-thumb {
-            left: 48px;
+            top: 3px;
+            left: 3px;
+            width: calc(50% - 3px);  /* 总宽度一半减去内边距 */
+            height: calc(100% - 6px);
+            border-radius: 30px;
             background: #0366d6;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        /* 当双列选中时，滑块移到右侧 */
+        .layout-switch.double .switch-slider {
+            left: calc(50%);
         }
 
-        .switch-label {
-            font-weight: 500;
-            color: #555;
-            user-select: none;
+        .switch-option {
+            padding: 8px 28px;
+            cursor: pointer;
+            transition: color 0.2s;
+            border-radius: 30px;
+            background: transparent;
+            color: #999;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
         }
-        .switch-label.active {
-            color: #0366d6;
+        .switch-option.active {
+            color: #ffffff; /* 选中文字白色 */
+        }
+        .switch-option:not(.active) {
+            color: #666;
+        }
+        .switch-option:hover:not(.active) {
+            color: #333;
+        }
+
+        .switch-divider {
+            width: 1px;
+            height: 28px;
+            background: #d0d0d0;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
         /* ============================================================
-           左上角：三横线（半透明正方形圆角）
+           栏目网格容器（由 JS 动态控制布局）
            ============================================================ */
+        .sections-grid {
+            display: block;
+        }
+
+        .col-left,
+        .col-right {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            flex: 1;
+        }
+
+        .sections-grid.grid-mode {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 28px;
+        }
+
+        /* 每个分类卡片 */
+        .section {
+            background: #fafafa;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
+            padding: 20px 24px 12px;
+            transition: box-shadow 0.25s ease;
+            width: 100%;
+        }
+        .section:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .sections-grid:not(.grid-mode) .section {
+            margin-bottom: 28px;
+        }
+        .sections-grid.grid-mode .section {
+            margin-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 0 10px 0;
+            border-bottom: 2px solid #eaeaea;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #222;
+        }
+
+        /* 折叠标签 + 三角形 */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .toggle-label {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: 400;
+            transition: color 0.2s;
+        }
+        .section-header:hover .toggle-label {
+            color: #555;
+        }
+        .toggle-btn {
+            font-size: 1.5rem;
+            color: #888;
+            transition: transform 0.3s ease, color 0.2s;
+            line-height: 1;
+        }
+        .section-header:hover .toggle-btn {
+            color: #333;
+        }
+        .section.collapsed .toggle-btn {
+            transform: rotate(-90deg);
+        }
+
+        .list-wrapper {
+            overflow: hidden;
+            max-height: 2000px;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s ease,
+                        margin 0.3s ease;
+            opacity: 1;
+        }
+        .section.collapsed .list-wrapper {
+            max-height: 0 !important;
+            opacity: 0;
+            margin: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ===== 网站条目 ===== */
+        li {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px 8px;
+            border-radius: 10px;
+            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, padding-left 0.2s;
+            cursor: pointer;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        li:hover {
+            background: #eef3fc;
+            box-shadow: 0 4px 16px rgba(3, 102, 214, 0.06);
+            transform: translateY(-1px);
+            padding-left: 18px;
+        }
+
+        .site-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111;
+            min-width: 100px;
+            flex: 0 0 auto;
+            pointer-events: none;
+        }
+
+        .site-url {
+            color: #0366d6;
+            text-decoration: none;
+            font-size: 0.9rem;
+            word-break: break-all;
+            flex: 1 1 auto;
+            text-align: right;
+            transition: opacity 0.15s;
+            pointer-events: none;
+        }
+        .site-url:hover {
+            text-decoration: underline;
+            opacity: 0.7;
+        }
+
+        /* ----- 左上角三横线 ----- */
         .hamburger {
             position: fixed;
             top: 24px;
@@ -110,7 +279,7 @@
             cursor: pointer;
             color: #333;
             user-select: none;
-            transition: transform 0.2s, background 0.2s;
+            transition: transform 0.2s, background 0.2s, color 0.2s;
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
@@ -126,10 +295,12 @@
         .hamburger:active {
             transform: scale(0.92);
         }
+        /* 侧边栏打开时汉堡变蓝 */
+        .hamburger.active {
+            color: #0366d6;
+        }
 
-        /* ============================================================
-           屏幕正中下方：搜索图标（半透明正方形圆角）
-           ============================================================ */
+        /* ----- 搜索图标（正中下方） ----- */
         .search-bottom {
             position: fixed;
             bottom: 28px;
@@ -140,12 +311,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
+            gap: 4px;
             cursor: pointer;
             user-select: none;
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -166,8 +337,8 @@
         }
 
         .search-icon-svg {
-            width: 26px;
-            height: 26px;
+            width: 30px;
+            height: 30px;
             display: block;
         }
         .search-icon-svg circle {
@@ -183,14 +354,14 @@
         }
 
         .search-label {
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             color: #888;
             letter-spacing: 0.5px;
             font-weight: 500;
             line-height: 1;
         }
 
-        /* ----- 侧边导航栏 ----- */
+        /* ----- 侧边导航栏（修改整行可点） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -201,7 +372,7 @@
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
             transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 999;
-            padding: 80px 20px 30px;
+            padding: 80px 0 30px;  /* 去掉左右内边距，由 a 控制 */
             overflow-y: auto;
             border-right: 1px solid #f0f0f0;
         }
@@ -214,11 +385,16 @@
             margin: 0;
         }
         .sidenav li {
-            padding: 14px 0;
+            padding: 0;
             border-bottom: 1px solid #f3f3f3;
+            cursor: pointer;
+            transition: background 0.15s;
         }
         .sidenav li:last-child {
             border-bottom: none;
+        }
+        .sidenav li:hover {
+            background: #f5f8ff;
         }
         .sidenav a {
             display: block;
@@ -226,12 +402,16 @@
             text-decoration: none;
             font-size: 1.2rem;
             font-weight: 500;
-            padding: 4px 0;
-            transition: color 0.15s, padding-left 0.15s;
+            padding: 14px 24px;
+            transition: color 0.15s, background 0.15s;
         }
         .sidenav a:hover {
             color: #0366d6;
-            padding-left: 8px;
+            background: transparent;
+        }
+        /* 点击后的高亮（短暂显示） */
+        .sidenav li:active {
+            background: #e0ebff;
         }
 
         .overlay {
@@ -251,7 +431,7 @@
             visibility: visible;
         }
 
-        /* ----- 搜索弹窗（模态框） ----- */
+        /* ----- 搜索弹窗 ----- */
         .search-modal {
             position: fixed;
             top: 0;
@@ -330,7 +510,7 @@
             transform: rotate(90deg);
         }
 
-        /* ===== 搜索结果两栏布局 ===== */
+        /* 搜索结果两栏 */
         .search-results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -346,7 +526,6 @@
             flex-direction: column;
             min-height: 0;
         }
-
         .result-column-title {
             font-size: 0.85rem;
             font-weight: 600;
@@ -357,13 +536,11 @@
             margin-bottom: 10px;
             flex-shrink: 0;
         }
-
         .result-column-list {
             flex: 1;
             overflow-y: auto;
             padding-right: 4px;
         }
-
         .result-column-list::-webkit-scrollbar {
             width: 4px;
         }
@@ -394,7 +571,6 @@
             background: #f0f4ff;
             box-shadow: 0 2px 8px rgba(3, 102, 214, 0.06);
         }
-
         .result-name {
             font-weight: 500;
             color: #222;
@@ -409,7 +585,6 @@
         .result-url:hover {
             text-decoration: underline;
         }
-
         .result-empty {
             color: #bbb;
             font-size: 0.9rem;
@@ -417,192 +592,51 @@
             text-align: center;
         }
 
-        /* ----- 分类卡片（默认单列） ----- */
-        .section {
-            background: #fafafa;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
-            margin-bottom: 28px;
-            padding: 20px 24px 12px;
-            transition: box-shadow 0.25s ease;
-        }
-        .section:hover {
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            user-select: none;
-            padding: 4px 0 10px 0;
-            border-bottom: 2px solid #eaeaea;
-            margin-bottom: 12px;
-        }
-        .section-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #222;
-        }
-
-        .toggle-btn {
-            font-size: 1.5rem;
-            color: #888;
-            transition: transform 0.3s ease, color 0.2s;
-            line-height: 1;
-            padding: 0 6px;
-        }
-        .section-header:hover .toggle-btn {
-            color: #333;
-        }
-        .section.collapsed .toggle-btn {
-            transform: rotate(-90deg);
-        }
-
-        .list-wrapper {
-            overflow: hidden;
-            max-height: 2000px;
-            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity 0.3s ease,
-                        margin 0.3s ease;
-            opacity: 1;
-        }
-        .section.collapsed .list-wrapper {
-            max-height: 0 !important;
-            opacity: 0;
-            margin: 0;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        /* ===== 网站条目（整体可点击） ===== */
-        li {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            padding: 12px 14px;
-            border-bottom: 1px solid #f0f0f0;
-            gap: 12px 8px;
-            border-radius: 10px;
-            transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, padding-left 0.2s;
-            cursor: pointer; /* 暗示可点击 */
-        }
-        li:last-child {
-            border-bottom: none;
-        }
-        li:hover {
-            background: #eef3fc;
-            box-shadow: 0 4px 16px rgba(3, 102, 214, 0.06);
-            transform: translateY(-1px);
-            padding-left: 18px;
-        }
-
-        .site-name {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #111;
-            min-width: 100px;
-            flex: 0 0 auto;
-            pointer-events: none; /* 阻止点击干扰，由 li 统一处理 */
-        }
-
-        .site-url {
-            color: #0366d6;
-            text-decoration: none;
-            font-size: 0.9rem;
-            word-break: break-all;
-            flex: 1 1 auto;
-            text-align: right;
-            transition: opacity 0.15s;
-            pointer-events: none; /* 阻止点击，由 li 统一处理 */
-        }
-        .site-url:hover {
-            text-decoration: underline;
-            opacity: 0.7;
-        }
-
-        /* ============================================================
-           双列模式（通过 .grid-mode 类）
-           ============================================================ */
-        .container.grid-mode .section {
-            display: inline-block; /* 用于 grid 或 flex */
-            vertical-align: top;
-            width: calc(50% - 14px);
-            margin-right: 28px;
-        }
-        .container.grid-mode .section:nth-child(2n) {
-            margin-right: 0;
-        }
-        /* 但若使用 display:grid 更灵活，我们选择 grid */
-        .container.grid-mode .section-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 28px;
-            margin-bottom: 0;
-        }
-        /* 每个 section 外边距由 grid gap 控制 */
-        .container.grid-mode .section {
-            margin-bottom: 0;
-        }
-
-        /* 但为了保持结构，我们不用额外 wrapper，直接让 .container 下的 .section 变为 grid 子项 */
-        /* 我们用 flex wrap 方式，更简单： */
-        .container.grid-mode {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-        }
-        .container.grid-mode .section {
-            flex: 0 0 calc(50% - 14px);
-            margin-bottom: 0;
-        }
-        /* 确保 .container 本身是 block 或 flex */
-        .container {
-            display: block; /* 默认 */
-        }
-        .container.grid-mode {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            align-items: stretch; /* 高度一致 */
-        }
-        .container.grid-mode .section {
-            flex: 0 0 calc(50% - 14px);
-            margin-bottom: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .container.grid-mode .section .list-wrapper {
-            flex: 1;
-        }
-        /* 但 flex 会导致每个 section 内容撑开，但我们需要每个卡片高度自适应 */
-        .container.grid-mode .section {
-            align-self: stretch;
-        }
-
-        /* 移动端下强制单列 */
-        @media (max-width: 767px) {
-            .container.grid-mode {
-                display: block;
-            }
-            .container.grid-mode .section {
-                flex: none;
-                width: 100%;
-                margin-bottom: 28px;
-            }
-        }
-
-        /* 桌面端切换开关可见 */
-        .layout-switch.visible {
-            display: flex;
+        /* 底部版权 */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px 0 10px;
+            font-size: 0.8rem;
+            color: #aaa;
+            border-top: 1px solid #efefef;
+            letter-spacing: 0.3px;
         }
 
         /* 移动端响应 */
+        @media (max-width: 767px) {
+            .sections-grid.grid-mode {
+                display: block !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+            .sections-grid.grid-mode .col-left,
+            .sections-grid.grid-mode .col-right {
+                display: block !important;
+                flex-direction: column !important;
+                gap: 0 !important;
+                flex: none !important;
+            }
+            .sections-grid.grid-mode .section {
+                margin-bottom: 28px !important;
+            }
+            .layout-switch.visible {
+                display: none;
+            }
+            .search-bottom {
+                width: 60px;
+                height: 60px;
+                bottom: 16px;
+            }
+            .search-icon-svg {
+                width: 26px;
+                height: 26px;
+            }
+            .search-label {
+                font-size: 0.65rem;
+            }
+        }
+
         @media (max-width: 700px) {
             .container { padding: 0 4px; }
             h1 { font-size: 2rem; }
@@ -618,17 +652,6 @@
                 font-size: 1.6rem;
                 border-radius: 12px;
             }
-
-            .search-bottom {
-                bottom: 16px;
-                width: 54px;
-                height: 54px;
-                border-radius: 14px;
-                gap: 2px;
-            }
-            .search-icon-svg { width: 22px; height: 22px; }
-            .search-label { font-size: 0.55rem; }
-
             .search-box { padding: 18px 16px 16px; }
             .search-header input { font-size: 1rem; padding: 12px 16px; }
             .search-results-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -643,12 +666,12 @@
             .search-results-grid { grid-template-columns: 1fr; }
             .search-bottom {
                 bottom: 12px;
-                width: 48px;
-                height: 48px;
-                border-radius: 12px;
+                width: 54px;
+                height: 54px;
+                border-radius: 14px;
             }
-            .search-icon-svg { width: 20px; height: 20px; }
-            .search-label { font-size: 0.5rem; }
+            .search-icon-svg { width: 22px; height: 22px; }
+            .search-label { font-size: 0.6rem; }
             .hamburger {
                 top: 12px;
                 left: 12px;
@@ -661,24 +684,14 @@
             .search-header input { font-size: 0.95rem; padding: 10px 14px; }
             .search-close { font-size: 1.3rem; }
         }
-
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px 0 10px;
-            font-size: 0.8rem;
-            color: #aaa;
-            border-top: 1px solid #efefef;
-            letter-spacing: 0.3px;
-        }
     </style>
 </head>
 <body>
 
-    <!-- ===== 左上角：三横线 ===== -->
+    <!-- ===== 左上角三横线 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 屏幕正中下方：搜索图标 ===== -->
+    <!-- ===== 搜索图标（正中下方） ===== -->
     <div class="search-bottom" id="searchBottom" aria-label="搜索">
         <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
             <circle cx="14" cy="14" r="10" />
@@ -700,14 +713,14 @@
     <!-- 遮罩层 -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- ===== 搜索弹窗 ===== -->
+    <!-- 搜索弹窗 -->
     <div class="search-modal" id="searchModal">
         <div class="search-box">
             <div class="search-header">
                 <input type="text" id="searchInput" placeholder="搜索网站..." autofocus>
                 <button class="search-close" id="searchClose">✕</button>
             </div>
-            <div class="search-results-grid" id="searchResultsGrid">
+            <div class="search-results-grid">
                 <div class="result-column">
                     <div class="result-column-title">标题匹配</div>
                     <div class="result-column-list" id="titleResults">
@@ -725,99 +738,23 @@
     </div>
 
     <!-- 主容器 -->
-    <div class="container" id="mainContainer">
+    <div class="container">
         <h1>GuLi 网站导航/收藏</h1>
 
-        <!-- 布局切换胶囊（仅桌面） -->
+        <!-- 布局切换胶囊（带滑块） -->
         <div class="layout-switch" id="layoutSwitch">
-            <span class="switch-label" id="labelSingle">单列</span>
-            <div class="switch-track" id="switchTrack">
-                <div class="switch-thumb" id="switchThumb"></div>
-            </div>
-            <span class="switch-label" id="labelDouble">双列</span>
+            <span class="switch-slider"></span>
+            <span class="switch-option active" id="optionSingle" data-mode="single">单列</span>
+            <span class="switch-divider"></span>
+            <span class="switch-option" id="optionDouble" data-mode="grid">双列</span>
         </div>
 
-        <!-- ===== 分类：社区网站 ===== -->
-        <div class="section" id="community">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="section-title">社区网站</span>
-                <span class="toggle-btn">▾</span>
-            </div>
-            <div class="list-wrapper">
-                <ul>
-                    <li data-url="https://www.bilibili.com">
-                        <span class="site-name">B站</span>
-                        <span class="site-url">https://www.bilibili.com</span>
-                    </li>
-                    <li data-url="https://www.youtube.com">
-                        <span class="site-name">油管</span>
-                        <span class="site-url">https://www.youtube.com</span>
-                    </li>
-                </ul>
-            </div>
+        <!-- ===== 栏目网格容器 ===== -->
+        <div class="sections-grid" id="sectionsGrid">
+            <!-- 由 JS 渲染 -->
         </div>
 
-        <!-- ===== 分类：实用工具 ===== -->
-        <div class="section" id="tools">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="section-title">实用工具</span>
-                <span class="toggle-btn">▾</span>
-            </div>
-            <div class="list-wrapper">
-                <ul>
-                    <li data-url="https://www.51tool.com/ico/">
-                        <span class="site-name">在线生成ICO图标</span>
-                        <span class="site-url">https://www.51tool.com/ico/</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- ===== 分类：购物网站 ===== -->
-        <div class="section" id="shopping">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="section-title">购物网站</span>
-                <span class="toggle-btn">▾</span>
-            </div>
-            <div class="list-wrapper">
-                <ul>
-                    <li data-url="https://www.taobao.com">
-                        <span class="site-name">淘宝</span>
-                        <span class="site-url">https://www.taobao.com</span>
-                    </li>
-                    <li data-url="https://www.jd.com">
-                        <span class="site-name">京东</span>
-                        <span class="site-url">https://www.jd.com</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- ===== 分类：常用邮箱 ===== -->
-        <div class="section" id="email">
-            <div class="section-header" onclick="toggleSection(this)">
-                <span class="section-title">常用邮箱</span>
-                <span class="toggle-btn">▾</span>
-            </div>
-            <div class="list-wrapper">
-                <ul>
-                    <li data-url="https://mail.google.com">
-                        <span class="site-name">谷歌Gmail</span>
-                        <span class="site-url">https://mail.google.com</span>
-                    </li>
-                    <li data-url="https://mail.163.com">
-                        <span class="site-name">网易163邮箱</span>
-                        <span class="site-url">https://mail.163.com</span>
-                    </li>
-                    <li data-url="https://mail.qq.com">
-                        <span class="site-name">QQ邮箱</span>
-                        <span class="site-url">https://mail.qq.com</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- 底部 -->
+        <!-- 底部版权 -->
         <div class="footer">
             此网站由 Wise GuLy 开发
         </div>
@@ -825,16 +762,134 @@
 
     <script>
         // ================================================================
-        // 1. 折叠功能
+        // 1. 定义卡片数据
         // ================================================================
-        function toggleSection(headerElement) {
-            const section = headerElement.closest('.section');
-            if (!section) return;
-            section.classList.toggle('collapsed');
+        const cardData = [
+            {
+                id: 'community',
+                title: '社区网站',
+                items: [
+                    { name: 'B站', url: 'https://www.bilibili.com' },
+                    { name: '油管', url: 'https://www.youtube.com' }
+                ]
+            },
+            {
+                id: 'tools',
+                title: '实用工具',
+                items: [
+                    { name: '在线生成ICO图标', url: 'https://www.51tool.com/ico/' }
+                ]
+            },
+            {
+                id: 'shopping',
+                title: '购物网站',
+                items: [
+                    { name: '淘宝', url: 'https://www.taobao.com' },
+                    { name: '京东', url: 'https://www.jd.com' }
+                ]
+            },
+            {
+                id: 'email',
+                title: '常用邮箱',
+                items: [
+                    { name: '谷歌Gmail', url: 'https://mail.google.com' },
+                    { name: '网易163邮箱', url: 'https://mail.163.com' },
+                    { name: 'QQ邮箱', url: 'https://mail.qq.com' }
+                ]
+            }
+        ];
+
+        // ================================================================
+        // 2. 生成卡片 DOM
+        // ================================================================
+        function createSection(data, collapsed = false) {
+            const section = document.createElement('div');
+            section.className = 'section' + (collapsed ? ' collapsed' : '');
+            section.id = data.id;
+
+            const header = document.createElement('div');
+            header.className = 'section-header';
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'section-title';
+            titleSpan.textContent = data.title;
+
+            // 右侧：折叠标签 + 三角形
+            const toggleGroup = document.createElement('div');
+            toggleGroup.className = 'toggle-group';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'toggle-label';
+            labelSpan.textContent = collapsed ? '展开' : '折叠';  // 初始状态
+
+            const toggleBtn = document.createElement('span');
+            toggleBtn.className = 'toggle-btn';
+            toggleBtn.textContent = '▾';
+
+            toggleGroup.appendChild(labelSpan);
+            toggleGroup.appendChild(toggleBtn);
+
+            header.appendChild(titleSpan);
+            header.appendChild(toggleGroup);
+
+            // 点击头部切换折叠
+            header.addEventListener('click', function(e) {
+                const sec = this.closest('.section');
+                if (!sec) return;
+                sec.classList.toggle('collapsed');
+                // 更新标签文字
+                const label = this.querySelector('.toggle-label');
+                if (label) {
+                    label.textContent = sec.classList.contains('collapsed') ? '展开' : '折叠';
+                }
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'list-wrapper';
+
+            const ul = document.createElement('ul');
+            data.items.forEach(item => {
+                const li = document.createElement('li');
+                li.dataset.url = item.url;
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'site-name';
+                nameSpan.textContent = item.name;
+
+                const urlSpan = document.createElement('span');
+                urlSpan.className = 'site-url';
+                urlSpan.textContent = item.url;
+
+                li.appendChild(nameSpan);
+                li.appendChild(urlSpan);
+                ul.appendChild(li);
+            });
+            wrapper.appendChild(ul);
+
+            section.appendChild(header);
+            section.appendChild(wrapper);
+
+            // 条目点击跳转
+            section.querySelectorAll('li').forEach(li => {
+                li.addEventListener('click', function(e) {
+                    const url = this.dataset.url;
+                    if (url) {
+                        window.open(url, '_blank');
+                    }
+                });
+            });
+
+            return section;
         }
 
         // ================================================================
-        // 2. 汉堡菜单 + 侧边栏
+        // 3. 折叠函数（保留作为备用，但已用内联事件）
+        // ================================================================
+        // 由于我们使用 header.addEventListener，不再需要全局 toggleSection，但保留以防其他调用
+        // 但为了兼容，保留空函数
+
+        // ================================================================
+        // 4. 汉堡菜单 + 侧边栏
         // ================================================================
         const hamburger = document.getElementById('hamburgerBtn');
         const sidenav = document.getElementById('sidenav');
@@ -846,12 +901,14 @@
             overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
             searchBottom.classList.add('hidden');
+            hamburger.classList.add('active');  // 变蓝
         }
         function closeNav() {
             sidenav.classList.remove('open');
             overlay.classList.remove('show');
             document.body.style.overflow = '';
             searchBottom.classList.remove('hidden');
+            hamburger.classList.remove('active');
         }
 
         hamburger.addEventListener('click', function(e) {
@@ -862,6 +919,7 @@
 
         overlay.addEventListener('click', closeNav);
 
+        // 侧边栏链接点击：关闭并平滑滚动
         document.querySelectorAll('.sidenav a').forEach(link => {
             link.addEventListener('click', function(e) {
                 const targetId = this.getAttribute('href');
@@ -877,7 +935,7 @@
         });
 
         // ================================================================
-        // 3. 搜索功能
+        // 5. 搜索功能
         // ================================================================
         const searchModal = document.getElementById('searchModal');
         const searchClose = document.getElementById('searchClose');
@@ -900,8 +958,6 @@
             });
             return items;
         }
-
-        const siteData = collectSiteData();
 
         function renderResultColumn(container, items) {
             if (!items || items.length === 0) {
@@ -927,14 +983,13 @@
                 urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
                 return;
             }
-
+            const siteData = collectSiteData();
             const titleMatches = siteData.filter(item =>
                 item.name.toLowerCase().includes(trimmed)
             );
             const urlMatches = siteData.filter(item =>
                 item.url.toLowerCase().includes(trimmed)
             );
-
             renderResultColumn(titleResults, titleMatches);
             renderResultColumn(urlResults, urlMatches);
         }
@@ -981,69 +1036,84 @@
         urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
 
         // ================================================================
-        // 4. 点击条目整体跳转
+        // 6. 布局切换（带滑块动画）
         // ================================================================
-        document.querySelectorAll('.section li').forEach(li => {
-            li.addEventListener('click', function(e) {
-                // 如果点击的是折叠按钮或分类标题，不触发跳转（已阻止冒泡）
-                // 但这里直接根据 data-url 跳转
-                const url = this.dataset.url;
-                if (url) {
-                    window.open(url, '_blank');
-                }
-            });
-        });
-
-        // ================================================================
-        // 5. 布局切换（单列/双列）
-        // ================================================================
-        const container = document.getElementById('mainContainer');
-        const switchTrack = document.getElementById('switchTrack');
-        const switchLabels = document.querySelectorAll('.switch-label');
+        const sectionsGrid = document.getElementById('sectionsGrid');
+        const optionSingle = document.getElementById('optionSingle');
+        const optionDouble = document.getElementById('optionDouble');
         const layoutSwitch = document.getElementById('layoutSwitch');
 
-        let isGridMode = false;
+        let desiredMode = 'single'; // 'single' 或 'grid'
 
-        function setLayout(mode) {
-            isGridMode = (mode === 'grid');
-            if (isGridMode) {
-                container.classList.add('grid-mode');
-                switchTrack.classList.add('active');
-                document.getElementById('labelSingle').classList.remove('active');
-                document.getElementById('labelDouble').classList.add('active');
-            } else {
-                container.classList.remove('grid-mode');
-                switchTrack.classList.remove('active');
-                document.getElementById('labelSingle').classList.add('active');
-                document.getElementById('labelDouble').classList.remove('active');
-            }
+        function getCollapsedStates() {
+            const states = {};
+            document.querySelectorAll('.section').forEach(section => {
+                states[section.id] = section.classList.contains('collapsed');
+            });
+            return states;
         }
 
-        switchTrack.addEventListener('click', function() {
-            setLayout(isGridMode ? 'single' : 'grid');
+        function applyLayout() {
+            const isDesktop = window.innerWidth >= 768;
+            const mode = isDesktop ? desiredMode : 'single';
+
+            const states = getCollapsedStates();
+            sectionsGrid.innerHTML = '';
+
+            const newSections = cardData.map(data => {
+                const collapsed = states[data.id] || false;
+                return createSection(data, collapsed);
+            });
+
+            if (mode === 'single') {
+                newSections.forEach(s => sectionsGrid.appendChild(s));
+                sectionsGrid.style.display = 'block';
+                sectionsGrid.classList.remove('grid-mode');
+                // 更新开关状态
+                layoutSwitch.classList.remove('double');
+                optionSingle.classList.add('active');
+                optionDouble.classList.remove('active');
+            } else {
+                const leftCol = document.createElement('div');
+                leftCol.className = 'col-left';
+                const rightCol = document.createElement('div');
+                rightCol.className = 'col-right';
+
+                newSections.forEach((section, index) => {
+                    if (index % 2 === 0) leftCol.appendChild(section);
+                    else rightCol.appendChild(section);
+                });
+
+                sectionsGrid.appendChild(leftCol);
+                sectionsGrid.appendChild(rightCol);
+                sectionsGrid.style.display = 'flex';
+                sectionsGrid.style.flexDirection = 'row';
+                sectionsGrid.style.gap = '28px';
+                sectionsGrid.classList.add('grid-mode');
+                // 更新开关状态
+                layoutSwitch.classList.add('double');
+                optionSingle.classList.remove('active');
+                optionDouble.classList.add('active');
+            }
+
+            layoutSwitch.classList.toggle('visible', isDesktop);
+        }
+
+        optionSingle.addEventListener('click', function() {
+            if (desiredMode !== 'single') {
+                desiredMode = 'single';
+                applyLayout();
+            }
+        });
+        optionDouble.addEventListener('click', function() {
+            if (desiredMode !== 'grid') {
+                desiredMode = 'grid';
+                applyLayout();
+            }
         });
 
-        // 检测是否为桌面端（宽度 >= 768px）
-        function checkDesktop() {
-            if (window.innerWidth >= 768) {
-                layoutSwitch.classList.add('visible');
-                // 默认单列（已经是）
-            } else {
-                layoutSwitch.classList.remove('visible');
-                // 强制单列（移除 grid-mode）
-                container.classList.remove('grid-mode');
-                switchTrack.classList.remove('active');
-                document.getElementById('labelSingle').classList.add('active');
-                document.getElementById('labelDouble').classList.remove('active');
-                isGridMode = false;
-            }
-        }
-
-        window.addEventListener('resize', checkDesktop);
-        checkDesktop(); // 初始化
-
-        // 默认单列标签高亮
-        document.getElementById('labelSingle').classList.add('active');
+        window.addEventListener('resize', applyLayout);
+        applyLayout();
     </script>
 </body>
 </html>
