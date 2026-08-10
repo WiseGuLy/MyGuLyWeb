@@ -164,6 +164,11 @@
             font-size: 1.4rem;
             font-weight: 600;
             color: #222;
+            transition: color 0.2s ease;
+        }
+        /* 小标题悬停变蓝，位置不变 */
+        .section-header:hover .section-title {
+            color: #0366d6;
         }
 
         .toggle-group {
@@ -177,7 +182,6 @@
             font-weight: 400;
             transition: color 0.2s ease;
         }
-        /* 折叠文字悬停变蓝 */
         .section-header:hover .toggle-label {
             color: #0366d6;
         }
@@ -235,7 +239,6 @@
             transform: translateY(-1px);
             padding-left: 18px;
         }
-        /* 网站名称悬停变蓝 */
         li:hover .site-name {
             color: #0366d6;
             transition: color 0.2s ease;
@@ -266,7 +269,7 @@
             opacity: 0.7;
         }
 
-        /* ----- 左上角三横线 ----- */
+        /* ----- 左上角三横线（汉堡） ----- */
         .hamburger {
             position: fixed;
             top: 24px;
@@ -282,7 +285,7 @@
             cursor: pointer;
             color: #333;
             user-select: none;
-            transition: transform 0.2s, background 0.2s, color 0.2s;
+            transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
@@ -294,12 +297,23 @@
         .hamburger:hover {
             transform: scale(1.05);
             background: rgba(255, 255, 255, 0.75);
+            color: #0366d6; /* 悬停变蓝 */
         }
         .hamburger:active {
             transform: scale(0.92);
         }
+        /* 侧边栏展开时：蓝底白字 */
         .hamburger.active {
-            color: #0366d6;
+            background: #0366d6;
+            color: #ffffff;
+            border-color: #0366d6;
+            box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3);
+        }
+        /* 展开时悬停效果保持不变（依然蓝底白字） */
+        .hamburger.active:hover {
+            background: #0366d6;
+            color: #ffffff;
+            transform: scale(1.05);
         }
 
         /* ----- 搜索图标（正中下方） ----- */
@@ -338,7 +352,6 @@
             pointer-events: none;
         }
 
-        /* 搜索图标悬停时线条变蓝，文字变蓝 */
         .search-bottom:hover .search-icon-svg circle,
         .search-bottom:hover .search-icon-svg line {
             stroke: #0366d6;
@@ -377,7 +390,7 @@
             transition: color 0.2s ease;
         }
 
-        /* ----- 侧边导航栏（悬停动画，非选中） ----- */
+        /* ----- 侧边导航栏（悬停动画） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -420,9 +433,8 @@
             font-weight: 500;
             padding: 14px 24px;
             transition: color 0.25s ease, padding-left 0.25s ease, background 0.15s;
-            pointer-events: none; /* 让 li 统一处理点击，避免 a 干扰 */
+            pointer-events: none;
         }
-        /* 悬停时文字变蓝并向右移动（不是点击选中） */
         .sidenav li:hover a {
             color: #0366d6;
             padding-left: 32px;
@@ -520,7 +532,7 @@
             line-height: 1;
         }
         .search-close:hover {
-            color: #333;
+            color: #e74c3c; /* 悬停变红 */
             transform: rotate(90deg);
         }
 
@@ -947,7 +959,7 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // ===== 侧边栏导航：点击整行跳转（移除 active 类，仅靠 hover） =====
+        // ===== 侧边栏导航：点击整行跳转 =====
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
