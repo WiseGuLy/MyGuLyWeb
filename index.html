@@ -102,12 +102,7 @@
         }
 
         .switch-divider {
-            width: 1px;
-            height: 28px;
-            background: #d0d0d0;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
+            display: none;
         }
 
         /* ============================================================
@@ -166,7 +161,6 @@
             color: #222;
             transition: color 0.2s ease;
         }
-        /* 小标题悬停变蓝，位置不变 */
         .section-header:hover .section-title {
             color: #0366d6;
         }
@@ -290,26 +284,24 @@
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(200, 200, 200, 0.3);
+            border: 1px solid rgba(160, 160, 160, 0.6);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
             font-weight: 300;
         }
         .hamburger:hover {
             transform: scale(1.05);
             background: rgba(255, 255, 255, 0.75);
-            color: #0366d6; /* 悬停变蓝 */
+            color: #0366d6;
         }
         .hamburger:active {
             transform: scale(0.92);
         }
-        /* 侧边栏展开时：蓝底白字 */
         .hamburger.active {
             background: #0366d6;
             color: #ffffff;
             border-color: #0366d6;
             box-shadow: 0 4px 16px rgba(3, 102, 214, 0.3);
         }
-        /* 展开时悬停效果保持不变（依然蓝底白字） */
         .hamburger.active:hover {
             background: #0366d6;
             color: #ffffff;
@@ -336,7 +328,7 @@
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(200, 200, 200, 0.3);
+            border: 1px solid rgba(160, 160, 160, 0.6);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s, background 0.2s, opacity 0.3s;
         }
@@ -390,7 +382,7 @@
             transition: color 0.2s ease;
         }
 
-        /* ----- 侧边导航栏（悬停动画） ----- */
+        /* ----- 侧边导航栏（修正） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -408,6 +400,22 @@
         .sidenav.open {
             left: 0;
         }
+        
+        /* 侧边栏顶部标题“分类” */
+        .sidenav-header {
+            padding: 0 24px 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0366d6;
+            border-bottom: 2px solid #f0f0f0;
+            margin-bottom: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidenav.open .sidenav-header {
+            opacity: 1;
+        }
+
         .sidenav ul {
             list-style: none;
             padding: 0;
@@ -532,7 +540,7 @@
             line-height: 1;
         }
         .search-close:hover {
-            color: #e74c3c; /* 悬停变红 */
+            color: #e74c3c;
             transform: rotate(90deg);
         }
 
@@ -711,7 +719,7 @@
 </head>
 <body>
 
-    <!-- ===== 左上角三横线 ===== -->
+    <!-- ===== 左上角三横线（汉堡） ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
     <!-- ===== 搜索图标（正中下方） ===== -->
@@ -725,9 +733,12 @@
 
     <!-- 侧边导航栏 -->
     <nav class="sidenav" id="sidenav">
+        <!-- 侧边栏顶部标题 -->
+        <div class="sidenav-header">分类</div>
         <ul>
-            <li><a href="#community">社区网站</a></li>
-            <li><a href="#ai-tools">AI工具</a></li>
+            <li><a href="#essential">必备网站</a></li>
+            <li><a href="#community">社区视频</a></li>
+            <li><a href="#ai-tools">AI 工具</a></li>
             <li><a href="#tools">实用工具</a></li>
             <li><a href="#shopping">购物网站</a></li>
             <li><a href="#email">常用邮箱</a></li>
@@ -782,26 +793,34 @@
 
         <!-- 底部版权 -->
         <div class="footer">
-            此网站由 Wise GuLy 开发
+            此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
     </div>
 
     <script>
         // ================================================================
-        // 1. 卡片数据（已更新）
+        // 1. 卡片数据（已按最新列表更新）
         // ================================================================
         const cardData = [
             {
+                id: 'essential',
+                title: '必备网站',
+                items: [
+                    { name: 'Github', url: 'https://github.com' }
+                ]
+            },
+            {
                 id: 'community',
-                title: '社区网站',
+                title: '社区视频',
                 items: [
                     { name: 'B站', url: 'https://www.bilibili.com' },
-                    { name: '油管', url: 'https://www.youtube.com' }
+                    { name: '油管', url: 'https://www.youtube.com' },
+                    { name: '小红书', url: 'https://www.xiaohongshu.com' }
                 ]
             },
             {
                 id: 'ai-tools',
-                title: 'AI工具',
+                title: 'AI 工具',
                 items: [
                     { name: 'DeepSeek API', url: 'https://platform.deepseek.com' },
                     { name: 'DeepSeek 对话', url: 'https://chat.deepseek.com' }
@@ -843,7 +862,7 @@
                 title: 'GuLi网站',
                 items: [
                     { name: 'GuLi官网', url: 'https://662506.xyz' },
-                    { name: 'CloudFlare', url: 'https://cloudflare.com' },
+                    { name: 'CloudFlare', url: 'https://www.cloudflare.com' },
                     { name: 'Spaceship域名', url: 'https://www.spaceship.com' }
                 ]
             }
