@@ -25,7 +25,7 @@
             margin: 0 auto;
         }
 
-        /* ----- 大标题（增加🐢） ----- */
+        /* ----- 大标题 ----- */
         h1 {
             text-align: center;
             font-size: 2.4rem;
@@ -38,7 +38,7 @@
         }
 
         /* ============================================================
-           布局切换胶囊（带滑动滑块）
+           布局切换胶囊
            ============================================================ */
         .layout-switch {
             display: none;
@@ -97,7 +97,6 @@
         .switch-option:not(.active) {
             color: #666;
         }
-        /* 切换选项悬停变蓝（未选中时） */
         .switch-option:not(.active):hover {
             color: #0366d6;
         }
@@ -127,9 +126,8 @@
             gap: 28px;
         }
 
-        /* 板块卡片：底色加深，悬停阴影变蓝 */
         .section {
-            background: #f5f5f5;  /* 原 #fafafa，加深 */
+            background: #f5f5f5;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
             padding: 20px 24px 12px;
@@ -137,7 +135,7 @@
             width: 100%;
         }
         .section:hover {
-            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15); /* 蓝色调阴影 */
+            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
         }
 
         .sections-grid:not(.grid-mode) .section {
@@ -187,7 +185,6 @@
             transition: transform 0.3s ease, color 0.2s;
             line-height: 1;
         }
-        /* 折叠三角悬停变蓝 */
         .section-header:hover .toggle-btn {
             color: #0366d6;
         }
@@ -310,14 +307,32 @@
             color: #ffffff;
             transform: scale(1.05);
         }
+        /* 设置打开时隐藏 */
+        .hamburger.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
 
-        /* ----- 搜索图标（正中下方） ----- */
-        .search-bottom {
+        /* ===== 底部工具容器（搜索 + 设置） ===== */
+        .bottom-tools {
             position: fixed;
             bottom: 28px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: opacity 0.3s ease;
+        }
+        .bottom-tools.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* 搜索和设置共用基础样式 */
+        .search-bottom,
+        .settings-bottom {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -335,48 +350,50 @@
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s, background 0.2s, opacity 0.3s;
         }
-        .search-bottom:hover {
-            transform: translateX(-50%) scale(1.04);
+        .search-bottom:hover,
+        .settings-bottom:hover {
+            transform: scale(1.04);
             background: rgba(255, 255, 255, 0.75);
         }
-        .search-bottom:active {
-            transform: translateX(-50%) scale(0.95);
-        }
-        .search-bottom.hidden {
-            opacity: 0;
-            pointer-events: none;
+        .search-bottom:active,
+        .settings-bottom:active {
+            transform: scale(0.95);
         }
 
-        .search-bottom:hover .search-icon-svg circle,
-        .search-bottom:hover .search-icon-svg line {
-            stroke: #0366d6;
-            transition: stroke 0.2s ease;
-        }
-        .search-bottom:hover .search-label {
-            color: #0366d6;
-            transition: color 0.2s ease;
-        }
-
-        .search-icon-svg {
+        .search-icon-svg,
+        .settings-icon-svg {
             width: 30px;
             height: 30px;
             display: block;
         }
-        .search-icon-svg circle {
+        .search-icon-svg circle,
+        .search-icon-svg line {
             fill: none;
             stroke: #333;
             stroke-width: 2.5;
             stroke-linecap: round;
             transition: stroke 0.2s ease;
         }
-        .search-icon-svg line {
+        .settings-icon-svg circle,
+        .settings-icon-svg path {
+            fill: none;
             stroke: #333;
             stroke-width: 2.5;
             stroke-linecap: round;
             transition: stroke 0.2s ease;
         }
 
-        .search-label {
+        .search-bottom:hover .search-icon-svg circle,
+        .search-bottom:hover .search-icon-svg line {
+            stroke: #0366d6;
+        }
+        .settings-bottom:hover .settings-icon-svg circle,
+        .settings-bottom:hover .settings-icon-svg path {
+            stroke: #0366d6;
+        }
+
+        .search-label,
+        .settings-label {
             font-size: 0.75rem;
             color: #888;
             letter-spacing: 0.5px;
@@ -384,8 +401,84 @@
             line-height: 1;
             transition: color 0.2s ease;
         }
+        .search-bottom:hover .search-label,
+        .settings-bottom:hover .settings-label {
+            color: #0366d6;
+        }
 
-        /* ----- 侧边导航栏（修正“分类”样式） ----- */
+        /* ===== 设置模态框 ===== */
+        .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .settings-modal.open {
+            display: flex;
+        }
+
+        .settings-panel {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 480px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 28px 20px;
+            animation: fadeInUp 0.25s ease;
+        }
+        .settings-panel h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .settings-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.6;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+            min-height: 120px;
+        }
+        .settings-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .settings-footer button {
+            padding: 10px 36px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            background: #0366d6;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .settings-footer button:hover {
+            background: #0250a5;
+        }
+        .settings-footer button:active {
+            transform: scale(0.96);
+        }
+
+        /* ----- 侧边导航栏 ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -404,10 +497,9 @@
             left: 0;
         }
         
-        /* 侧边栏顶部标题“分类” - 加大、下移、与列表间距相等 */
         .sidenav-header {
-            padding: 16px 24px 12px 24px;  /* 与列表项内边距一致 */
-            font-size: 1.4rem;             /* 加大 */
+            padding: 16px 24px 12px 24px;
+            font-size: 1.4rem;
             font-weight: 600;
             color: #0366d6;
             border-bottom: 2px solid #f0f0f0;
@@ -658,16 +750,22 @@
             .layout-switch.visible {
                 display: none;
             }
-            .search-bottom {
+            .bottom-tools {
+                bottom: 16px;
+                gap: 12px;
+            }
+            .search-bottom,
+            .settings-bottom {
                 width: 60px;
                 height: 60px;
-                bottom: 16px;
             }
-            .search-icon-svg {
+            .search-icon-svg,
+            .settings-icon-svg {
                 width: 26px;
                 height: 26px;
             }
-            .search-label {
+            .search-label,
+            .settings-label {
                 font-size: 0.65rem;
             }
         }
@@ -698,14 +796,25 @@
             .site-url { flex-basis: 100%; text-align: left; }
             .site-name { flex: 1 1 auto; }
             .search-results-grid { grid-template-columns: 1fr; }
-            .search-bottom {
+            .bottom-tools {
                 bottom: 12px;
+                gap: 10px;
+            }
+            .search-bottom,
+            .settings-bottom {
                 width: 54px;
                 height: 54px;
                 border-radius: 14px;
             }
-            .search-icon-svg { width: 22px; height: 22px; }
-            .search-label { font-size: 0.6rem; }
+            .search-icon-svg,
+            .settings-icon-svg {
+                width: 22px;
+                height: 22px;
+            }
+            .search-label,
+            .settings-label {
+                font-size: 0.6rem;
+            }
             .hamburger {
                 top: 12px;
                 left: 12px;
@@ -722,21 +831,31 @@
 </head>
 <body>
 
-    <!-- ===== 左上角三横线（汉堡） ===== -->
+    <!-- ===== 左上角汉堡 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 搜索图标（正中下方） ===== -->
-    <div class="search-bottom" id="searchBottom" aria-label="搜索">
-        <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="14" cy="14" r="10" />
-            <line x1="21" y1="21" x2="28" y2="28" />
-        </svg>
-        <span class="search-label">搜索</span>
+    <!-- ===== 底部工具组（搜索 + 设置） ===== -->
+    <div class="bottom-tools" id="bottomTools">
+        <!-- 搜索 -->
+        <div class="search-bottom" id="searchBottom" aria-label="搜索">
+            <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="14" cy="14" r="10" />
+                <line x1="21" y1="21" x2="28" y2="28" />
+            </svg>
+            <span class="search-label">搜索</span>
+        </div>
+        <!-- 设置 -->
+        <div class="settings-bottom" id="settingsBottom" aria-label="设置">
+            <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="4" />
+                <path d="M16 4 L16 8 M16 24 L16 28 M4 16 L8 16 M24 16 L28 16 M7.5 7.5 L10.5 10.5 M21.5 21.5 L24.5 24.5 M7.5 24.5 L10.5 21.5 M21.5 10.5 L24.5 7.5" />
+            </svg>
+            <span class="settings-label">设置</span>
+        </div>
     </div>
 
-    <!-- 侧边导航栏 -->
+    <!-- ===== 侧边导航栏 ===== -->
     <nav class="sidenav" id="sidenav">
-        <!-- 侧边栏顶部标题“分类” -->
         <div class="sidenav-header">分类</div>
         <ul>
             <li><a href="#essential">必备网站</a></li>
@@ -750,10 +869,10 @@
         </ul>
     </nav>
 
-    <!-- 遮罩层 -->
+    <!-- 侧边栏遮罩 -->
     <div class="overlay" id="overlay"></div>
 
-    <!-- 搜索弹窗 -->
+    <!-- ===== 搜索弹窗 ===== -->
     <div class="search-modal" id="searchModal">
         <div class="search-box">
             <div class="search-header">
@@ -777,12 +896,25 @@
         </div>
     </div>
 
-    <!-- 主容器 -->
+    <!-- ===== 设置弹窗 ===== -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-panel">
+            <h2>⚙️ 设置</h2>
+            <div class="settings-content" id="settingsContent">
+                <p>设置内容将在此处显示。</p>
+                <p>（具体选项待后续添加）</p>
+            </div>
+            <div class="settings-footer">
+                <button id="settingsConfirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
     <div class="container">
-        <!-- 大标题两侧增加 🐢 -->
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
-        <!-- 布局切换胶囊 -->
+        <!-- 布局切换 -->
         <div class="layout-switch" id="layoutSwitch">
             <span class="switch-slider"></span>
             <span class="switch-option active" id="optionSingle" data-mode="single">单列</span>
@@ -790,9 +922,9 @@
             <span class="switch-option" id="optionDouble" data-mode="grid">双列</span>
         </div>
 
-        <!-- ===== 栏目网格容器 ===== -->
+        <!-- ===== 栏目网格 ===== -->
         <div class="sections-grid" id="sectionsGrid">
-            <!-- 由 JS 渲染 -->
+            <!-- 由 JS 动态渲染 -->
         </div>
 
         <!-- 底部版权 -->
@@ -803,7 +935,7 @@
 
     <script>
         // ================================================================
-        // 1. 卡片数据（已按最新列表更新）
+        // 1. 卡片数据
         // ================================================================
         const cardData = [
             {
@@ -982,7 +1114,7 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // ===== 侧边栏导航：点击整行跳转 =====
+        // 侧边栏导航点击跳转
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
@@ -1086,22 +1218,65 @@
             performSearch(this.value);
         });
 
+        // ================================================================
+        // 5. 设置功能
+        // ================================================================
+        const settingsBtn = document.getElementById('settingsBottom');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsConfirm = document.getElementById('settingsConfirmBtn');
+        const bottomTools = document.getElementById('bottomTools');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+
+        function openSettings() {
+            // 隐藏底部工具和汉堡
+            bottomTools.classList.add('hidden');
+            hamburgerBtn.classList.add('hidden');
+            // 关闭可能打开的侧边栏
+            if (sidenav.classList.contains('open')) {
+                closeNav();
+            }
+            // 关闭可能打开的搜索
+            if (searchModal.classList.contains('open')) {
+                closeSearch();
+            }
+            // 显示设置窗口
+            settingsModal.classList.add('open');
+        }
+
+        function closeSettings() {
+            settingsModal.classList.remove('open');
+            bottomTools.classList.remove('hidden');
+            hamburgerBtn.classList.remove('hidden');
+        }
+
+        settingsBtn.addEventListener('click', openSettings);
+        settingsConfirm.addEventListener('click', closeSettings);
+        settingsModal.addEventListener('click', function(e) {
+            if (e.target === settingsModal) {
+                closeSettings();
+            }
+        });
+
+        // ================================================================
+        // 6. 全局 ESC 按键处理（整合所有）
+        // ================================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (searchModal.classList.contains('open')) {
+                if (settingsModal.classList.contains('open')) {
+                    closeSettings();
+                    e.preventDefault();
+                } else if (searchModal.classList.contains('open')) {
                     closeSearch();
                     e.preventDefault();
                 } else if (sidenav.classList.contains('open')) {
                     closeNav();
+                    e.preventDefault();
                 }
             }
         });
 
-        titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
-        urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
-
         // ================================================================
-        // 5. 布局切换
+        // 7. 布局切换
         // ================================================================
         const sectionsGrid = document.getElementById('sectionsGrid');
         const optionSingle = document.getElementById('optionSingle');
@@ -1176,7 +1351,11 @@
         });
 
         window.addEventListener('resize', applyLayout);
+
+        // 初始化
         applyLayout();
+        titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+        urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
     </script>
 </body>
 </html>
