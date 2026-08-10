@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuLi的网站</title>
+    <title>GuLi 导航收藏</title>
     <style>
-        /* 重置边距，白色背景，内容居中 */
         * {
             margin: 0;
             padding: 0;
@@ -13,40 +12,112 @@
         }
         body {
             background-color: #ffffff;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            padding: 40px 20px;
+            color: #222;
         }
         .container {
-            text-align: center;
+            max-width: 860px;
+            width: 100%;
         }
         h1 {
-            font-size: 3rem;
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 45px;
+            color: #1a1a1a;
+        }
+        .section {
+            margin-bottom: 35px;
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
             color: #222;
-            margin-bottom: 1.5rem;
-            font-weight: 400;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
         }
-        button {
-            padding: 12px 36px;
-            font-size: 1.2rem;
-            border: 1px solid #d0d0d0;
-            border-radius: 6px;
-            background-color: #f5f5f5;
-            color: #333;
-            cursor: default;      /* 鼠标悬停不变成手型，暗示无交互 */
-            user-select: none;    /* 避免选中文本 */
-            transition: none;     /* 无动画 */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-        /* 按钮无 hover 效果，保持完全静止 */
+        li {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            padding: 8px 0;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .site-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111;
+            min-width: 100px;
+            margin-right: 12px;
+        }
+        a {
+            color: #0366d6;
+            text-decoration: none;
+            font-size: 0.95rem;
+            word-break: break-all;
+            transition: opacity 0.1s;
+        }
+        a:hover {
+            text-decoration: underline;
+            opacity: 0.8;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .site-name {
+                min-width: 70px;
+                font-size: 1rem;
+            }
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+                padding: 10px 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>GuLi的网站</h1>
-        <button type="button">按钮</button>
-        <!-- type="button" 确保不会触发表单提交，按下无任何反应 -->
+        <h1>GuLi 网站导航/收藏</h1>
+
+        <div class="section">
+            <div class="section-title">社区网站：</div>
+            <ul>
+                <li>
+                    <span class="site-name">B站</span>
+                    <a href="https://www.bilibili.com" target="_blank" rel="noopener noreferrer">https://www.bilibili.com</a>
+                </li>
+                <li>
+                    <span class="site-name">油管</span>
+                    <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer">https://www.youtube.com</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <div class="section-title">实用工具：</div>
+            <ul>
+                <li>
+                    <span class="site-name">在线生成ICO图标</span>
+                    <a href="https://www.51tool.com/ico/" target="_blank" rel="noopener noreferrer">https://www.51tool.com/ico/</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </body>
 </html>
