@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 页面标题：显示在浏览器标签上 -->
     <title>GuLi 导航收藏</title>
     <style>
+        /* ================================================================
+               全局基础样式
+               - 重置所有元素的边距和内边距
+               - 设置全局字体为系统默认字体
+               - 页面背景白色，预留底部空间给固定按钮
+               - 禁止横向滚动
+            ================================================================ */
         * {
             margin: 0;
             padding: 0;
@@ -15,12 +23,13 @@
             background-color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #1e1e1e;
-            padding: 40px 20px 100px;
+            padding: 40px 20px 100px; /* 底部留白，避免被底部工具栏遮挡 */
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
 
+        /* 粒子画布：覆盖全屏，指针事件穿透，不影响点击 */
         #particleCanvas {
             position: fixed;
             top: 0;
@@ -31,16 +40,17 @@
             z-index: 9999;
         }
 
+        /* 主容器：最大宽度900px，居中，切换三列时宽度自动扩展 */
         .container {
             max-width: 900px;
             margin: 0 auto;
             transition: max-width 0.3s ease;
         }
-
         .container.triple-layout {
-            max-width: 1360px;
+            max-width: 1360px; /* 三列时自动扩展，使每列宽度与双列一致 */
         }
 
+        /* 页面主标题 */
         h1 {
             text-align: center;
             font-size: 2.4rem;
@@ -52,53 +62,45 @@
             border-bottom: 1px solid #ececec;
         }
 
-        /* ============================================================
-           布局切换容器（sticky 包裹）
-           ============================================================ */
-        .layout-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            gap: 16px;
-            z-index: 100;
-            flex-wrap: wrap;
-        }
-        .layout-wrapper.sticky {
-            position: sticky;
-            top: 12px;
-            background: #ffffff;
-            padding: 8px 0;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-            border-radius: 40px;
-            backdrop-filter: none;
-        }
-
-        /* 列数切换胶囊（无半透明，边框加深） */
+        /* ================================================================
+           列数切换胶囊（带滑动滑块）
+           - 默认半透明背景，Sticky 固定（由开关控制）
+           - 内含三个选项：单列、双列、三列
+           - 滑块位置根据当前模式动态移动
+           ================================================================ */
         .layout-switch {
-            display: none;
+            display: none; /* 默认隐藏，由JS根据屏幕宽度显示 */
             justify-content: center;
             align-items: center;
+            margin-bottom: 30px;
             font-size: 0.95rem;
             font-weight: 500;
             color: #555;
             user-select: none;
-            border: 1.5px solid #b0b0b0; /* 边框加深 */
+            border: 2px solid #888888; /* 边框加深：加粗并加深颜色 */
             border-radius: 40px;
             padding: 3px;
-            background: #f9f9f9; /* 取消半透明 */
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
             width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
             position: relative;
             min-width: 200px;
             overflow: hidden;
-            flex-shrink: 0;
+            z-index: 100;
         }
-        .layout-switch.visible {
-            display: flex;
+        .layout-switch.visible { display: flex; } /* 桌面端可见 */
+        .layout-switch.sticky { /* 启用固定时 */
+            position: sticky;
+            top: 12px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border-color: rgba(200,200,200,0.6);
         }
 
+        /* 蓝色滑动滑块 */
         .switch-slider {
             position: absolute;
             top: 3px;
@@ -108,19 +110,22 @@
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            width: calc(33.33% - 3px);
+            width: calc(33.33% - 3px); /* 默认三档均分 */
         }
 
+        /* 根据模式调整滑块位置 */
         .layout-switch.mode-single .switch-slider { left: 3px; }
         .layout-switch.mode-double .switch-slider { left: calc(33.33% + 2px); }
-        .layout-switch.mode-triple .switch-slider { left: calc(66.66% + 2px); }
+        .layout-switch.mode-triple .switch-slider { left: calc(66.66% + 1.5px); } /* 微调右侧间隙 */
 
+        /* 当只有双列选项时（宽度<1024px），滑块宽度占一半 */
         .layout-switch.two-options .switch-slider {
             width: calc(50% - 3px);
         }
         .layout-switch.two-options.mode-single .switch-slider { left: 3px; }
         .layout-switch.two-options.mode-double .switch-slider { left: calc(50% + 2px); }
 
+        /* 每个选项的文字样式 */
         .switch-option {
             padding: 8px 20px;
             cursor: pointer;
@@ -134,66 +139,43 @@
             flex: 1;
         }
         .switch-option.active {
-            color: #ffffff;
+            color: #ffffff; /* 被选中时文字白色（滑块覆盖） */
         }
         .switch-option:not(.active) {
-            color: #555; /* 加深灰色文字 */
+            color: #555; /* 未选中时灰色文字加深 */
         }
         .switch-option:not(.active):hover {
-            color: #0366d6;
+            color: #0366d6; /* 悬停变蓝 */
         }
 
-        /* 折叠按钮组 */
-        .fold-buttons {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .fold-btn {
-            padding: 6px 14px;
-            border-radius: 30px;
-            border: 1.5px solid #b0b0b0;
-            background: #f9f9f9;
-            color: #555;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s, border-color 0.2s;
-            user-select: none;
-        }
-        .fold-btn:hover {
-            background: #eef3fc;
-            border-color: #0366d6;
-            color: #0366d6;
-        }
-        .fold-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* ============================================================
-           栏目网格容器（间距 21px）
-           ============================================================ */
+        /* ================================================================
+           栏目网格容器（卡片列表）
+           - 单列时块级排列，双列/三列时使用flex行排列
+           - 每个卡片（.section）独立
+           ================================================================ */
         .sections-grid {
             display: block;
         }
 
+        /* 列容器：双列和三列时，每一列的容器 */
         .col-left,
         .col-right,
         .col-mid {
             display: flex;
             flex-direction: column;
-            gap: 21px;
+            gap: 21px; /* 卡片之间的垂直间距 */
             flex: 1;
         }
 
+        /* 双列/三列时，网格变为flex行 */
         .sections-grid.grid-mode,
         .sections-grid.triple-mode {
             display: flex !important;
             flex-direction: row !important;
-            gap: 21px;
+            gap: 21px; /* 列之间的水平间距 */
         }
 
+        /* 每个分类卡片 */
         .section {
             background: #f5f5f5;
             border-radius: 16px;
@@ -201,12 +183,13 @@
             padding: 18px 24px 12px;
             transition: box-shadow 0.25s ease;
             width: 100%;
-            border: 2px solid transparent;
+            border: 2px solid transparent; /* 透明边框占位，用于高亮模式 */
         }
         .section:hover {
-            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
+            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15); /* 悬停阴影变蓝 */
         }
 
+        /* 单列模式下每个卡片底部留白，双列/三列由flex gap控制 */
         .sections-grid:not(.grid-mode):not(.triple-mode) .section {
             margin-bottom: 21px;
         }
@@ -215,6 +198,7 @@
             margin-bottom: 0;
         }
 
+        /* 卡片头部（小标题 + 折叠控制） */
         .section-header {
             display: flex;
             align-items: center;
@@ -232,9 +216,10 @@
             transition: color 0.2s ease;
         }
         .section-header:hover .section-title {
-            color: #0366d6;
+            color: #0366d6; /* 悬停变蓝 */
         }
 
+        /* 折叠标签和三角形按钮 */
         .toggle-group {
             display: flex;
             align-items: center;
@@ -258,13 +243,15 @@
         .section-header:hover .toggle-btn {
             color: #0366d6;
         }
+        /* 折叠状态时三角形旋转 */
         .section.collapsed .toggle-btn {
             transform: rotate(-90deg);
         }
 
+        /* 列表内容容器（用于展开/收起动画） */
         .list-wrapper {
             overflow: hidden;
-            max-height: 2000px;
+            max-height: 2000px; /* 足够大 */
             transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
                         opacity 0.3s ease,
                         margin 0.3s ease;
@@ -282,7 +269,7 @@
             margin: 0;
         }
 
-        /* ===== 网站条目 ===== */
+        /* ===== 每个网站条目 ===== */
         li {
             display: flex;
             align-items: center;
@@ -296,7 +283,7 @@
             border-bottom: 1px solid #f0f0f0;
         }
         li:last-child {
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0; /* 最后一项也保留底线 */
         }
         li:hover {
             background: #eef3fc;
@@ -314,7 +301,7 @@
             color: #111;
             min-width: 100px;
             flex: 0 0 auto;
-            pointer-events: none;
+            pointer-events: none; /* 点击由父级li统一处理 */
             transition: color 0.2s ease;
         }
 
@@ -326,14 +313,14 @@
             flex: 1 1 auto;
             text-align: right;
             transition: opacity 0.15s;
-            pointer-events: none;
+            pointer-events: none; /* 点击由父级li统一处理 */
         }
         .site-url:hover {
             text-decoration: underline;
             opacity: 0.7;
         }
 
-        /* ----- 左上角汉堡 ----- */
+        /* ----- 左上角汉堡菜单（三横线） ----- */
         .hamburger {
             position: fixed;
             top: 24px;
@@ -379,10 +366,10 @@
         }
         .hamburger.hidden {
             opacity: 0;
-            pointer-events: none;
+            pointer-events: none; /* 打开设置时隐藏 */
         }
 
-        /* ===== 底部工具 ===== */
+        /* ===== 底部工具栏（搜索 + 设置） ===== */
         .bottom-tools {
             position: fixed;
             bottom: 28px;
@@ -396,9 +383,10 @@
         }
         .bottom-tools.hidden {
             opacity: 0;
-            pointer-events: none;
+            pointer-events: none; /* 打开设置/侧边栏时隐藏 */
         }
 
+        /* 搜索按钮和设置按钮共用样式 */
         .search-bottom,
         .settings-bottom {
             display: flex;
@@ -428,6 +416,7 @@
             transform: scale(0.95);
         }
 
+        /* SVG 图标样式 */
         .search-icon-svg,
         .settings-icon-svg {
             width: 30px;
@@ -474,7 +463,7 @@
             color: #0366d6;
         }
 
-        /* ===== 设置模态框（新增“全部”选项卡） ===== */
+        /* ===== 设置模态框 ===== */
         .settings-modal {
             position: fixed;
             top: 0;
@@ -498,7 +487,7 @@
             border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 560px;
+            max-width: 520px;
             max-height: 90vh;
             display: flex;
             flex-direction: column;
@@ -515,7 +504,7 @@
             flex-shrink: 0;
         }
 
-        /* 子选项卡：带滑动胶囊（4项） */
+        /* 子选项卡（外观/功能/关于）滑动胶囊 */
         .sub-tabs {
             position: relative;
             display: flex;
@@ -528,10 +517,10 @@
             flex-shrink: 0;
         }
         .sub-tab {
-            padding: 6px 12px;
+            padding: 6px 20px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 500;
             color: #666;
             transition: color 0.2s;
@@ -547,7 +536,6 @@
         .sub-tab:not(.active):hover {
             color: #0366d6;
         }
-        /* 滑动胶囊 */
         .sub-tab-slider {
             position: absolute;
             top: 4px;
@@ -556,32 +544,34 @@
             border-radius: 30px;
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: calc(33.33% - 4px);
             z-index: 0;
-            width: calc(25% - 4px);
         }
-        .sub-tabs.active-all .sub-tab-slider { left: 4px; }
-        .sub-tabs.active-appearance .sub-tab-slider { left: calc(25% + 2px); }
-        .sub-tabs.active-features .sub-tab-slider { left: calc(50% + 2px); }
-        .sub-tabs.active-about .sub-tab-slider { left: calc(75% + 2px); }
+        /* 根据激活选项卡移动滑块 */
+        .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
+        .sub-tabs.active-features .sub-tab-slider { left: calc(33.33% + 2px); }
+        .sub-tabs.active-about .sub-tab-slider { left: calc(66.66% + 2px); }
 
-        /* 内容容器（滑动动画） */
+        /* 设置内容滑动容器 */
         .settings-slider {
-            overflow: hidden;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             position: relative;
         }
         .settings-slider-inner {
             display: flex;
+            flex: 1;
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100%;
         }
         .settings-slide {
-            flex: 0 0 100%;
+            flex: 0 0 100%; /* 每个子项占满父容器宽度 */
             padding: 6px 0 8px;
-            overflow-y: auto;
+            overflow-y: auto; /* 内容过多时垂直滚动 */
             min-height: 120px;
         }
-        /* 设置项通用样式 */
+        /* 设置项行 */
         .settings-slide .switch-setting {
             display: flex;
             align-items: center;
@@ -599,6 +589,7 @@
             cursor: pointer;
             padding-left: 8px;
         }
+        /* 自定义开关 */
         .switch-toggle {
             position: relative;
             width: 48px;
@@ -628,7 +619,7 @@
             transform: translateX(22px);
         }
 
-        /* 关于样式 */
+        /* “关于”页面的特殊样式 */
         .about-content {
             display: flex;
             align-items: center;
@@ -652,20 +643,7 @@
             margin-right: 4px;
         }
 
-        /* “全部”页面内的小标题 */
-        .section-subtitle {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #0366d6;
-            margin: 12px 0 4px 0;
-            padding-left: 8px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 4px;
-        }
-        .section-subtitle:first-of-type {
-            margin-top: 0;
-        }
-
+        /* 设置底部确定按钮 */
         .settings-footer {
             display: flex;
             justify-content: center;
@@ -712,7 +690,6 @@
         .sidenav.open {
             left: 0;
         }
-        
         .sidenav-header {
             padding: 16px 24px 12px 24px;
             font-size: 1.4rem;
@@ -726,7 +703,6 @@
         .sidenav.open .sidenav-header {
             opacity: 1;
         }
-
         .sidenav ul {
             list-style: none;
             padding: 0;
@@ -754,13 +730,14 @@
             font-weight: 500;
             padding: 10px 20px;
             transition: color 0.25s ease, padding-left 0.25s ease, background 0.15s;
-            pointer-events: none;
+            pointer-events: none; /* 点击由li统一处理 */
         }
         .sidenav li:hover a {
             color: #0366d6;
             padding-left: 28px;
         }
 
+        /* 侧边栏遮罩 */
         .overlay {
             position: fixed;
             top: 0;
@@ -778,7 +755,7 @@
             visibility: visible;
         }
 
-        /* ----- 搜索弹窗（标题匹配/网址匹配左对齐） ----- */
+        /* ----- 搜索弹窗 ----- */
         .search-modal {
             position: fixed;
             top: 0;
@@ -858,6 +835,7 @@
             transform: rotate(90deg);
         }
 
+        /* 搜索结果网格（两列） */
         .search-results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -873,6 +851,7 @@
             flex-direction: column;
             min-height: 0;
         }
+        /* 标题“标题匹配”和“网址匹配”左对齐（与搜索结果项对齐） */
         .result-column-title {
             font-size: 0.9rem;
             font-weight: 600;
@@ -882,7 +861,7 @@
             border-bottom: 2px solid #f0f0f0;
             margin-bottom: 10px;
             flex-shrink: 0;
-            padding-left: 10px; /* 与结果项左对齐 */
+            padding-left: 10px; /* 向右移，与结果项对齐 */
         }
         .result-column-list {
             flex: 1;
@@ -943,6 +922,7 @@
             text-align: center;
         }
 
+        /* 底部版权文字 */
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -959,9 +939,9 @@
             color: #0366d6;
         }
 
-        /* ============================================================
-           更直观显示模式
-           ============================================================ */
+        /* ================================================================
+           更直观显示模式（开启后，悬停时出现蓝色边框）
+           ================================================================ */
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
         body.highlight-mode .settings-bottom:hover {
@@ -984,10 +964,12 @@
             box-shadow: inset 0 0 0 1px #0366d6;
         }
 
-        /* 移动端响应 */
+        /* ================================================================
+           移动端响应式适配
+           ================================================================ */
         @media (max-width: 767px) {
             .container.triple-layout {
-                max-width: 900px !important;
+                max-width: 900px !important; /* 小屏强制单列 */
             }
             .sections-grid.grid-mode,
             .sections-grid.triple-mode {
@@ -1009,20 +991,11 @@
             .sections-grid.triple-mode .section {
                 margin-bottom: 21px !important;
             }
-            .layout-wrapper.sticky {
-                position: relative;
-                top: 0;
-                padding: 0;
-                background: transparent;
-                box-shadow: none;
-                border-radius: 0;
-            }
+            /* 移动端隐藏列数切换 */
             .layout-switch.visible {
                 display: none;
             }
-            .fold-buttons {
-                display: none;
-            }
+            /* 底部工具缩小 */
             .bottom-tools {
                 bottom: 16px;
                 gap: 12px;
@@ -1052,8 +1025,8 @@
                 min-width: 0;
             }
             .sub-tab {
-                padding: 4px 8px;
-                font-size: 0.75rem;
+                padding: 4px 14px;
+                font-size: 0.8rem;
             }
             .settings-slide {
                 min-height: 80px;
@@ -1130,8 +1103,8 @@
                 min-width: 0;
             }
             .sub-tab {
-                padding: 4px 6px;
-                font-size: 0.7rem;
+                padding: 4px 10px;
+                font-size: 0.75rem;
             }
             .sidenav a {
                 padding: 6px 14px;
@@ -1142,13 +1115,15 @@
 </head>
 <body>
 
+    <!-- ===== 粒子画布 ===== -->
     <canvas id="particleCanvas"></canvas>
 
-    <!-- ===== 汉堡菜单 ===== -->
+    <!-- ===== 左上角汉堡菜单 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 底部工具 ===== -->
+    <!-- ===== 底部工具栏（搜索 + 设置） ===== -->
     <div class="bottom-tools" id="bottomTools">
+        <!-- 搜索按钮 -->
         <div class="search-bottom" id="searchBottom" aria-label="搜索">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="14" cy="14" r="10" />
@@ -1156,6 +1131,7 @@
             </svg>
             <span class="search-label">搜索</span>
         </div>
+        <!-- 设置按钮 -->
         <div class="settings-bottom" id="settingsBottom" aria-label="设置">
             <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="16" cy="16" r="4" />
@@ -1165,7 +1141,7 @@
         </div>
     </div>
 
-    <!-- ===== 侧边栏 ===== -->
+    <!-- ===== 侧边导航栏 ===== -->
     <nav class="sidenav" id="sidenav">
         <div class="sidenav-header">分类</div>
         <ul>
@@ -1183,6 +1159,7 @@
         </ul>
     </nav>
 
+    <!-- 侧边栏遮罩 -->
     <div class="overlay" id="overlay"></div>
 
     <!-- ===== 搜索弹窗 ===== -->
@@ -1209,50 +1186,21 @@
         </div>
     </div>
 
-    <!-- ===== 设置弹窗（新增“全部”选项卡） ===== -->
+    <!-- ===== 设置弹窗 ===== -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-panel">
             <h2>设置</h2>
-            <!-- 子选项卡带滑块（4项） -->
-            <div class="sub-tabs active-all" id="subTabs">
-                <span class="sub-tab active" data-tab="all">全部</span>
-                <span class="sub-tab" data-tab="appearance">外观</span>
+            <!-- 子选项卡 -->
+            <div class="sub-tabs active-appearance" id="subTabs">
+                <span class="sub-tab active" data-tab="appearance">外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
                 <span class="sub-tab" data-tab="about">关于</span>
                 <span class="sub-tab-slider"></span>
             </div>
-            <!-- 滑动容器 -->
+            <!-- 滑动内容 -->
             <div class="settings-slider">
                 <div class="settings-slider-inner" id="settingsSlider">
-                    <!-- 全部 -->
-                    <div class="settings-slide" data-slide="all">
-                        <div class="section-subtitle">外观</div>
-                        <div class="switch-setting">
-                            <label for="visualSwitch">更直观显示</label>
-                            <div class="switch-toggle" id="visualSwitch" role="button" tabindex="0" aria-checked="false">
-                                <div class="slider"></div>
-                            </div>
-                        </div>
-                        <div class="switch-setting">
-                            <label for="particleSwitch">粒子特效</label>
-                            <div class="switch-toggle" id="particleSwitch" role="button" tabindex="0" aria-checked="true">
-                                <div class="slider"></div>
-                            </div>
-                        </div>
-                        <div class="section-subtitle">功能</div>
-                        <div class="switch-setting">
-                            <label for="stickySwitch">始终显示列数切换</label>
-                            <div class="switch-toggle active" id="stickySwitch" role="button" tabindex="0" aria-checked="true">
-                                <div class="slider"></div>
-                            </div>
-                        </div>
-                        <div class="section-subtitle">关于</div>
-                        <div class="about-content">
-                            <span class="about-label">网站源码</span>
-                            <span class="about-value">暂未开放</span>
-                        </div>
-                    </div>
-                    <!-- 外观 -->
+                    <!-- 外观选项卡 -->
                     <div class="settings-slide" data-slide="appearance">
                         <div class="switch-setting">
                             <label for="visualSwitch">更直观显示</label>
@@ -1267,7 +1215,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 功能 -->
+                    <!-- 功能选项卡 -->
                     <div class="settings-slide" data-slide="features">
                         <div class="switch-setting">
                             <label for="stickySwitch">始终显示列数切换</label>
@@ -1276,7 +1224,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 关于 -->
+                    <!-- 关于选项卡 -->
                     <div class="settings-slide" data-slide="about">
                         <div class="about-content">
                             <span class="about-label">网站源码</span>
@@ -1295,22 +1243,18 @@
     <div class="container" id="mainContainer">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
-        <!-- 布局切换容器（含折叠按钮） -->
-        <div class="layout-wrapper sticky" id="layoutWrapper">
-            <div class="layout-switch visible" id="layoutSwitch">
-                <span class="switch-slider"></span>
-                <span class="switch-option active" data-mode="single">单列</span>
-                <span class="switch-option" data-mode="double">双列</span>
-                <span class="switch-option" data-mode="triple">三列</span>
-            </div>
-            <div class="fold-buttons">
-                <button class="fold-btn" id="foldAllBtn">全部折叠</button>
-                <button class="fold-btn" id="expandAllBtn">全部展开</button>
-            </div>
+        <!-- 列数切换 -->
+        <div class="layout-switch visible sticky" id="layoutSwitch">
+            <span class="switch-slider"></span>
+            <span class="switch-option active" data-mode="single">单列</span>
+            <span class="switch-option" data-mode="double">双列</span>
+            <span class="switch-option" data-mode="triple">三列</span>
         </div>
 
+        <!-- 卡片列表容器 -->
         <div class="sections-grid" id="sectionsGrid"></div>
 
+        <!-- 底部版权 -->
         <div class="footer" id="footerText">
             此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
@@ -1318,8 +1262,12 @@
 
     <script>
         // ================================================================
-        // 1. 卡片数据
+        // JavaScript 逻辑
         // ================================================================
+
+        // ----------------------------------------------------------------
+        // 1. 卡片数据（所有分类及其网站条目）
+        // ----------------------------------------------------------------
         const cardData = [
             {
                 id: 'essential',
@@ -1410,9 +1358,10 @@
             }
         ];
 
-        // ================================================================
-        // 2. 生成卡片 DOM
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 2. 生成卡片 DOM 函数
+        //    根据数据创建每个分类卡片，包含头部（标题+折叠）和条目列表
+        // ----------------------------------------------------------------
         function createSection(data, collapsed = false) {
             const section = document.createElement('div');
             section.className = 'section' + (collapsed ? ' collapsed' : '');
@@ -1442,6 +1391,7 @@
             header.appendChild(titleSpan);
             header.appendChild(toggleGroup);
 
+            // 点击头部切换折叠状态
             header.addEventListener('click', function(e) {
                 const sec = this.closest('.section');
                 if (!sec) return;
@@ -1477,6 +1427,7 @@
             section.appendChild(header);
             section.appendChild(wrapper);
 
+            // 为每个条目绑定点击事件，打开链接
             section.querySelectorAll('li').forEach(li => {
                 li.addEventListener('click', function(e) {
                     const url = this.dataset.url;
@@ -1489,45 +1440,9 @@
             return section;
         }
 
-        // ================================================================
-        // 3. 全部折叠 / 全部展开
-        // ================================================================
-        function toggleAllSections(collapse) {
-            const sections = document.querySelectorAll('.section');
-            sections.forEach(section => {
-                if (collapse) {
-                    section.classList.add('collapsed');
-                } else {
-                    section.classList.remove('collapsed');
-                }
-                // 更新每个卡片内的折叠标签文字
-                const label = section.querySelector('.toggle-label');
-                if (label) {
-                    label.textContent = collapse ? '展开' : '折叠';
-                }
-            });
-            // 触发粒子特效（在按钮点击中已触发）
-        }
-
-        document.getElementById('foldAllBtn').addEventListener('click', function(e) {
-            if (typeof spawnParticles === 'function') {
-                const rect = this.getBoundingClientRect();
-                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
-            }
-            toggleAllSections(true);
-        });
-
-        document.getElementById('expandAllBtn').addEventListener('click', function(e) {
-            if (typeof spawnParticles === 'function') {
-                const rect = this.getBoundingClientRect();
-                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
-            }
-            toggleAllSections(false);
-        });
-
-        // ================================================================
-        // 4. 汉堡菜单 + 侧边栏（触发粒子）
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 3. 汉堡菜单 + 侧边栏控制
+        // ----------------------------------------------------------------
         const hamburger = document.getElementById('hamburgerBtn');
         const sidenav = document.getElementById('sidenav');
         const overlay = document.getElementById('overlay');
@@ -1560,6 +1475,7 @@
 
         overlay.addEventListener('click', closeNav);
 
+        // 侧边栏条目点击跳转
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
@@ -1580,15 +1496,16 @@
             });
         });
 
-        // ================================================================
-        // 5. 搜索功能
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 4. 搜索功能
+        // ----------------------------------------------------------------
         const searchModal = document.getElementById('searchModal');
         const searchClose = document.getElementById('searchClose');
         const searchInput = document.getElementById('searchInput');
         const titleResults = document.getElementById('titleResults');
         const urlResults = document.getElementById('urlResults');
 
+        // 收集所有网站数据（从DOM中读取）
         function collectSiteData() {
             const items = [];
             document.querySelectorAll('.section li').forEach(li => {
@@ -1605,6 +1522,7 @@
             return items;
         }
 
+        // 渲染搜索结果列
         function renderResultColumn(container, items) {
             if (!items || items.length === 0) {
                 container.innerHTML = '<div class="result-empty">未找到匹配</div>';
@@ -1622,6 +1540,7 @@
             container.innerHTML = html;
         }
 
+        // 执行搜索
         function performSearch(query) {
             const trimmed = query.trim().toLowerCase();
             if (!trimmed) {
@@ -1640,6 +1559,7 @@
             renderResultColumn(urlResults, urlMatches);
         }
 
+        // 打开/关闭搜索弹窗
         function openSearch() {
             searchModal.classList.add('open');
             document.body.style.overflow = 'hidden';
@@ -1672,19 +1592,19 @@
             performSearch(this.value);
         });
 
-        // ================================================================
-        // 6. 设置功能（子选项卡、开关）
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 5. 设置功能（子选项卡、开关）
+        // ----------------------------------------------------------------
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
         const settingsConfirm = document.getElementById('settingsConfirmBtn');
 
-        // 开关元素
+        // 获取开关元素
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
 
-        // 状态
+        // 状态变量
         let visualMode = false;
         let particleEnabled = true;
         let stickyEnabled = true;
@@ -1702,15 +1622,15 @@
         function updateStickySwitch() {
             stickySwitch.classList.toggle('active', stickyEnabled);
             stickySwitch.setAttribute('aria-checked', stickyEnabled);
-            const layoutWrapper = document.getElementById('layoutWrapper');
+            const layoutSwitch = document.getElementById('layoutSwitch');
             if (stickyEnabled) {
-                layoutWrapper.classList.add('sticky');
+                layoutSwitch.classList.add('sticky');
             } else {
-                layoutWrapper.classList.remove('sticky');
+                layoutSwitch.classList.remove('sticky');
             }
         }
 
-        // 开关点击事件（触发粒子 + 切换）
+        // 开关点击事件（触发粒子并切换状态）
         visualSwitch.addEventListener('click', function(e) {
             if (typeof spawnParticles === 'function') {
                 const rect = this.getBoundingClientRect();
@@ -1771,22 +1691,19 @@
             }
         });
 
-        // 子选项卡切换（更新滑块位置和内容滑动）
+        // 子选项卡切换
         const subTabs = document.getElementById('subTabs');
         const tabItems = subTabs.querySelectorAll('.sub-tab');
         const settingsSlider = document.getElementById('settingsSlider');
-        let currentTab = 'all';
+        let currentTab = 'appearance';
 
         function switchTab(tabName) {
             const index = Array.from(tabItems).findIndex(t => t.dataset.tab === tabName);
             if (index === -1) return;
-            // 更新高亮
             tabItems.forEach(t => t.classList.remove('active'));
             tabItems[index].classList.add('active');
-            // 更新滑块位置（通过类控制）
-            subTabs.classList.remove('active-all', 'active-appearance', 'active-features', 'active-about');
+            subTabs.classList.remove('active-appearance', 'active-features', 'active-about');
             subTabs.classList.add('active-' + tabName);
-            // 滑动内容
             settingsSlider.style.transform = `translateX(-${index * 100}%)`;
             currentTab = tabName;
         }
@@ -1796,7 +1713,6 @@
                 const tabName = this.dataset.tab;
                 if (tabName === currentTab) return;
                 switchTab(tabName);
-                // 触发粒子
                 if (typeof spawnParticles === 'function') {
                     const rect = this.getBoundingClientRect();
                     spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
@@ -1804,7 +1720,7 @@
             });
         });
 
-        // 打开/关闭设置
+        // 打开/关闭设置弹窗
         function openSettings() {
             bottomTools.classList.add('hidden');
             hamburger.classList.add('hidden');
@@ -1815,7 +1731,6 @@
                 closeSearch();
             }
             settingsModal.classList.add('open');
-            // 确保内容滑动位置正确
             switchTab(currentTab);
             if (typeof spawnParticles === 'function') {
                 const rect = settingsBtn.getBoundingClientRect();
@@ -1837,14 +1752,15 @@
             }
         });
 
-        // ================================================================
-        // 7. 粒子特效
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 6. 粒子特效（绿色方块爆裂）
+        // ----------------------------------------------------------------
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         let animationId = null;
 
+        // 自适应画布大小
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -1852,6 +1768,7 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
+        // 单个粒子类
         class GreenParticle {
             constructor(x, y) {
                 this.x = x;
@@ -1884,6 +1801,7 @@
             }
         }
 
+        // 生成一组粒子
         function spawnParticles(x, y) {
             if (!particleEnabled) return;
             for (let i = 0; i < 12; i++) {
@@ -1894,6 +1812,7 @@
             }
         }
 
+        // 动画循环
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let alive = false;
@@ -1916,7 +1835,7 @@
             }
         }
 
-        // 全局点击触发粒子
+        // 全局点击触发粒子（排除输入框）
         document.addEventListener('click', function(e) {
             const target = e.target;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
@@ -1925,9 +1844,9 @@
             spawnParticles(e.clientX, e.clientY);
         });
 
-        // ================================================================
-        // 8. 底部文字交互
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 7. 底部版权文字交互（点击变表情）
+        // ----------------------------------------------------------------
         const footerEl = document.getElementById('footerText');
         const originalText = '此网站由 Wise GuLy 所有，由 DeepSeek 开发';
         let restoreTimer = null;
@@ -1944,9 +1863,9 @@
             }, 3000);
         });
 
-        // ================================================================
-        // 9. 全局 ESC
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 8. 全局 ESC 键关闭所有弹窗
+        // ----------------------------------------------------------------
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (settingsModal.classList.contains('open')) {
@@ -1962,16 +1881,18 @@
             }
         });
 
-        // ================================================================
-        // 10. 布局切换（带滑块，根据宽度调整可用选项）
-        // ================================================================
+        // ----------------------------------------------------------------
+        // 9. 布局切换（单列/双列/三列）
+        //    根据屏幕宽度动态显示可用选项，并处理容器宽度
+        // ----------------------------------------------------------------
         const sectionsGrid = document.getElementById('sectionsGrid');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
         const mainContainer = document.getElementById('mainContainer');
 
-        let desiredMode = 'single';
+        let desiredMode = 'single'; // 当前模式
 
+        // 获取所有卡片的折叠状态（用于重绘时保留）
         function getCollapsedStates() {
             const states = {};
             document.querySelectorAll('.section').forEach(section => {
@@ -1980,12 +1901,14 @@
             return states;
         }
 
+        // 更新切换选项显示和滑块
         function updateSwitchOptions() {
             const width = window.innerWidth;
             let availableModes = ['single', 'double'];
             if (width >= 1024) {
                 availableModes.push('triple');
             }
+            // 显示/隐藏选项
             switchOptions.forEach(opt => {
                 const mode = opt.dataset.mode;
                 if (availableModes.includes(mode)) {
@@ -1994,21 +1917,27 @@
                     opt.style.display = 'none';
                 }
             });
+            // 如果当前模式不可用，切换到第一个可用
             if (!availableModes.includes(desiredMode)) {
                 desiredMode = availableModes[0];
             }
+            // 调整滑块宽度类
             if (availableModes.length === 2) {
                 layoutSwitch.classList.add('two-options');
             } else {
                 layoutSwitch.classList.remove('two-options');
             }
+            // 更新模式类
             layoutSwitch.classList.remove('mode-single', 'mode-double', 'mode-triple');
             layoutSwitch.classList.add('mode-' + desiredMode);
+            // 高亮选项
             switchOptions.forEach(opt => {
                 opt.classList.toggle('active', opt.dataset.mode === desiredMode);
             });
+            // 桌面端显示切换，移动端隐藏
             const isDesktop = width >= 768;
             layoutSwitch.classList.toggle('visible', isDesktop);
+            // 三列时容器宽度扩展
             if (desiredMode === 'triple' && isDesktop) {
                 mainContainer.classList.add('triple-layout');
             } else {
@@ -2019,6 +1948,7 @@
             applyLayout();
         }
 
+        // 应用布局（重新绘制卡片）
         function applyLayout() {
             const mode = desiredMode;
             const states = getCollapsedStates();
@@ -2072,6 +2002,7 @@
             }
         }
 
+        // 点击切换选项
         switchOptions.forEach(opt => {
             opt.addEventListener('click', function() {
                 const mode = this.dataset.mode;
@@ -2086,19 +2017,22 @@
             updateSwitchOptions();
         });
 
+        // ----------------------------------------------------------------
         // 初始化
+        // ----------------------------------------------------------------
         function init() {
-            // 确保开关初始状态
+            // 设置默认状态
             visualMode = false;
             particleEnabled = true;
             stickyEnabled = true;
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
-            // 设置子选项卡默认全部
-            switchTab('all');
+            // 默认显示外观选项卡
+            switchTab('appearance');
             // 加载布局
             updateSwitchOptions();
+            // 搜索框初始提示
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
         }
