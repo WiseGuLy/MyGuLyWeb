@@ -19,7 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #1e1e1e;
             padding: 40px 20px 100px;
-            min-height: 100vh;
+            min-height: 200vh;
             position: relative;
             overflow-x: hidden;
         }
@@ -454,7 +454,7 @@
             color: #0366d6;
         }
 
-        /* ===== 设置模态框 ===== */
+        /* ===== 设置模态框（已添加“更新”选项卡） ===== */
         .settings-modal {
             position: fixed;
             top: 0;
@@ -507,10 +507,10 @@
             flex-shrink: 0;
         }
         .sub-tab {
-            padding: 6px 20px;
+            padding: 6px 12px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
             color: #666;
             transition: color 0.2s;
@@ -534,12 +534,13 @@
             border-radius: 30px;
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: calc(33.33% - 4px);
             z-index: 0;
+            width: calc(25% - 4px); /* 四档 */
         }
         .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
-        .sub-tabs.active-features .sub-tab-slider { left: calc(33.33% + 2px); }
-        .sub-tabs.active-about .sub-tab-slider { left: calc(66.66% + 2px); }
+        .sub-tabs.active-features .sub-tab-slider { left: calc(25% + 2px); }
+        .sub-tabs.active-updates .sub-tab-slider { left: calc(50% + 2px); }
+        .sub-tabs.active-about .sub-tab-slider { left: calc(75% + 2px); }
 
         .settings-slider {
             flex: 1;
@@ -605,27 +606,50 @@
             transform: translateX(22px);
         }
 
-        .about-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+        /* 更新页面特殊样式 */
+        .update-content {
+            padding: 8px 0;
         }
-        .about-content:last-child {
+        .update-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95rem;
+            color: #444;
+        }
+        .update-item:last-child {
             border-bottom: none;
         }
-        .about-label {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #333;
-            padding-left: 8px;
+        .update-item .date {
+            font-weight: 600;
+            color: #0366d6;
         }
-        .about-value {
+        .update-item .version {
+            font-weight: 500;
+            color: #222;
+        }
+
+        /* 关于页面 */
+        .about-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 8px 0;
+        }
+        .about-line {
+            display: flex;
+            align-items: baseline;
+            padding: 4px 0;
+            border-bottom: 1px solid #f5f5f5;
             font-size: 0.95rem;
-            color: #999;
-            font-style: italic;
-            margin-right: 4px;
+            color: #444;
+        }
+        .about-line .label {
+            font-weight: 600;
+            color: #222;
+            min-width: 80px;
+        }
+        .about-line .value {
+            color: #555;
         }
 
         .settings-footer {
@@ -694,12 +718,13 @@
             color: #0366d6;
         }
 
+        /* 实时预览开关样式（修改悬停效果） */
         .preview-toggle {
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             user-select: none;
-            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s, border-color 0.2s;
             color: #999;
             padding: 3px 12px;
             border-radius: 20px;
@@ -707,14 +732,18 @@
             border: 2px solid #ddd;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
+        /* 关闭状态下悬停文字变蓝，且如果更直观显示开启，边框也变蓝 */
+        .preview-toggle:not(.active):hover {
+            color: #0366d6;
+        }
+        body.highlight-mode .preview-toggle:not(.active):hover {
+            border-color: #0366d6;
+        }
         .preview-toggle.active {
             color: #ffffff;
             background: #0366d6;
             border-color: #0366d6;
             box-shadow: 0 2px 8px rgba(3, 102, 214, 0.25);
-        }
-        .preview-toggle:hover {
-            background: #e6e6e6;
         }
         .preview-toggle.active:hover {
             background: #0250a5;
@@ -1120,8 +1149,8 @@
                 min-width: 0;
             }
             .sub-tab {
-                padding: 4px 14px;
-                font-size: 0.8rem;
+                padding: 4px 10px;
+                font-size: 0.75rem;
             }
             .settings-slide {
                 min-height: 80px;
@@ -1202,8 +1231,8 @@
                 min-width: 0;
             }
             .sub-tab {
-                padding: 4px 10px;
-                font-size: 0.75rem;
+                padding: 4px 8px;
+                font-size: 0.7rem;
             }
             .sidenav a {
                 padding: 6px 14px;
@@ -1286,13 +1315,14 @@
         </div>
     </div>
 
-    <!-- ===== 设置弹窗 ===== -->
+    <!-- ===== 设置弹窗（新增“更新”选项卡，修改“关于”内容） ===== -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-panel">
             <h2>设置</h2>
             <div class="sub-tabs active-appearance" id="subTabs">
                 <span class="sub-tab active" data-tab="appearance">外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
+                <span class="sub-tab" data-tab="updates">更新</span>
                 <span class="sub-tab" data-tab="about">关于</span>
                 <span class="sub-tab-slider"></span>
             </div>
@@ -1322,11 +1352,31 @@
                             </div>
                         </div>
                     </div>
+                    <!-- 更新 -->
+                    <div class="settings-slide" data-slide="updates">
+                        <div class="update-content">
+                            <div class="update-item">
+                                <span class="date">2026-08-11</span>
+                                <span class="version">V1.0beta</span>
+                                <span>完成网站静态前端代码</span>
+                            </div>
+                            <div class="update-item" style="border-bottom: none; margin-top: 8px; font-weight: 500; color: #0366d6;">
+                                后续更新计划
+                            </div>
+                            <div class="update-item" style="border-bottom: none; color: #555;">
+                                开始研发支持用户自主上传的动态网站
+                            </div>
+                        </div>
+                    </div>
                     <!-- 关于 -->
                     <div class="settings-slide" data-slide="about">
                         <div class="about-content">
-                            <span class="about-label">网站源码</span>
-                            <span class="about-value">暂未开放</span>
+                            <div class="about-line"><span class="label">项目名称</span><span class="value">GuLi 网站导航与收藏</span></div>
+                            <div class="about-line"><span class="label">版本</span><span class="value">V1.0beta</span></div>
+                            <div class="about-line"><span class="label">网站制作</span><span class="value">Wise GuLy</span></div>
+                            <div class="about-line"><span class="label">代码编写</span><span class="value">DeepSeek</span></div>
+                            <div class="about-line"><span class="label">开源地址</span><span class="value">暂未公布</span></div>
+                            <div class="about-line" style="border-bottom: none;"><span class="label">联系方式</span><span class="value">暂无</span></div>
                         </div>
                     </div>
                 </div>
@@ -1337,7 +1387,7 @@
         </div>
     </div>
 
-    <!-- ===== 预览模态框（无遮罩） ===== -->
+    <!-- ===== 预览模态框 ===== -->
     <div class="preview-modal" id="previewModal">
         <div class="preview-content" id="previewContent">
             <!-- 动态填充 -->
@@ -1602,7 +1652,7 @@
         overlay.addEventListener('click', closeNav);
 
         // ----------------------------------------------------------------
-        // 4. 实时预览功能（无遮罩）
+        // 4. 实时预览功能
         // ----------------------------------------------------------------
         const previewToggle = document.getElementById('previewToggle');
         let previewActive = false;
@@ -1611,6 +1661,7 @@
         const previewContent = document.getElementById('previewContent');
 
         let currentPreviewSection = null;
+        let currentHighlight = null; // 当前高亮的板块元素
 
         function showPreview(sectionId, title) {
             const originalSection = document.getElementById(sectionId);
@@ -1638,7 +1689,7 @@
             previewContent.innerHTML = '';
             previewContent.appendChild(clone);
 
-            // 锁定滚动（预览框显示时锁定）
+            // 锁定滚动
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
 
@@ -1647,7 +1698,6 @@
 
         function hidePreview() {
             previewModal.classList.remove('visible');
-            // 仅当侧边栏关闭时恢复滚动
             if (!sidenav.classList.contains('open')) {
                 document.documentElement.style.overflow = '';
                 document.body.style.overflow = '';
@@ -1656,17 +1706,23 @@
             currentPreviewSection = null;
         }
 
+        // 清除所有高亮（侧边栏和板块）
+        function clearHighlights() {
+            document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
+                el.classList.remove('preview-active');
+            });
+            if (currentHighlight) {
+                currentHighlight.classList.remove('preview-highlight');
+                currentHighlight = null;
+            }
+        }
+
         previewToggle.addEventListener('click', function(e) {
             e.stopPropagation();
             previewActive = !previewActive;
             this.classList.toggle('active', previewActive);
             if (!previewActive) {
-                document.querySelectorAll('.section.preview-highlight').forEach(el => {
-                    el.classList.remove('preview-highlight');
-                });
-                document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
-                    el.classList.remove('preview-active');
-                });
+                clearHighlights();
                 hidePreview();
             }
             if (typeof spawnParticles === 'function') {
@@ -1676,7 +1732,6 @@
         });
 
         const sideNavItems = document.querySelectorAll('.sidenav li');
-        let currentHighlight = null;
 
         sideNavItems.forEach(li => {
             li.addEventListener('mouseenter', function(e) {
@@ -1685,14 +1740,11 @@
                 if (!anchor) return;
                 const targetId = anchor.getAttribute('href');
                 if (targetId && targetId.startsWith('#')) {
-                    // 移除之前高亮
-                    document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
-                        el.classList.remove('preview-active');
-                    });
-                    if (currentHighlight) {
-                        currentHighlight.classList.remove('preview-highlight');
-                    }
+                    // 移除之前的高亮
+                    clearHighlights();
+                    // 高亮当前侧边栏项
                     this.classList.add('preview-active');
+                    // 高亮对应板块
                     const target = document.querySelector(targetId);
                     if (target) {
                         target.classList.add('preview-highlight');
@@ -1709,15 +1761,20 @@
 
             li.addEventListener('mouseleave', function(e) {
                 if (!previewActive) return;
+                // 移除当前项的高亮
+                this.classList.remove('preview-active');
+                // 移除板块高亮
+                if (currentHighlight) {
+                    currentHighlight.classList.remove('preview-highlight');
+                    currentHighlight = null;
+                }
                 hidePreview();
             });
         });
 
+        // 当鼠标离开侧边栏整体时，清除所有高亮（防止残留）
         sidenav.addEventListener('mouseleave', function() {
-            if (currentHighlight) {
-                currentHighlight.classList.remove('preview-highlight');
-                currentHighlight = null;
-            }
+            clearHighlights();
         });
 
         // ----------------------------------------------------------------
@@ -1817,7 +1874,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 6. 设置功能
+        // 6. 设置功能（子选项卡、开关）
         // ----------------------------------------------------------------
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
@@ -1911,7 +1968,7 @@
             }
         });
 
-        // 子选项卡切换
+        // 子选项卡切换（四档）
         const subTabs = document.getElementById('subTabs');
         const tabItems = subTabs.querySelectorAll('.sub-tab');
         const settingsSlider = document.getElementById('settingsSlider');
@@ -1922,7 +1979,7 @@
             if (index === -1) return;
             tabItems.forEach(t => t.classList.remove('active'));
             tabItems[index].classList.add('active');
-            subTabs.classList.remove('active-appearance', 'active-features', 'active-about');
+            subTabs.classList.remove('active-appearance', 'active-features', 'active-updates', 'active-about');
             subTabs.classList.add('active-' + tabName);
             settingsSlider.style.transform = `translateX(-${index * 100}%)`;
             currentTab = tabName;
@@ -2227,7 +2284,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 11. 侧边栏点击：跳转并展开板块（预览模式下自动关闭侧边栏）
+        // 11. 侧边栏点击：跳转并展开板块（预览模式下关闭侧边栏，同时确保展开）
         // ----------------------------------------------------------------
         const sideNavUl = sidenav.querySelector('ul');
         sideNavUl.addEventListener('click', function(e) {
@@ -2250,27 +2307,19 @@
                     }
 
                     if (previewActive) {
-                        // 预览模式：关闭侧边栏（解除滚动锁定），然后跳转，再重新锁定滚动（通过 showPreview）
-                        closeNav(); // 关闭侧边栏，滚动解锁
+                        // 预览模式：关闭侧边栏，跳转，然后重新显示预览
+                        closeNav(); // 关闭侧边栏，解锁滚动
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                         // 更新高亮和预览
-                        if (currentHighlight) {
-                            currentHighlight.classList.remove('preview-highlight');
-                        }
+                        clearHighlights();
                         target.classList.add('preview-highlight');
                         currentHighlight = target;
-                        // 注意：关闭侧边栏后，li 可能不可见，但类仍可添加，但无妨
-                        document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
-                            el.classList.remove('preview-active');
-                        });
-                        li.classList.add('preview-active');
                         const title = anchor.textContent.trim();
                         if (currentPreviewSection !== targetId) {
                             showPreview(targetId.replace('#', ''), title);
                             currentPreviewSection = targetId;
                         }
-                        // showPreview 会重新锁定滚动
                     } else {
                         // 非预览模式：正常跳转，关闭侧边栏
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -2296,6 +2345,7 @@
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
+            // 默认选中外观选项卡
             switchTab('appearance');
             updateSwitchOptions();
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
