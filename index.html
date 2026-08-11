@@ -380,7 +380,8 @@
         }
 
         .search-bottom,
-        .settings-bottom {
+        .settings-bottom,
+        .apps-bottom {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -399,17 +400,20 @@
             transition: transform 0.2s, background 0.2s, opacity 0.3s, border-color 0.2s ease;
         }
         .search-bottom:hover,
-        .settings-bottom:hover {
+        .settings-bottom:hover,
+        .apps-bottom:hover {
             transform: scale(1.04);
             background: rgba(255, 255, 255, 0.75);
         }
         .search-bottom:active,
-        .settings-bottom:active {
+        .settings-bottom:active,
+        .apps-bottom:active {
             transform: scale(0.95);
         }
 
         .search-icon-svg,
-        .settings-icon-svg {
+        .settings-icon-svg,
+        .apps-icon-svg {
             width: 30px;
             height: 30px;
             display: block;
@@ -430,6 +434,14 @@
             stroke-linecap: round;
             transition: stroke 0.2s ease;
         }
+        /* 应用图标：四个正方形 */
+        .apps-icon-svg rect {
+            fill: none;
+            stroke: #333;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            transition: stroke 0.2s ease;
+        }
 
         .search-bottom:hover .search-icon-svg circle,
         .search-bottom:hover .search-icon-svg line {
@@ -439,9 +451,13 @@
         .settings-bottom:hover .settings-icon-svg path {
             stroke: #0366d6;
         }
+        .apps-bottom:hover .apps-icon-svg rect {
+            stroke: #0366d6;
+        }
 
         .search-label,
-        .settings-label {
+        .settings-label,
+        .apps-label {
             font-size: 0.75rem;
             color: #888;
             letter-spacing: 0.5px;
@@ -450,11 +466,12 @@
             transition: color 0.2s ease;
         }
         .search-bottom:hover .search-label,
-        .settings-bottom:hover .settings-label {
+        .settings-bottom:hover .settings-label,
+        .apps-bottom:hover .apps-label {
             color: #0366d6;
         }
 
-        /* ===== 设置模态框（已添加“更新”选项卡） ===== */
+        /* ===== 设置模态框 ===== */
         .settings-modal {
             position: fixed;
             top: 0;
@@ -510,7 +527,7 @@
             padding: 6px 12px;
             border-radius: 30px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.95rem; /* 增大字号 */
             font-weight: 500;
             color: #666;
             transition: color 0.2s;
@@ -606,7 +623,7 @@
             transform: translateX(22px);
         }
 
-        /* 更新页面特殊样式 */
+        /* 更新页面 */
         .update-content {
             padding: 8px 0;
         }
@@ -628,12 +645,24 @@
             color: #222;
         }
 
-        /* 关于页面 */
+        /* 关于页面（新版式） */
         .about-content {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            align-items: center;
             padding: 8px 0;
+        }
+        .about-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0366d6;
+            margin-bottom: 8px;
+        }
+        .about-version {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #222;
+            margin-bottom: 16px;
         }
         .about-line {
             display: flex;
@@ -642,6 +671,8 @@
             border-bottom: 1px solid #f5f5f5;
             font-size: 0.95rem;
             color: #444;
+            width: 100%;
+            max-width: 280px;
         }
         .about-line .label {
             font-weight: 600;
@@ -650,6 +681,9 @@
         }
         .about-line .value {
             color: #555;
+        }
+        .about-line:last-child {
+            border-bottom: none;
         }
 
         .settings-footer {
@@ -718,7 +752,6 @@
             color: #0366d6;
         }
 
-        /* 实时预览开关样式（修改悬停效果） */
         .preview-toggle {
             font-size: 1rem;
             font-weight: 700;
@@ -732,7 +765,6 @@
             border: 2px solid #ddd;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-        /* 关闭状态下悬停文字变蓝，且如果更直观显示开启，边框也变蓝 */
         .preview-toggle:not(.active):hover {
             color: #0366d6;
         }
@@ -1072,7 +1104,8 @@
            ================================================================ */
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
-        body.highlight-mode .settings-bottom:hover {
+        body.highlight-mode .settings-bottom:hover,
+        body.highlight-mode .apps-bottom:hover {
             border-color: #0366d6;
         }
 
@@ -1125,17 +1158,20 @@
                 gap: 12px;
             }
             .search-bottom,
-            .settings-bottom {
+            .settings-bottom,
+            .apps-bottom {
                 width: 60px;
                 height: 60px;
             }
             .search-icon-svg,
-            .settings-icon-svg {
+            .settings-icon-svg,
+            .apps-icon-svg {
                 width: 26px;
                 height: 26px;
             }
             .search-label,
-            .settings-label {
+            .settings-label,
+            .apps-label {
                 font-size: 0.65rem;
             }
             .settings-panel {
@@ -1150,7 +1186,7 @@
             }
             .sub-tab {
                 padding: 4px 10px;
-                font-size: 0.75rem;
+                font-size: 0.85rem;
             }
             .settings-slide {
                 min-height: 80px;
@@ -1196,18 +1232,21 @@
                 gap: 10px;
             }
             .search-bottom,
-            .settings-bottom {
+            .settings-bottom,
+            .apps-bottom {
                 width: 54px;
                 height: 54px;
                 border-radius: 14px;
             }
             .search-icon-svg,
-            .settings-icon-svg {
+            .settings-icon-svg,
+            .apps-icon-svg {
                 width: 22px;
                 height: 22px;
             }
             .search-label,
-            .settings-label {
+            .settings-label,
+            .apps-label {
                 font-size: 0.6rem;
             }
             .hamburger {
@@ -1232,7 +1271,7 @@
             }
             .sub-tab {
                 padding: 4px 8px;
-                font-size: 0.7rem;
+                font-size: 0.8rem;
             }
             .sidenav a {
                 padding: 6px 14px;
@@ -1249,8 +1288,9 @@
     <!-- ===== 左上角汉堡菜单 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 底部工具栏（搜索 + 设置） ===== -->
+    <!-- ===== 底部工具栏（搜索 + 设置 + 应用） ===== -->
     <div class="bottom-tools" id="bottomTools">
+        <!-- 搜索 -->
         <div class="search-bottom" id="searchBottom" aria-label="搜索">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="14" cy="14" r="10" />
@@ -1258,12 +1298,23 @@
             </svg>
             <span class="search-label">搜索</span>
         </div>
+        <!-- 设置 -->
         <div class="settings-bottom" id="settingsBottom" aria-label="设置">
             <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="16" cy="16" r="4" />
                 <path d="M16 4 L16 8 M16 24 L16 28 M4 16 L8 16 M24 16 L28 16 M7.5 7.5 L10.5 10.5 M21.5 21.5 L24.5 24.5 M7.5 24.5 L10.5 21.5 M21.5 10.5 L24.5 7.5" />
             </svg>
             <span class="settings-label">设置</span>
+        </div>
+        <!-- 应用（新图标） -->
+        <div class="apps-bottom" id="appsBottom" aria-label="应用">
+            <svg class="apps-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="4" width="9" height="9" rx="1.5" />
+                <rect x="19" y="4" width="9" height="9" rx="1.5" />
+                <rect x="4" y="19" width="9" height="9" rx="1.5" />
+                <rect x="19" y="19" width="9" height="9" rx="1.5" />
+            </svg>
+            <span class="apps-label">应用</span>
         </div>
     </div>
 
@@ -1315,7 +1366,7 @@
         </div>
     </div>
 
-    <!-- ===== 设置弹窗（新增“更新”选项卡，修改“关于”内容） ===== -->
+    <!-- ===== 设置弹窗 ===== -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-panel">
             <h2>设置</h2>
@@ -1368,11 +1419,11 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 关于 -->
+                    <!-- 关于（新样式） -->
                     <div class="settings-slide" data-slide="about">
                         <div class="about-content">
-                            <div class="about-line"><span class="label">项目名称</span><span class="value">GuLi 网站导航与收藏</span></div>
-                            <div class="about-line"><span class="label">版本</span><span class="value">V1.0beta</span></div>
+                            <div class="about-title">GuLi 网站导航与收藏</div>
+                            <div class="about-version">V1.0beta</div>
                             <div class="about-line"><span class="label">网站制作</span><span class="value">Wise GuLy</span></div>
                             <div class="about-line"><span class="label">代码编写</span><span class="value">DeepSeek</span></div>
                             <div class="about-line"><span class="label">开源地址</span><span class="value">暂未公布</span></div>
@@ -1652,7 +1703,7 @@
         overlay.addEventListener('click', closeNav);
 
         // ----------------------------------------------------------------
-        // 4. 实时预览功能
+        // 4. 实时预览功能（悬停时展开对应板块）
         // ----------------------------------------------------------------
         const previewToggle = document.getElementById('previewToggle');
         let previewActive = false;
@@ -1666,6 +1717,15 @@
         function showPreview(sectionId, title) {
             const originalSection = document.getElementById(sectionId);
             if (!originalSection) return;
+
+            // 展开该板块（如果折叠）
+            if (originalSection.classList.contains('collapsed')) {
+                originalSection.classList.remove('collapsed');
+                const label = originalSection.querySelector('.toggle-label');
+                if (label) {
+                    label.textContent = '折叠';
+                }
+            }
 
             const clone = originalSection.cloneNode(true);
             clone.classList.remove('collapsed');
@@ -1750,6 +1810,14 @@
                         target.classList.add('preview-highlight');
                         currentHighlight = target;
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // 展开该板块（如果折叠）
+                        if (target.classList.contains('collapsed')) {
+                            target.classList.remove('collapsed');
+                            const label = target.querySelector('.toggle-label');
+                            if (label) {
+                                label.textContent = '折叠';
+                            }
+                        }
                     }
                     const title = anchor.textContent.trim();
                     if (currentPreviewSection !== targetId) {
@@ -1874,7 +1942,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 6. 设置功能（子选项卡、开关）
+        // 6. 设置功能
         // ----------------------------------------------------------------
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
@@ -2035,7 +2103,21 @@
         });
 
         // ----------------------------------------------------------------
-        // 7. 粒子特效
+        // 7. 应用图标功能（点击弹窗提示）
+        // ----------------------------------------------------------------
+        const appsBtn = document.getElementById('appsBottom');
+        appsBtn.addEventListener('click', function(e) {
+            // 目前仅作演示，弹出提示
+            alert('应用功能开发中，敬请期待！');
+            // 触发粒子效果
+            if (typeof spawnParticles === 'function') {
+                const rect = this.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
+        });
+
+        // ----------------------------------------------------------------
+        // 8. 粒子特效
         // ----------------------------------------------------------------
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
@@ -2122,7 +2204,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 8. 底部文字交互
+        // 9. 底部文字交互
         // ----------------------------------------------------------------
         const footerEl = document.getElementById('footerText');
         const originalText = '此网站由 Wise GuLy 所有，由 DeepSeek 开发';
@@ -2141,7 +2223,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 9. 全局 ESC
+        // 10. 全局 ESC
         // ----------------------------------------------------------------
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -2162,7 +2244,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 10. 布局切换
+        // 11. 布局切换
         // ----------------------------------------------------------------
         const sectionsGrid = document.getElementById('sectionsGrid');
         const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
@@ -2284,7 +2366,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 11. 侧边栏点击：跳转并展开板块（预览模式下关闭侧边栏，同时确保展开）
+        // 12. 侧边栏点击：跳转并展开板块（预览模式下关闭侧边栏，同时确保展开）
         // ----------------------------------------------------------------
         const sideNavUl = sidenav.querySelector('ul');
         sideNavUl.addEventListener('click', function(e) {
@@ -2308,7 +2390,7 @@
 
                     if (previewActive) {
                         // 预览模式：关闭侧边栏，跳转，然后重新显示预览
-                        closeNav(); // 关闭侧边栏，解锁滚动
+                        closeNav();
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
                         // 更新高亮和预览
@@ -2336,7 +2418,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 12. 初始化
+        // 13. 初始化
         // ----------------------------------------------------------------
         function init() {
             visualMode = true;
