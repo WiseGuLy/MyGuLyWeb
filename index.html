@@ -21,14 +21,14 @@
             overflow-x: hidden;
         }
 
-        /* 粒子 Canvas 覆盖全屏 */
+        /* 粒子 Canvas */
         #particleCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* 不阻挡点击 */
+            pointer-events: none;
             z-index: 9999;
         }
 
@@ -37,7 +37,6 @@
             margin: 0 auto;
         }
 
-        /* ----- 大标题 ----- */
         h1 {
             text-align: center;
             font-size: 2.4rem;
@@ -50,7 +49,7 @@
         }
 
         /* ============================================================
-           布局切换胶囊
+           布局切换胶囊（三选项）
            ============================================================ */
         .layout-switch {
             display: none;
@@ -69,80 +68,59 @@
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
-            position: relative;
-            min-width: 160px;
+            overflow: hidden;
         }
         .layout-switch.visible {
             display: flex;
         }
 
-        .switch-slider {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: calc(50% - 3px);
-            height: calc(100% - 6px);
-            border-radius: 30px;
-            background: #0366d6;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-        .layout-switch.double .switch-slider {
-            left: calc(50%);
-        }
-
         .switch-option {
-            padding: 8px 28px;
+            padding: 8px 20px;
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color 0.2s, background 0.2s;
             border-radius: 30px;
             background: transparent;
             color: #999;
-            position: relative;
-            z-index: 1;
-            flex: 1;
             text-align: center;
+            min-width: 64px;
+            z-index: 1;
         }
         .switch-option.active {
             color: #ffffff;
-        }
-        .switch-option:not(.active) {
-            color: #666;
+            background: #0366d6;
         }
         .switch-option:not(.active):hover {
             color: #0366d6;
         }
 
-        .switch-divider {
-            display: none;
-        }
-
         /* ============================================================
-           栏目网格容器
+           栏目网格容器（间距缩小至21px）
            ============================================================ */
         .sections-grid {
             display: block;
         }
 
         .col-left,
-        .col-right {
+        .col-right,
+        .col-mid {
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 21px;  /* 原28px，缩小约1/4 */
             flex: 1;
         }
 
-        .sections-grid.grid-mode {
+        .sections-grid.grid-mode,
+        .sections-grid.triple-mode {
             display: flex !important;
             flex-direction: row !important;
-            gap: 28px;
+            gap: 21px;  /* 原28px */
         }
 
         .section {
             background: #f5f5f5;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
-            padding: 20px 24px 12px;
+            padding: 18px 24px 12px; /* padding-top 从20px减至18px */
             transition: box-shadow 0.25s ease;
             width: 100%;
             border: 2px solid transparent;
@@ -151,10 +129,11 @@
             box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
         }
 
-        .sections-grid:not(.grid-mode) .section {
-            margin-bottom: 28px;
+        .sections-grid:not(.grid-mode):not(.triple-mode) .section {
+            margin-bottom: 21px;  /* 原28px */
         }
-        .sections-grid.grid-mode .section {
+        .sections-grid.grid-mode .section,
+        .sections-grid.triple-mode .section {
             margin-bottom: 0;
         }
 
@@ -225,12 +204,12 @@
             margin: 0;
         }
 
-        /* ===== 网站条目 ===== */
+        /* 网站条目（调整内边距保持紧凑） */
         li {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
-            padding: 12px 14px;
+            padding: 10px 14px;
             gap: 12px 8px;
             border-radius: 10px;
             transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, padding-left 0.2s;
@@ -249,7 +228,6 @@
         }
         li:hover .site-name {
             color: #0366d6;
-            transition: color 0.2s ease;
         }
 
         .site-name {
@@ -277,7 +255,7 @@
             opacity: 0.7;
         }
 
-        /* ----- 左上角三横线（汉堡） ----- */
+        /* ----- 左上角汉堡 ----- */
         .hamburger {
             position: fixed;
             top: 24px;
@@ -326,7 +304,7 @@
             pointer-events: none;
         }
 
-        /* ===== 底部工具容器（搜索 + 设置） ===== */
+        /* ===== 底部工具 ===== */
         .bottom-tools {
             position: fixed;
             bottom: 28px;
@@ -688,10 +666,9 @@
             color: #bbb;
         }
 
-        /* 搜索关闭按钮加粗加大 */
         .search-close {
-            font-size: 1.85rem;  /* 略微增大 */
-            font-weight: 600;    /* 加粗 */
+            font-size: 1.85rem;
+            font-weight: 600;
             background: none;
             border: none;
             cursor: pointer;
@@ -721,10 +698,9 @@
             flex-direction: column;
             min-height: 0;
         }
-        /* 标题匹配 / 网址匹配 加粗加大 */
         .result-column-title {
-            font-size: 0.9rem;    /* 略微增大 */
-            font-weight: 600;      /* 加粗 */
+            font-size: 0.9rem;
+            font-weight: 600;
             color: #888;
             letter-spacing: 0.5px;
             padding-bottom: 6px;
@@ -749,7 +725,6 @@
             border-radius: 4px;
         }
 
-        /* 搜索结果项 */
         .result-item {
             padding: 8px 10px;
             border-radius: 8px;
@@ -792,7 +767,7 @@
             text-align: center;
         }
 
-        /* 底部版权文字（新增交互） */
+        /* 底部版权 */
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -810,7 +785,7 @@
         }
 
         /* ============================================================
-           更直观显示模式（内阴影边框，宽度 1px）
+           更直观显示模式（内阴影边框）
            ============================================================ */
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
@@ -836,20 +811,25 @@
 
         /* 移动端响应 */
         @media (max-width: 767px) {
-            .sections-grid.grid-mode {
+            .sections-grid.grid-mode,
+            .sections-grid.triple-mode {
                 display: block !important;
                 flex-direction: column !important;
                 gap: 0 !important;
             }
             .sections-grid.grid-mode .col-left,
-            .sections-grid.grid-mode .col-right {
+            .sections-grid.grid-mode .col-right,
+            .sections-grid.triple-mode .col-left,
+            .sections-grid.triple-mode .col-right,
+            .sections-grid.triple-mode .col-mid {
                 display: block !important;
                 flex-direction: column !important;
                 gap: 0 !important;
                 flex: none !important;
             }
-            .sections-grid.grid-mode .section {
-                margin-bottom: 28px !important;
+            .sections-grid.grid-mode .section,
+            .sections-grid.triple-mode .section {
+                margin-bottom: 21px !important;
             }
             .layout-switch.visible {
                 display: none;
@@ -889,7 +869,7 @@
             h1 { font-size: 2rem; }
             .section { padding: 16px 16px 8px; }
             .site-name { min-width: 70px; font-size: 1rem; }
-            li { gap: 6px; padding: 10px 12px; }
+            li { gap: 6px; padding: 8px 12px; }
             .hamburger {
                 top: 16px;
                 left: 16px;
@@ -954,15 +934,13 @@
 </head>
 <body>
 
-    <!-- 粒子 Canvas -->
     <canvas id="particleCanvas"></canvas>
 
-    <!-- ===== 左上角汉堡 ===== -->
+    <!-- ===== 汉堡菜单 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 底部工具组（搜索 + 设置） ===== -->
+    <!-- ===== 底部工具 ===== -->
     <div class="bottom-tools" id="bottomTools">
-        <!-- 搜索 -->
         <div class="search-bottom" id="searchBottom" aria-label="搜索">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="14" cy="14" r="10" />
@@ -970,7 +948,6 @@
             </svg>
             <span class="search-label">搜索</span>
         </div>
-        <!-- 设置 -->
         <div class="settings-bottom" id="settingsBottom" aria-label="设置">
             <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="16" cy="16" r="4" />
@@ -980,7 +957,7 @@
         </div>
     </div>
 
-    <!-- ===== 侧边导航栏 ===== -->
+    <!-- ===== 侧边栏 ===== -->
     <nav class="sidenav" id="sidenav">
         <div class="sidenav-header">分类</div>
         <ul>
@@ -995,7 +972,6 @@
         </ul>
     </nav>
 
-    <!-- 侧边栏遮罩 -->
     <div class="overlay" id="overlay"></div>
 
     <!-- ===== 搜索弹窗 ===== -->
@@ -1027,21 +1003,18 @@
         <div class="settings-panel">
             <h2>设置</h2>
             <div class="settings-content" id="settingsContent">
-                <!-- 开关：更直观显示 -->
                 <div class="switch-setting">
                     <label for="visualSwitch">更直观显示</label>
                     <div class="switch-toggle" id="visualSwitch" role="button" tabindex="0" aria-checked="false">
                         <div class="slider"></div>
                     </div>
                 </div>
-                <!-- 开关：粒子特效 -->
                 <div class="switch-setting">
                     <label for="particleSwitch">粒子特效</label>
                     <div class="switch-toggle" id="particleSwitch" role="button" tabindex="0" aria-checked="true">
                         <div class="slider"></div>
                     </div>
                 </div>
-                <!-- 后续可添加更多设置项 -->
             </div>
             <div class="settings-footer">
                 <button id="settingsConfirmBtn">确定</button>
@@ -1053,20 +1026,14 @@
     <div class="container">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
-        <!-- 布局切换 -->
         <div class="layout-switch" id="layoutSwitch">
-            <span class="switch-slider"></span>
-            <span class="switch-option active" id="optionSingle" data-mode="single">单列</span>
-            <span class="switch-divider"></span>
-            <span class="switch-option" id="optionDouble" data-mode="grid">双列</span>
+            <span class="switch-option active" data-mode="single">单列</span>
+            <span class="switch-option" data-mode="double">双列</span>
+            <span class="switch-option" data-mode="triple">三列</span>
         </div>
 
-        <!-- ===== 栏目网格 ===== -->
-        <div class="sections-grid" id="sectionsGrid">
-            <!-- 由 JS 动态渲染 -->
-        </div>
+        <div class="sections-grid" id="sectionsGrid"></div>
 
-        <!-- 底部版权（交互文字） -->
         <div class="footer" id="footerText">
             此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
@@ -1253,7 +1220,6 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // 侧边栏导航点击跳转
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
@@ -1359,7 +1325,7 @@
         });
 
         // ================================================================
-        // 5. 设置功能 + 开关（更直观显示 + 粒子特效）
+        // 5. 设置功能 + 开关
         // ================================================================
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
@@ -1367,11 +1333,9 @@
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
 
-        // 状态
         let visualMode = false;
-        let particleEnabled = true; // 默认开启
+        let particleEnabled = true;
 
-        // 更新开关外观和 body 类
         function updateVisualSwitch() {
             visualSwitch.classList.toggle('active', visualMode);
             visualSwitch.setAttribute('aria-checked', visualMode);
@@ -1383,7 +1347,6 @@
             particleSwitch.setAttribute('aria-checked', particleEnabled);
         }
 
-        // 点击开关切换
         visualSwitch.addEventListener('click', function(e) {
             e.stopPropagation();
             visualMode = !visualMode;
@@ -1437,7 +1400,7 @@
         });
 
         // ================================================================
-        // 6. 粒子特效系统
+        // 6. 粒子特效（优化：减少粒子数量、速度，增加文字粒子）
         // ================================================================
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
@@ -1451,12 +1414,13 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        class Particle {
+        // 普通绿色粒子
+        class GreenParticle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
                 const angle = Math.random() * 2 * Math.PI;
-                const speed = 3 + Math.random() * 5;
+                const speed = 2 + Math.random() * 4; // 速度降低
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed;
                 this.size = 4 + Math.random() * 4;
@@ -1483,10 +1447,52 @@
             }
         }
 
+        // 文字粒子（显示“人民万岁！”或🐢）
+        class TextParticle {
+            constructor(x, y, text) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.fontSize = 30;
+                this.alpha = 1.0;
+                this.growth = 1.5; // 每帧增大
+                this.decay = 0.015; // 透明度衰减
+                this.color = text === '🐢' ? '#ffaa00' : '#ff0000'; // 红色文字，乌龟用金色
+            }
+            update() {
+                this.fontSize += this.growth;
+                this.alpha -= this.decay;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.font = `${this.fontSize}px "Arial", sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.text === '🐢' ? '#ffaa00' : '#ff0000';
+                ctx.fillStyle = this.color;
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
         function spawnParticles(x, y) {
             if (!particleEnabled) return;
-            for (let i = 0; i < 16; i++) {
-                particles.push(new Particle(x, y));
+            const rand = Math.random();
+            // 10% 概率显示“人民万岁！”
+            if (rand < 0.1) {
+                particles.push(new TextParticle(x, y, '人民万岁！'));
+            } 
+            // 10% 概率显示 🐢
+            else if (rand < 0.2) {
+                particles.push(new TextParticle(x, y, '🐢'));
+            } 
+            // 80% 概率普通绿色粒子，数量减少至12个
+            else {
+                for (let i = 0; i < 12; i++) {
+                    particles.push(new GreenParticle(x, y));
+                }
             }
             if (!animationId) {
                 animateParticles();
@@ -1500,7 +1506,8 @@
                 const p = particles[i];
                 p.update();
                 p.draw(ctx);
-                if (p.life > 0 && p.size > 0.5) {
+                if ((p.life !== undefined && p.life > 0 && p.size > 0.5) || 
+                    (p.alpha !== undefined && p.alpha > 0)) {
                     alive = true;
                 } else {
                     particles.splice(i, 1);
@@ -1515,11 +1522,27 @@
             }
         }
 
-        // 全局点击监听（触发粒子）
+        // 点击事件（排除交互元素）
         document.addEventListener('click', function(e) {
-            // 排除输入框、按钮等交互元素（防止干扰正常操作）
             const target = e.target;
-            if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('.switch-toggle')) {
+            // 排除交互性元素：A, BUTTON, INPUT, 以及有特定class或role的交互控件
+            if (target.closest('a') || 
+                target.closest('button') || 
+                target.tagName === 'INPUT' ||
+                target.closest('.switch-toggle') ||
+                target.closest('.hamburger') ||
+                target.closest('.search-bottom') ||
+                target.closest('.settings-bottom') ||
+                target.closest('.switch-option') ||
+                target.closest('.section-header') ||
+                target.closest('.sidenav li') ||
+                target.closest('.overlay') ||
+                target.closest('.settings-modal') ||
+                target.closest('.search-modal') ||
+                target.closest('.search-close') ||
+                target.closest('.settings-footer button') ||
+                target.closest('.footer') // 底部文字点击保留但我们已经单独处理，但排除粒子以免干扰
+            ) {
                 return;
             }
             spawnParticles(e.clientX, e.clientY);
@@ -1545,7 +1568,7 @@
         });
 
         // ================================================================
-        // 8. 全局 ESC 按键处理
+        // 8. 全局 ESC
         // ================================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1563,12 +1586,11 @@
         });
 
         // ================================================================
-        // 9. 布局切换
+        // 9. 布局切换（单列 / 双列 / 三列）
         // ================================================================
         const sectionsGrid = document.getElementById('sectionsGrid');
-        const optionSingle = document.getElementById('optionSingle');
-        const optionDouble = document.getElementById('optionDouble');
         const layoutSwitch = document.getElementById('layoutSwitch');
+        const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
 
         let desiredMode = 'single';
 
@@ -1592,49 +1614,66 @@
                 return createSection(data, collapsed);
             });
 
+            sectionsGrid.classList.remove('grid-mode', 'triple-mode');
+            sectionsGrid.style.display = 'block';
+
             if (mode === 'single') {
                 newSections.forEach(s => sectionsGrid.appendChild(s));
                 sectionsGrid.style.display = 'block';
-                sectionsGrid.classList.remove('grid-mode');
-                layoutSwitch.classList.remove('double');
-                optionSingle.classList.add('active');
-                optionDouble.classList.remove('active');
-            } else {
+            } else if (mode === 'double') {
                 const leftCol = document.createElement('div');
                 leftCol.className = 'col-left';
                 const rightCol = document.createElement('div');
                 rightCol.className = 'col-right';
-
                 newSections.forEach((section, index) => {
                     if (index % 2 === 0) leftCol.appendChild(section);
                     else rightCol.appendChild(section);
                 });
-
                 sectionsGrid.appendChild(leftCol);
                 sectionsGrid.appendChild(rightCol);
                 sectionsGrid.style.display = 'flex';
                 sectionsGrid.style.flexDirection = 'row';
-                sectionsGrid.style.gap = '28px';
+                sectionsGrid.style.gap = '21px';
                 sectionsGrid.classList.add('grid-mode');
-                layoutSwitch.classList.add('double');
-                optionSingle.classList.remove('active');
-                optionDouble.classList.add('active');
+            } else if (mode === 'triple') {
+                const col1 = document.createElement('div');
+                col1.className = 'col-left';
+                const col2 = document.createElement('div');
+                col2.className = 'col-mid';
+                const col3 = document.createElement('div');
+                col3.className = 'col-right';
+                newSections.forEach((section, index) => {
+                    if (index % 3 === 0) col1.appendChild(section);
+                    else if (index % 3 === 1) col2.appendChild(section);
+                    else col3.appendChild(section);
+                });
+                sectionsGrid.appendChild(col1);
+                sectionsGrid.appendChild(col2);
+                sectionsGrid.appendChild(col3);
+                sectionsGrid.style.display = 'flex';
+                sectionsGrid.style.flexDirection = 'row';
+                sectionsGrid.style.gap = '21px';
+                sectionsGrid.classList.add('triple-mode');
             }
+
+            switchOptions.forEach(opt => {
+                opt.classList.remove('active');
+                if (opt.dataset.mode === mode) {
+                    opt.classList.add('active');
+                }
+            });
 
             layoutSwitch.classList.toggle('visible', isDesktop);
         }
 
-        optionSingle.addEventListener('click', function() {
-            if (desiredMode !== 'single') {
-                desiredMode = 'single';
-                applyLayout();
-            }
-        });
-        optionDouble.addEventListener('click', function() {
-            if (desiredMode !== 'grid') {
-                desiredMode = 'grid';
-                applyLayout();
-            }
+        switchOptions.forEach(opt => {
+            opt.addEventListener('click', function() {
+                const mode = this.dataset.mode;
+                if (mode !== desiredMode) {
+                    desiredMode = mode;
+                    applyLayout();
+                }
+            });
         });
 
         window.addEventListener('resize', applyLayout);
