@@ -19,7 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #1e1e1e;
             padding: 40px 20px 100px;
-            min-height: 200vh;
+            min-height: 100vh; /* 修复：移除原有的 200vh 避免底部大量空白 */
             position: relative;
             overflow-x: hidden;
         }
@@ -209,16 +209,19 @@
         .section-header:hover .toggle-btn { color: #0366d6; }
         .section.collapsed .toggle-btn { transform: rotate(-90deg); }
 
+        /* 修复：降低 max-height 并精确匹配过渡时间，消除折叠空隙感 */
         .list-wrapper {
             overflow: hidden;
-            max-height: 2000px;
-            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
+            max-height: 1000px; 
+            transition: max-height 0.4s ease, opacity 0.25s ease, margin 0.4s ease;
             opacity: 1;
         }
         .section.collapsed .list-wrapper {
             max-height: 0 !important;
             opacity: 0;
             margin: 0;
+            /* 折叠状态专属：高度 0.25s 收缩，文字 0.15s 淡出，完美同步无缝隙 */
+            transition: max-height 0.25s ease, opacity 0.15s ease, margin 0.25s ease;
         }
 
         ul { list-style: none; padding: 0; margin: 0; }
@@ -852,7 +855,7 @@
             box-shadow: none;
             margin: 0;
         }
-        .preview-content .section .list-wrapper { max-height: 2000px !important; opacity: 1 !important; margin: 0 !important; }
+        .preview-content .section .list-wrapper { max-height: 1000px !important; opacity: 1 !important; margin: 0 !important; }
         .preview-content .section .toggle-btn, .preview-content .section .toggle-label { display: none; }
         .preview-content .section .section-header {
             cursor: default;
@@ -1477,6 +1480,7 @@
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
             hideLayoutSwitch();
+            hamburger.classList.add('hidden'); // 修复：打开搜索时隐藏侧边栏按键
             setTimeout(() => searchInput.focus(), 150);
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
@@ -1492,6 +1496,7 @@
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             showLayoutSwitch();
+            hamburger.classList.remove('hidden'); // 修复：关闭搜索时恢复侧边栏按键
         }
 
         searchBtn.addEventListener('click', openSearch);
@@ -1723,7 +1728,6 @@
             if (!availableModes.includes(desiredMode)) desiredMode = availableModes[0];
             
             layoutSwitch.classList.toggle('two-options', availableModes.length === 2);
-            // 安全地移除旧类名并添加新类名，避免字符串替换造成的丢失
             layoutSwitch.classList.remove('mode-single', 'mode-double', 'mode-triple');
             layoutSwitch.classList.add(`mode-${desiredMode}`);
             
