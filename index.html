@@ -43,7 +43,6 @@
             max-width: 1360px;
         }
 
-        /* 顶部标题下划线加深 */
         h1 {
             text-align: center;
             font-size: 2.4rem;
@@ -52,7 +51,7 @@
             margin-bottom: 16px;
             color: #1a1a1a;
             padding-bottom: 12px;
-            border-bottom: 2px solid #d0d0d0; /* 加深 */
+            border-bottom: 2px solid #d0d0d0;
         }
 
         /* ================================================================
@@ -79,6 +78,7 @@
             min-width: 200px;
             overflow: hidden;
             z-index: 100;
+            transition: opacity 0.3s, visibility 0.3s;
         }
         .layout-switch.visible { display: flex; }
         .layout-switch.sticky {
@@ -87,6 +87,17 @@
             z-index: 100;
             box-shadow: 0 4px 20px rgba(0,0,0,0.06);
             border-color: rgba(200,200,200,0.6);
+        }
+        .layout-switch.hidden-switch {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            margin-bottom: 0;
+            height: 0;
+            min-height: 0;
+            padding: 0;
+            border: none;
+            overflow: hidden;
         }
 
         .switch-slider {
@@ -170,7 +181,6 @@
             box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
         }
 
-        /* 实时预览高亮样式 */
         .section.preview-highlight {
             background: #eef6ff;
             border-color: #0366d6;
@@ -303,12 +313,12 @@
             opacity: 0.7;
         }
 
-        /* ----- 左上角汉堡 ----- */
+        /* ----- 左上角汉堡（z-index提升） ----- */
         .hamburger {
             position: fixed;
             top: 24px;
             left: 24px;
-            z-index: 1000;
+            z-index: 10001;
             width: 52px;
             height: 52px;
             display: flex;
@@ -646,7 +656,7 @@
             transform: scale(0.96);
         }
 
-        /* ----- 侧边导航栏（包含实时预览开关） ----- */
+        /* ----- 侧边导航栏 ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -656,7 +666,7 @@
             background: #ffffff;
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
             transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 999;
+            z-index: 10000;
             padding: 80px 0 30px;
             overflow-y: auto;
             border-right: 1px solid #f0f0f0;
@@ -684,23 +694,31 @@
             color: #0366d6;
         }
 
-        /* 实时预览开关（文字按钮） */
         .preview-toggle {
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
             user-select: none;
-            transition: color 0.2s;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
             color: #999;
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 3px 12px;
+            border-radius: 20px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .preview-toggle.active {
-            color: #0366d6;
-            background: rgba(3, 102, 214, 0.1);
+            color: #ffffff;
+            background: #0366d6;
+            border-color: #0366d6;
+            box-shadow: 0 2px 8px rgba(3, 102, 214, 0.25);
         }
         .preview-toggle:hover {
-            background: rgba(0,0,0,0.04);
+            background: #e6e6e6;
+        }
+        .preview-toggle.active:hover {
+            background: #0250a5;
+            border-color: #0250a5;
         }
 
         .sidenav ul {
@@ -712,15 +730,20 @@
             padding: 0;
             border-bottom: 1px solid #f3f3f3;
             cursor: pointer;
-            transition: background 0.15s, box-shadow 0.2s;
+            transition: background 0.15s, box-shadow 0.2s, border-left-color 0.2s;
             border: 2px solid transparent;
             border-bottom: 1px solid #f3f3f3;
+            border-left: 4px solid transparent;
         }
         .sidenav li:last-child {
             border-bottom: 1px solid #f3f3f3;
         }
         .sidenav li:hover {
             background: #f5f8ff;
+        }
+        .sidenav li.preview-active {
+            background: #e0edff;
+            border-left-color: #0366d6;
         }
         .sidenav a {
             display: block;
@@ -730,7 +753,7 @@
             font-weight: 500;
             padding: 10px 20px;
             transition: color 0.25s ease, padding-left 0.25s ease, background 0.15s;
-            pointer-events: none; /* 点击由li统一处理 */
+            pointer-events: none;
         }
         .sidenav li:hover a {
             color: #0366d6;
@@ -919,14 +942,13 @@
             text-align: center;
         }
 
-        /* 底部版权上划线加深 */
         .footer {
             text-align: center;
             margin-top: 40px;
             padding: 20px 0 10px;
             font-size: 0.8rem;
             color: #aaa;
-            border-top: 2px solid #d0d0d0; /* 加深 */
+            border-top: 2px solid #d0d0d0;
             letter-spacing: 0.3px;
             transition: color 0.2s ease;
             cursor: default;
@@ -934,6 +956,86 @@
         }
         .footer:hover {
             color: #0366d6;
+        }
+
+        /* ================================================================
+           预览模态框（无遮罩）
+           ================================================================ */
+        .preview-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            z-index: 9999;
+            background: #fafcff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            border: 2px solid #0366d6;
+        }
+        .preview-modal.visible {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .preview-modal .preview-content {
+            padding: 20px 24px 24px;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        .preview-content .section {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 16px 20px 10px;
+            border: none;
+            box-shadow: none;
+            margin: 0;
+        }
+        .preview-content .section .list-wrapper {
+            max-height: 2000px !important;
+            opacity: 1 !important;
+            margin: 0 !important;
+        }
+        .preview-content .section .toggle-btn {
+            display: none;
+        }
+        .preview-content .section .toggle-label {
+            display: none;
+        }
+        .preview-content .section .section-header {
+            cursor: default;
+            border-bottom-color: #d0d0d0;
+            margin-bottom: 10px;
+        }
+        .preview-content .section .section-title {
+            color: #0366d6;
+        }
+        .preview-content .section li {
+            padding: 6px 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .preview-content .section li:last-child {
+            border-bottom: none;
+        }
+        .preview-content .section li:hover {
+            background: transparent;
+            transform: none;
+            box-shadow: none;
+            padding-left: 12px;
+        }
+        .preview-content .section .site-name {
+            min-width: 80px;
+            font-size: 1rem;
+        }
+        .preview-content .section .site-url {
+            font-size: 0.85rem;
         }
 
         /* ================================================================
@@ -1027,6 +1129,10 @@
             .sidenav a {
                 padding: 8px 16px;
                 font-size: 1.1rem;
+            }
+            .preview-modal {
+                max-width: 95%;
+                width: 95%;
             }
         }
 
@@ -1132,7 +1238,7 @@
         </div>
     </div>
 
-    <!-- ===== 侧边导航栏（含实时预览开关） ===== -->
+    <!-- ===== 侧边导航栏 ===== -->
     <nav class="sidenav" id="sidenav">
         <div class="sidenav-header">
             <span class="header-title">分类</span>
@@ -1196,13 +1302,13 @@
                     <div class="settings-slide" data-slide="appearance">
                         <div class="switch-setting">
                             <label for="visualSwitch">更直观显示</label>
-                            <div class="switch-toggle" id="visualSwitch" role="button" tabindex="0" aria-checked="false">
+                            <div class="switch-toggle active" id="visualSwitch" role="button" tabindex="0" aria-checked="true">
                                 <div class="slider"></div>
                             </div>
                         </div>
                         <div class="switch-setting">
                             <label for="particleSwitch">粒子特效</label>
-                            <div class="switch-toggle" id="particleSwitch" role="button" tabindex="0" aria-checked="true">
+                            <div class="switch-toggle active" id="particleSwitch" role="button" tabindex="0" aria-checked="true">
                                 <div class="slider"></div>
                             </div>
                         </div>
@@ -1231,10 +1337,18 @@
         </div>
     </div>
 
+    <!-- ===== 预览模态框（无遮罩） ===== -->
+    <div class="preview-modal" id="previewModal">
+        <div class="preview-content" id="previewContent">
+            <!-- 动态填充 -->
+        </div>
+    </div>
+
     <!-- ===== 主容器 ===== -->
     <div class="container" id="mainContainer">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
+        <!-- 列数切换 -->
         <div class="layout-switch visible sticky" id="layoutSwitch">
             <span class="switch-slider"></span>
             <span class="switch-option active" data-mode="single">单列</span>
@@ -1242,8 +1356,10 @@
             <span class="switch-option" data-mode="triple">三列</span>
         </div>
 
+        <!-- 卡片列表容器 -->
         <div class="sections-grid" id="sectionsGrid"></div>
 
+        <!-- 底部版权 -->
         <div class="footer" id="footerText">
             此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
@@ -1433,24 +1549,48 @@
         const sidenav = document.getElementById('sidenav');
         const overlay = document.getElementById('overlay');
         const bottomTools = document.getElementById('bottomTools');
+        const layoutSwitch = document.getElementById('layoutSwitch');
+
+        let scrollbarWidth = 0;
+
+        function getScrollbarWidth() {
+            return window.innerWidth - document.documentElement.clientWidth;
+        }
+
+        function hideLayoutSwitch() {
+            layoutSwitch.classList.add('hidden-switch');
+        }
+        function showLayoutSwitch() {
+            layoutSwitch.classList.remove('hidden-switch');
+        }
 
         function openNav() {
+            scrollbarWidth = getScrollbarWidth();
+            if (scrollbarWidth > 0) {
+                document.body.style.paddingRight = scrollbarWidth + 'px';
+            }
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
             sidenav.classList.add('open');
             overlay.classList.add('show');
-            document.body.style.overflow = 'hidden';
             bottomTools.classList.add('hidden');
             hamburger.classList.add('active');
+            hideLayoutSwitch();
             if (typeof spawnParticles === 'function') {
                 const rect = hamburger.getBoundingClientRect();
                 spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
             }
         }
+
         function closeNav() {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            document.body.style.paddingRight = '';
             sidenav.classList.remove('open');
             overlay.classList.remove('show');
-            document.body.style.overflow = '';
             bottomTools.classList.remove('hidden');
             hamburger.classList.remove('active');
+            showLayoutSwitch();
         }
 
         hamburger.addEventListener('click', function(e) {
@@ -1462,30 +1602,79 @@
         overlay.addEventListener('click', closeNav);
 
         // ----------------------------------------------------------------
-        // 4. 实时预览功能
+        // 4. 实时预览功能（无遮罩）
         // ----------------------------------------------------------------
         const previewToggle = document.getElementById('previewToggle');
         let previewActive = false;
 
-        // 切换预览状态
+        const previewModal = document.getElementById('previewModal');
+        const previewContent = document.getElementById('previewContent');
+
+        let currentPreviewSection = null;
+
+        function showPreview(sectionId, title) {
+            const originalSection = document.getElementById(sectionId);
+            if (!originalSection) return;
+
+            const clone = originalSection.cloneNode(true);
+            clone.classList.remove('collapsed');
+            const toggleGroup = clone.querySelector('.toggle-group');
+            if (toggleGroup) toggleGroup.style.display = 'none';
+            const listWrapper = clone.querySelector('.list-wrapper');
+            if (listWrapper) {
+                listWrapper.style.maxHeight = 'none';
+                listWrapper.style.opacity = '1';
+                listWrapper.style.margin = '0';
+            }
+            const header = clone.querySelector('.section-header');
+            if (header) {
+                const titleSpan = header.querySelector('.section-title');
+                header.innerHTML = '';
+                header.appendChild(titleSpan);
+                header.style.cursor = 'default';
+                header.style.borderBottom = '2px solid #0366d6';
+            }
+
+            previewContent.innerHTML = '';
+            previewContent.appendChild(clone);
+
+            // 锁定滚动（预览框显示时锁定）
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.overflow = 'hidden';
+
+            previewModal.classList.add('visible');
+        }
+
+        function hidePreview() {
+            previewModal.classList.remove('visible');
+            // 仅当侧边栏关闭时恢复滚动
+            if (!sidenav.classList.contains('open')) {
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+            }
+            previewContent.innerHTML = '';
+            currentPreviewSection = null;
+        }
+
         previewToggle.addEventListener('click', function(e) {
             e.stopPropagation();
             previewActive = !previewActive;
             this.classList.toggle('active', previewActive);
-            // 如果关闭预览，移除所有高亮
             if (!previewActive) {
                 document.querySelectorAll('.section.preview-highlight').forEach(el => {
                     el.classList.remove('preview-highlight');
                 });
+                document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
+                    el.classList.remove('preview-active');
+                });
+                hidePreview();
             }
-            // 触发粒子
             if (typeof spawnParticles === 'function') {
                 const rect = this.getBoundingClientRect();
                 spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
             }
         });
 
-        // 侧边栏链接悬停事件（仅当预览开启时）
         const sideNavItems = document.querySelectorAll('.sidenav li');
         let currentHighlight = null;
 
@@ -1496,40 +1685,40 @@
                 if (!anchor) return;
                 const targetId = anchor.getAttribute('href');
                 if (targetId && targetId.startsWith('#')) {
+                    // 移除之前高亮
+                    document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
+                        el.classList.remove('preview-active');
+                    });
+                    if (currentHighlight) {
+                        currentHighlight.classList.remove('preview-highlight');
+                    }
+                    this.classList.add('preview-active');
                     const target = document.querySelector(targetId);
                     if (target) {
-                        // 移除之前的高亮
-                        if (currentHighlight) {
-                            currentHighlight.classList.remove('preview-highlight');
-                        }
-                        // 高亮新的
                         target.classList.add('preview-highlight');
                         currentHighlight = target;
-                        // 平滑滚动
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                    const title = anchor.textContent.trim();
+                    if (currentPreviewSection !== targetId) {
+                        showPreview(targetId.replace('#', ''), title);
+                        currentPreviewSection = targetId;
                     }
                 }
             });
 
-            // 鼠标离开侧边栏时取消高亮（但悬停在侧边栏其他项时也会触发，我们只保留当前高亮）
-            // 这里使用 mouseleave 在 li 上，但为了避免移出侧边栏时还留着高亮，在侧边栏整体 mouseleave 时清除
+            li.addEventListener('mouseleave', function(e) {
+                if (!previewActive) return;
+                hidePreview();
+            });
         });
 
-        // 当鼠标离开整个侧边栏时，清除高亮（但保持预览开启）
         sidenav.addEventListener('mouseleave', function() {
             if (currentHighlight) {
                 currentHighlight.classList.remove('preview-highlight');
                 currentHighlight = null;
             }
         });
-
-        // 侧边栏条目点击（保持原有跳转功能，但实时预览开启时不关闭侧边栏？ 要求“保持侧边栏开启”，所以点击链接时不关闭侧边栏）
-        // 但原有的点击是关闭侧边栏的，我们修改一下：如果预览开启，点击后不关闭侧边栏，只滚动
-        // 我们修改原有的点击事件
-        // 先移除原有的点击监听（之前绑定的在下面），我们需要重新绑定
-        // 因为之前的代码在下面绑定了，我们会在后面覆盖，但为了避免冲突，我们将在初始化时重新绑定
-        // 现在我们保留原有逻辑，但修改点击事件：
-        // 在后面的代码中，我们会重写侧边栏点击事件，所以这里先不绑定。
 
         // ----------------------------------------------------------------
         // 5. 搜索功能
@@ -1594,6 +1783,8 @@
         function openSearch() {
             searchModal.classList.add('open');
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            hideLayoutSwitch();
             setTimeout(() => searchInput.focus(), 150);
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
@@ -1607,9 +1798,11 @@
         function closeSearch() {
             searchModal.classList.remove('open');
             document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
             searchInput.value = '';
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+            showLayoutSwitch();
         }
 
         const searchBtn = document.getElementById('searchBottom');
@@ -1634,7 +1827,7 @@
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
 
-        let visualMode = false;
+        let visualMode = true;
         let particleEnabled = true;
         let stickyEnabled = true;
 
@@ -1750,6 +1943,9 @@
         function openSettings() {
             bottomTools.classList.add('hidden');
             hamburger.classList.add('hidden');
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+            hideLayoutSwitch();
             if (sidenav.classList.contains('open')) {
                 closeNav();
             }
@@ -1768,6 +1964,9 @@
             settingsModal.classList.remove('open');
             bottomTools.classList.remove('hidden');
             hamburger.classList.remove('hidden');
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+            showLayoutSwitch();
         }
 
         settingsBtn.addEventListener('click', openSettings);
@@ -1898,6 +2097,9 @@
                 } else if (sidenav.classList.contains('open')) {
                     closeNav();
                     e.preventDefault();
+                } else if (previewModal.classList.contains('visible')) {
+                    hidePreview();
+                    e.preventDefault();
                 }
             }
         });
@@ -1906,7 +2108,6 @@
         // 10. 布局切换
         // ----------------------------------------------------------------
         const sectionsGrid = document.getElementById('sectionsGrid');
-        const layoutSwitch = document.getElementById('layoutSwitch');
         const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
         const mainContainer = document.getElementById('mainContainer');
 
@@ -2026,115 +2227,80 @@
         });
 
         // ----------------------------------------------------------------
-        // 11. 重新绑定侧边栏点击事件（支持实时预览）
+        // 11. 侧边栏点击：跳转并展开板块（预览模式下自动关闭侧边栏）
         // ----------------------------------------------------------------
-        // 移除之前绑定的点击事件（如果有）
-        // 我们重新为所有侧边栏 li 绑定点击事件
-        // 由于之前已经有 addEventListener，我们需要移除旧的监听，但为了简单，我们覆盖：先移除所有，再添加新的。
-        // 但我们在上面没有显式绑定点击（除了在 openNav 中绑定的那个？上面有 document.querySelectorAll('.sidenav li') 的点击，但那是为了关闭侧边栏并跳转。
-        // 我们将那个监听替换为新的逻辑。
-        // 先获取所有 li，移除之前的监听（如果可能），但更简单的做法是重新绑定，覆盖之前的。
-        // 由于之前用匿名函数，无法移除，我们直接覆盖：移除所有监听再添加新的。
-        // 但为了保持代码清晰，我们在这里重新绑定。
-        // 先移除旧监听：我们可以克隆节点替换，但太麻烦。我们采用事件委托：在 sidenav ul 上监听 click，然后判断 target。
-        // 用委托方式更干净。
-        // 我们在初始化时添加委托监听，并移除之前的单个监听。
-        // 由于之前是直接 addEventListener 到每个 li，现在我们用委托方式。
+        const sideNavUl = sidenav.querySelector('ul');
+        sideNavUl.addEventListener('click', function(e) {
+            const li = e.target.closest('li');
+            if (!li) return;
+            const anchor = li.querySelector('a');
+            if (!anchor) return;
+            const targetId = anchor.getAttribute('href');
+            if (targetId && targetId.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(targetId);
+                if (target) {
+                    // 展开板块（如果折叠）
+                    if (target.classList.contains('collapsed')) {
+                        target.classList.remove('collapsed');
+                        const label = target.querySelector('.toggle-label');
+                        if (label) {
+                            label.textContent = '折叠';
+                        }
+                    }
 
-        // 移除之前的单个监听？我们可以在初始化时清除，但为了安全，我们直接使用委托，并忽略之前绑定的。
-        // 因为之前绑定的会与委托冲突，但我们可以阻止它们触发。
-        // 更好的方法：在初始化时，删除所有 li 上已有的 click 监听（但我们无法删除匿名函数）。
-        // 我们可以在委托中判断是否由实时预览控制，但为了简单，我们就用委托，并防止原有的点击执行。
-        // 实际上，之前的点击事件也会触发，但我们可以通过标记阻止。
-        // 简单处理：在委托中，如果实时预览开启，阻止默认行为并执行我们的逻辑，否则执行原有逻辑。
-        // 但为了彻底，我们完全用委托代替，不去管之前的绑定。
+                    if (previewActive) {
+                        // 预览模式：关闭侧边栏（解除滚动锁定），然后跳转，再重新锁定滚动（通过 showPreview）
+                        closeNav(); // 关闭侧边栏，滚动解锁
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // 我们在这里添加一个新的委托监听，并让之前的点击不干扰。
-        // 但之前的点击会触发 closeNav 和滚动，可能冲突。
-        // 所以我们需要移除之前的点击。由于之前是每个 li 单独绑定，我们无法直接移除匿名函数。
-        // 但我们可以通过将之前的监听替换为我们的委托，但实际我们可以在初始化时先移除所有 li 的点击事件。
-        // 这里我们在页面加载完成后重新绑定。
-        // 简单做法：在初始化时，清除所有 li 的 click 事件（通过替换为新的），但我们不想修改太多。
-        // 因为之前的点击是在脚本中通过 forEach 添加的，我们可以将那段代码移除，然后在这里用委托。
-        // 为了简洁，我将在最后重新定义侧边栏点击行为，覆盖之前的。
-        // 实际上，我可以修改之前的代码，但为了清晰，我在初始化时移除旧的监听。
+                        // 更新高亮和预览
+                        if (currentHighlight) {
+                            currentHighlight.classList.remove('preview-highlight');
+                        }
+                        target.classList.add('preview-highlight');
+                        currentHighlight = target;
+                        // 注意：关闭侧边栏后，li 可能不可见，但类仍可添加，但无妨
+                        document.querySelectorAll('.sidenav li.preview-active').forEach(el => {
+                            el.classList.remove('preview-active');
+                        });
+                        li.classList.add('preview-active');
+                        const title = anchor.textContent.trim();
+                        if (currentPreviewSection !== targetId) {
+                            showPreview(targetId.replace('#', ''), title);
+                            currentPreviewSection = targetId;
+                        }
+                        // showPreview 会重新锁定滚动
+                    } else {
+                        // 非预览模式：正常跳转，关闭侧边栏
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        closeNav();
+                    }
 
-        // 由于前面已经添加了侧边栏点击的监听（在打开侧边栏后），我们现在移除它们：
-        // 但我们无法直接移除匿名函数。所以最好的方式是：用委托监听，并阻止之前的监听执行。
-        // 我们可以使用 event.stopImmediatePropagation() 在委托中，但无法阻止已绑定的。
-        // 更可靠的方法是：在绑定新的委托后，将之前的监听标记为不执行。
-        // 但这里我们直接采用新的方式：在初始化时，先将所有 li 的 click 监听移除（通过 cloneNode 替换）？
-        // 更简单：直接将之前的监听代码注释掉，只保留委托。
-        // 在之前代码中，有 document.querySelectorAll('.sidenav li').forEach(li => { li.addEventListener('click', ...) });
-        // 我们现在注释掉那段，改为委托。
-        // 由于我们提供完整代码，可以直接修改。
-
-        // 在下面的初始化中，我们不再使用之前的绑定。
-
-        // 但是，因为上面已经存在绑定了（在汉堡菜单部分），我们需要移除那段代码。
-        // 实际上，在代码中，有 document.querySelectorAll('.sidenav li').forEach(li => { li.addEventListener('click', ...) });
-        // 我已经注意到，所以我在初始化时重新实现侧边栏点击逻辑。
-
-        // 我们将这段逻辑放在初始化函数中，并覆盖之前的。
-        // 为了不重复，我在上面就没有绑定，而是在这里统一处理。
+                    // 触发粒子
+                    if (typeof spawnParticles === 'function') {
+                        const rect = li.getBoundingClientRect();
+                        spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                    }
+                }
+            }
+        });
 
         // ----------------------------------------------------------------
         // 12. 初始化
         // ----------------------------------------------------------------
         function init() {
-            // 设置默认状态
-            visualMode = false;
+            visualMode = true;
             particleEnabled = true;
             stickyEnabled = true;
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
-            // 默认显示外观选项卡
             switchTab('appearance');
-            // 加载布局
             updateSwitchOptions();
-            // 搜索框初始提示
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
-
-            // 侧边栏点击事件委托（支持实时预览）
-            const sideNavUl = sidenav.querySelector('ul');
-            sideNavUl.addEventListener('click', function(e) {
-                const li = e.target.closest('li');
-                if (!li) return;
-                const anchor = li.querySelector('a');
-                if (!anchor) return;
-                const targetId = anchor.getAttribute('href');
-                if (targetId && targetId.startsWith('#')) {
-                    e.preventDefault(); // 阻止默认跳转
-                    const target = document.querySelector(targetId);
-                    if (target) {
-                        // 如果实时预览开启，不关闭侧边栏，只滚动
-                        if (previewActive) {
-                            // 移除之前高亮
-                            if (currentHighlight) {
-                                currentHighlight.classList.remove('preview-highlight');
-                            }
-                            target.classList.add('preview-highlight');
-                            currentHighlight = target;
-                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            // 不关闭侧边栏
-                        } else {
-                            // 原有行为：关闭侧边栏并跳转
-                            closeNav();
-                            setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
-                        }
-                        // 触发粒子
-                        if (typeof spawnParticles === 'function') {
-                            const rect = li.getBoundingClientRect();
-                            spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
-                        }
-                    }
-                }
-            });
-
-            // 注意：原有的单个 li 点击监听已经被移除，因为我们在上面没有用 forEach 绑定。
-            // 这样可以确保点击行为统一。
+            showLayoutSwitch();
         }
         init();
     </script>
