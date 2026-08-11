@@ -18,6 +18,18 @@
             padding: 40px 20px 100px;
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 粒子 Canvas 覆盖全屏 */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 不阻挡点击 */
+            z-index: 9999;
         }
 
         .container {
@@ -133,6 +145,7 @@
             padding: 20px 24px 12px;
             transition: box-shadow 0.25s ease;
             width: 100%;
+            border: 2px solid transparent;
         }
         .section:hover {
             box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
@@ -152,7 +165,7 @@
             cursor: pointer;
             user-select: none;
             padding: 4px 0 10px 0;
-            border-bottom: 2px solid #eaeaea;
+            border-bottom: 2px solid #d0d0d0;
             margin-bottom: 12px;
         }
         .section-title {
@@ -218,14 +231,15 @@
             align-items: center;
             flex-wrap: wrap;
             padding: 12px 14px;
-            border-bottom: 1px solid #f0f0f0;
             gap: 12px 8px;
             border-radius: 10px;
             transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease, padding-left 0.2s;
             cursor: pointer;
+            border: 2px solid transparent;
+            border-bottom: 1px solid #f0f0f0;
         }
         li:last-child {
-            border-bottom: none;
+            border-bottom: 1px solid #f0f0f0;
         }
         li:hover {
             background: #eef3fc;
@@ -279,12 +293,12 @@
             cursor: pointer;
             color: #333;
             user-select: none;
-            transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s ease;
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(160, 160, 160, 0.6);
+            border: 2px solid rgba(160, 160, 160, 0.6);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
             font-weight: 300;
         }
@@ -307,7 +321,6 @@
             color: #ffffff;
             transform: scale(1.05);
         }
-        /* 设置打开时隐藏 */
         .hamburger.hidden {
             opacity: 0;
             pointer-events: none;
@@ -330,7 +343,6 @@
             pointer-events: none;
         }
 
-        /* 搜索和设置共用基础样式 */
         .search-bottom,
         .settings-bottom {
             display: flex;
@@ -346,9 +358,9 @@
             background: rgba(255, 255, 255, 0.55);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(160, 160, 160, 0.6);
+            border: 2px solid rgba(160, 160, 160, 0.6);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            transition: transform 0.2s, background 0.2s, opacity 0.3s;
+            transition: transform 0.2s, background 0.2s, opacity 0.3s, border-color 0.2s ease;
         }
         .search-bottom:hover,
         .settings-bottom:hover {
@@ -431,11 +443,12 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 480px;
-            max-height: 80vh;
+            max-height: 90vh;
             display: flex;
             flex-direction: column;
             padding: 32px 28px 20px;
             animation: fadeInUp 0.25s ease;
+            overflow: hidden;
         }
         .settings-panel h2 {
             font-size: 1.6rem;
@@ -443,6 +456,7 @@
             color: #222;
             margin-bottom: 20px;
             text-align: center;
+            flex-shrink: 0;
         }
         .settings-content {
             flex: 1;
@@ -454,15 +468,61 @@
             border-top: 1px solid #eee;
             border-bottom: 1px solid #eee;
             margin-bottom: 20px;
-            min-height: 120px;
+            min-height: 80px;
         }
+        .switch-setting {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .switch-setting:last-child {
+            border-bottom: none;
+        }
+        .switch-setting label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+        .switch-toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: #ccc;
+            border-radius: 26px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .switch-toggle.active {
+            background: #0366d6;
+        }
+        .switch-toggle .slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .switch-toggle.active .slider {
+            transform: translateX(22px);
+        }
+
         .settings-footer {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
+            flex-shrink: 0;
+            padding-top: 8px;
         }
         .settings-footer button {
-            padding: 10px 36px;
-            font-size: 1rem;
+            padding: 12px 40px;
+            font-size: 1.1rem;
             font-weight: 500;
             color: #fff;
             background: #0366d6;
@@ -470,6 +530,9 @@
             border-radius: 40px;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
+            width: 100%;
+            max-width: 280px;
+            min-width: 160px;
         }
         .settings-footer button:hover {
             background: #0250a5;
@@ -520,10 +583,12 @@
             padding: 0;
             border-bottom: 1px solid #f3f3f3;
             cursor: pointer;
-            transition: background 0.15s;
+            transition: background 0.15s, box-shadow 0.2s;
+            border: 2px solid transparent;
+            border-bottom: 1px solid #f3f3f3;
         }
         .sidenav li:last-child {
-            border-bottom: none;
+            border-bottom: 1px solid #f3f3f3;
         }
         .sidenav li:hover {
             background: #f5f8ff;
@@ -623,8 +688,10 @@
             color: #bbb;
         }
 
+        /* 搜索关闭按钮加粗加大 */
         .search-close {
-            font-size: 1.8rem;
+            font-size: 1.85rem;  /* 略微增大 */
+            font-weight: 600;    /* 加粗 */
             background: none;
             border: none;
             cursor: pointer;
@@ -654,9 +721,10 @@
             flex-direction: column;
             min-height: 0;
         }
+        /* 标题匹配 / 网址匹配 加粗加大 */
         .result-column-title {
-            font-size: 0.85rem;
-            font-weight: 600;
+            font-size: 0.9rem;    /* 略微增大 */
+            font-weight: 600;      /* 加粗 */
             color: #888;
             letter-spacing: 0.5px;
             padding-bottom: 6px;
@@ -681,6 +749,7 @@
             border-radius: 4px;
         }
 
+        /* 搜索结果项 */
         .result-item {
             padding: 8px 10px;
             border-radius: 8px;
@@ -691,9 +760,12 @@
             gap: 6px;
             border-bottom: 1px solid #f5f5f5;
             transition: background 0.15s, box-shadow 0.15s;
+            border: 2px solid transparent;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: default;
         }
         .result-item:last-child {
-            border-bottom: none;
+            border-bottom: 1px solid #f5f5f5;
         }
         .result-item:hover {
             background: #f0f4ff;
@@ -720,6 +792,7 @@
             text-align: center;
         }
 
+        /* 底部版权文字（新增交互） */
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -728,6 +801,37 @@
             color: #aaa;
             border-top: 1px solid #efefef;
             letter-spacing: 0.3px;
+            transition: color 0.2s ease;
+            cursor: default;
+            user-select: none;
+        }
+        .footer:hover {
+            color: #0366d6;
+        }
+
+        /* ============================================================
+           更直观显示模式（内阴影边框，宽度 1px）
+           ============================================================ */
+        body.highlight-mode .hamburger:hover,
+        body.highlight-mode .search-bottom:hover,
+        body.highlight-mode .settings-bottom:hover {
+            border-color: #0366d6;
+        }
+
+        body.highlight-mode .section:hover {
+            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15), inset 0 0 0 1px #0366d6;
+        }
+
+        body.highlight-mode li:hover {
+            box-shadow: 0 4px 16px rgba(3, 102, 214, 0.06), inset 0 0 0 1px #0366d6;
+        }
+
+        body.highlight-mode .sidenav li:hover {
+            box-shadow: inset 0 0 0 1px #0366d6;
+        }
+
+        body.highlight-mode .result-item:hover {
+            box-shadow: inset 0 0 0 1px #0366d6;
         }
 
         /* 移动端响应 */
@@ -768,6 +872,16 @@
             .settings-label {
                 font-size: 0.65rem;
             }
+            .settings-panel {
+                padding: 24px 16px 16px;
+                max-height: 95vh;
+            }
+            .settings-footer button {
+                padding: 10px 20px;
+                font-size: 1rem;
+                max-width: 100%;
+                min-width: 0;
+            }
         }
 
         @media (max-width: 700px) {
@@ -788,7 +902,7 @@
             .search-header input { font-size: 1rem; padding: 12px 16px; }
             .search-results-grid { grid-template-columns: 1fr; gap: 12px; }
             .result-column-list { max-height: 150px; }
-            .search-close { font-size: 1.5rem; padding: 0 4px; }
+            .search-close { font-size: 1.6rem; }
         }
 
         @media (max-width: 500px) {
@@ -825,11 +939,23 @@
             }
             .search-box { padding: 14px 12px 12px; }
             .search-header input { font-size: 0.95rem; padding: 10px 14px; }
-            .search-close { font-size: 1.3rem; }
+            .search-close { font-size: 1.4rem; }
+            .settings-panel {
+                padding: 20px 12px 12px;
+                max-height: 98vh;
+            }
+            .settings-footer button {
+                padding: 10px 16px;
+                font-size: 0.95rem;
+                min-width: 0;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- 粒子 Canvas -->
+    <canvas id="particleCanvas"></canvas>
 
     <!-- ===== 左上角汉堡 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
@@ -899,10 +1025,23 @@
     <!-- ===== 设置弹窗 ===== -->
     <div class="settings-modal" id="settingsModal">
         <div class="settings-panel">
-            <h2>⚙️ 设置</h2>
+            <h2>设置</h2>
             <div class="settings-content" id="settingsContent">
-                <p>设置内容将在此处显示。</p>
-                <p>（具体选项待后续添加）</p>
+                <!-- 开关：更直观显示 -->
+                <div class="switch-setting">
+                    <label for="visualSwitch">更直观显示</label>
+                    <div class="switch-toggle" id="visualSwitch" role="button" tabindex="0" aria-checked="false">
+                        <div class="slider"></div>
+                    </div>
+                </div>
+                <!-- 开关：粒子特效 -->
+                <div class="switch-setting">
+                    <label for="particleSwitch">粒子特效</label>
+                    <div class="switch-toggle" id="particleSwitch" role="button" tabindex="0" aria-checked="true">
+                        <div class="slider"></div>
+                    </div>
+                </div>
+                <!-- 后续可添加更多设置项 -->
             </div>
             <div class="settings-footer">
                 <button id="settingsConfirmBtn">确定</button>
@@ -927,8 +1066,8 @@
             <!-- 由 JS 动态渲染 -->
         </div>
 
-        <!-- 底部版权 -->
-        <div class="footer">
+        <!-- 底部版权（交互文字） -->
+        <div class="footer" id="footerText">
             此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
     </div>
@@ -1089,20 +1228,20 @@
         const hamburger = document.getElementById('hamburgerBtn');
         const sidenav = document.getElementById('sidenav');
         const overlay = document.getElementById('overlay');
-        const searchBottom = document.getElementById('searchBottom');
+        const bottomTools = document.getElementById('bottomTools');
 
         function openNav() {
             sidenav.classList.add('open');
             overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
-            searchBottom.classList.add('hidden');
+            bottomTools.classList.add('hidden');
             hamburger.classList.add('active');
         }
         function closeNav() {
             sidenav.classList.remove('open');
             overlay.classList.remove('show');
             document.body.style.overflow = '';
-            searchBottom.classList.remove('hidden');
+            bottomTools.classList.remove('hidden');
             hamburger.classList.remove('active');
         }
 
@@ -1208,7 +1347,8 @@
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
         }
 
-        searchBottom.addEventListener('click', openSearch);
+        const searchBtn = document.getElementById('searchBottom');
+        searchBtn.addEventListener('click', openSearch);
         searchClose.addEventListener('click', closeSearch);
         searchModal.addEventListener('click', function(e) {
             if (e.target === searchModal) closeSearch();
@@ -1219,34 +1359,73 @@
         });
 
         // ================================================================
-        // 5. 设置功能
+        // 5. 设置功能 + 开关（更直观显示 + 粒子特效）
         // ================================================================
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
         const settingsConfirm = document.getElementById('settingsConfirmBtn');
-        const bottomTools = document.getElementById('bottomTools');
-        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const visualSwitch = document.getElementById('visualSwitch');
+        const particleSwitch = document.getElementById('particleSwitch');
+
+        // 状态
+        let visualMode = false;
+        let particleEnabled = true; // 默认开启
+
+        // 更新开关外观和 body 类
+        function updateVisualSwitch() {
+            visualSwitch.classList.toggle('active', visualMode);
+            visualSwitch.setAttribute('aria-checked', visualMode);
+            document.body.classList.toggle('highlight-mode', visualMode);
+        }
+
+        function updateParticleSwitch() {
+            particleSwitch.classList.toggle('active', particleEnabled);
+            particleSwitch.setAttribute('aria-checked', particleEnabled);
+        }
+
+        // 点击开关切换
+        visualSwitch.addEventListener('click', function(e) {
+            e.stopPropagation();
+            visualMode = !visualMode;
+            updateVisualSwitch();
+        });
+        visualSwitch.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                visualMode = !visualMode;
+                updateVisualSwitch();
+            }
+        });
+
+        particleSwitch.addEventListener('click', function(e) {
+            e.stopPropagation();
+            particleEnabled = !particleEnabled;
+            updateParticleSwitch();
+        });
+        particleSwitch.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                particleEnabled = !particleEnabled;
+                updateParticleSwitch();
+            }
+        });
 
         function openSettings() {
-            // 隐藏底部工具和汉堡
             bottomTools.classList.add('hidden');
-            hamburgerBtn.classList.add('hidden');
-            // 关闭可能打开的侧边栏
+            hamburger.classList.add('hidden');
             if (sidenav.classList.contains('open')) {
                 closeNav();
             }
-            // 关闭可能打开的搜索
             if (searchModal.classList.contains('open')) {
                 closeSearch();
             }
-            // 显示设置窗口
             settingsModal.classList.add('open');
         }
 
         function closeSettings() {
             settingsModal.classList.remove('open');
             bottomTools.classList.remove('hidden');
-            hamburgerBtn.classList.remove('hidden');
+            hamburger.classList.remove('hidden');
         }
 
         settingsBtn.addEventListener('click', openSettings);
@@ -1258,7 +1437,115 @@
         });
 
         // ================================================================
-        // 6. 全局 ESC 按键处理（整合所有）
+        // 6. 粒子特效系统
+        // ================================================================
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationId = null;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * 2 * Math.PI;
+                const speed = 3 + Math.random() * 5;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.size = 4 + Math.random() * 4;
+                this.life = 1.0;
+                this.decay = 0.008 + Math.random() * 0.012;
+                this.color = `hsl(120, 80%, ${50 + Math.random() * 30}%)`;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+                this.life -= this.decay;
+                this.size *= 0.99;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#00cc00';
+                ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function spawnParticles(x, y) {
+            if (!particleEnabled) return;
+            for (let i = 0; i < 16; i++) {
+                particles.push(new Particle(x, y));
+            }
+            if (!animationId) {
+                animateParticles();
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let alive = false;
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw(ctx);
+                if (p.life > 0 && p.size > 0.5) {
+                    alive = true;
+                } else {
+                    particles.splice(i, 1);
+                }
+            }
+            if (alive || particles.length > 0) {
+                animationId = requestAnimationFrame(animateParticles);
+            } else {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        // 全局点击监听（触发粒子）
+        document.addEventListener('click', function(e) {
+            // 排除输入框、按钮等交互元素（防止干扰正常操作）
+            const target = e.target;
+            if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.closest('.switch-toggle')) {
+                return;
+            }
+            spawnParticles(e.clientX, e.clientY);
+        });
+
+        // ================================================================
+        // 7. 底部文字交互
+        // ================================================================
+        const footerEl = document.getElementById('footerText');
+        const originalText = '此网站由 Wise GuLy 所有，由 DeepSeek 开发';
+        let restoreTimer = null;
+
+        footerEl.addEventListener('click', function() {
+            if (restoreTimer) {
+                clearTimeout(restoreTimer);
+                restoreTimer = null;
+            }
+            this.textContent = '😭DeepSeek牛逼！梁文锋恩情还不完！😭';
+            restoreTimer = setTimeout(() => {
+                this.textContent = originalText;
+                restoreTimer = null;
+            }, 3000);
+        });
+
+        // ================================================================
+        // 8. 全局 ESC 按键处理
         // ================================================================
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1276,7 +1563,7 @@
         });
 
         // ================================================================
-        // 7. 布局切换
+        // 9. 布局切换
         // ================================================================
         const sectionsGrid = document.getElementById('sectionsGrid');
         const optionSingle = document.getElementById('optionSingle');
@@ -1356,6 +1643,8 @@
         applyLayout();
         titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
         urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+        updateVisualSwitch();
+        updateParticleSwitch();
     </script>
 </body>
 </html>
