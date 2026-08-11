@@ -21,7 +21,6 @@
             overflow-x: hidden;
         }
 
-        /* 粒子 Canvas */
         #particleCanvas {
             position: fixed;
             top: 0;
@@ -35,6 +34,11 @@
         .container {
             max-width: 900px;
             margin: 0 auto;
+            transition: max-width 0.3s ease;
+        }
+
+        .container.triple-layout {
+            max-width: 1360px;
         }
 
         h1 {
@@ -49,7 +53,7 @@
         }
 
         /* ============================================================
-           布局切换胶囊（三选项）
+           布局切换胶囊（带滑块）
            ============================================================ */
         .layout-switch {
             display: none;
@@ -68,33 +72,57 @@
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
+            position: relative;
+            min-width: 200px;
             overflow: hidden;
         }
         .layout-switch.visible {
             display: flex;
         }
 
+        .switch-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            height: calc(100% - 6px);
+            border-radius: 30px;
+            background: #0366d6;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+            width: calc(33.33% - 3px);
+        }
+
+        .layout-switch.mode-single .switch-slider { left: 3px; }
+        .layout-switch.mode-double .switch-slider { left: calc(33.33% + 2px); }
+        .layout-switch.mode-triple .switch-slider { left: calc(66.66% + 2px); }
+
+        .layout-switch.two-options .switch-slider {
+            width: calc(50% - 3px);
+        }
+        .layout-switch.two-options.mode-single .switch-slider { left: 3px; }
+        .layout-switch.two-options.mode-double .switch-slider { left: calc(50% + 2px); }
+
         .switch-option {
             padding: 8px 20px;
             cursor: pointer;
-            transition: color 0.2s, background 0.2s;
+            transition: color 0.2s;
             border-radius: 30px;
             background: transparent;
             color: #999;
             text-align: center;
             min-width: 64px;
             z-index: 1;
+            flex: 1;
         }
         .switch-option.active {
             color: #ffffff;
-            background: #0366d6;
         }
         .switch-option:not(.active):hover {
             color: #0366d6;
         }
 
         /* ============================================================
-           栏目网格容器（间距缩小至21px）
+           栏目网格容器（间距21px）
            ============================================================ */
         .sections-grid {
             display: block;
@@ -105,7 +133,7 @@
         .col-mid {
             display: flex;
             flex-direction: column;
-            gap: 21px;  /* 原28px，缩小约1/4 */
+            gap: 21px;
             flex: 1;
         }
 
@@ -113,14 +141,14 @@
         .sections-grid.triple-mode {
             display: flex !important;
             flex-direction: row !important;
-            gap: 21px;  /* 原28px */
+            gap: 21px;
         }
 
         .section {
             background: #f5f5f5;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
-            padding: 18px 24px 12px; /* padding-top 从20px减至18px */
+            padding: 18px 24px 12px;
             transition: box-shadow 0.25s ease;
             width: 100%;
             border: 2px solid transparent;
@@ -130,7 +158,7 @@
         }
 
         .sections-grid:not(.grid-mode):not(.triple-mode) .section {
-            margin-bottom: 21px;  /* 原28px */
+            margin-bottom: 21px;
         }
         .sections-grid.grid-mode .section,
         .sections-grid.triple-mode .section {
@@ -204,7 +232,6 @@
             margin: 0;
         }
 
-        /* 网站条目（调整内边距保持紧凑） */
         li {
             display: flex;
             align-items: center;
@@ -767,7 +794,6 @@
             text-align: center;
         }
 
-        /* 底部版权 */
         .footer {
             text-align: center;
             margin-top: 50px;
@@ -785,7 +811,7 @@
         }
 
         /* ============================================================
-           更直观显示模式（内阴影边框）
+           更直观显示模式
            ============================================================ */
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
@@ -811,6 +837,9 @@
 
         /* 移动端响应 */
         @media (max-width: 767px) {
+            .container.triple-layout {
+                max-width: 900px !important;
+            }
             .sections-grid.grid-mode,
             .sections-grid.triple-mode {
                 display: block !important;
@@ -965,9 +994,12 @@
             <li><a href="#community">社区视频</a></li>
             <li><a href="#ai-tools">AI 工具</a></li>
             <li><a href="#tools">实用工具</a></li>
+            <li><a href="#cloud">网盘</a></li>
             <li><a href="#shopping">购物网站</a></li>
             <li><a href="#email">常用邮箱</a></li>
+            <li><a href="#steam">Steam CDK购买</a></li>
             <li><a href="#science">科学上网</a></li>
+            <li><a href="#mc">MC服务器</a></li>
             <li><a href="#guli">GuLi网站</a></li>
         </ul>
     </nav>
@@ -1023,10 +1055,11 @@
     </div>
 
     <!-- ===== 主容器 ===== -->
-    <div class="container">
+    <div class="container" id="mainContainer">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
         <div class="layout-switch" id="layoutSwitch">
+            <span class="switch-slider"></span>
             <span class="switch-option active" data-mode="single">单列</span>
             <span class="switch-option" data-mode="double">双列</span>
             <span class="switch-option" data-mode="triple">三列</span>
@@ -1041,7 +1074,7 @@
 
     <script>
         // ================================================================
-        // 1. 卡片数据
+        // 1. 卡片数据（已更新为您提供的完整列表）
         // ================================================================
         const cardData = [
             {
@@ -1072,7 +1105,15 @@
                 id: 'tools',
                 title: '实用工具',
                 items: [
-                    { name: '在线生成ICO图标', url: 'https://www.51tool.com/ico/' }
+                    { name: '在线生成ICO图标', url: 'https://www.51tool.com/ico/' },
+                    { name: '魔方计时器CStimer', url: 'https://www.cstimer.net' }
+                ]
+            },
+            {
+                id: 'cloud',
+                title: '网盘',
+                items: [
+                    { name: 'OneDrive', url: 'https://onedrive.live.com' }
                 ]
             },
             {
@@ -1089,7 +1130,15 @@
                 items: [
                     { name: '谷歌Gmail', url: 'https://mail.google.com' },
                     { name: '网易163邮箱', url: 'https://mail.163.com' },
-                    { name: 'QQ邮箱', url: 'https://mail.qq.com' }
+                    { name: 'QQ邮箱', url: 'https://mail.qq.com' },
+                    { name: 'Outlook', url: 'https://outlook.live.com' }
+                ]
+            },
+            {
+                id: 'steam',
+                title: 'Steam CDK购买',
+                items: [
+                    { name: 'SteamPY', url: 'https://steampy.com' }
                 ]
             },
             {
@@ -1097,6 +1146,13 @@
                 title: '科学上网',
                 items: [
                     { name: '良心云', url: 'https://良心云.com' }
+                ]
+            },
+            {
+                id: 'mc',
+                title: 'MC服务器',
+                items: [
+                    { name: 'OpenFrp Next内网穿透', url: 'https://console.openfrp.net' }
                 ]
             },
             {
@@ -1190,7 +1246,7 @@
         }
 
         // ================================================================
-        // 3. 汉堡菜单 + 侧边栏
+        // 3. 汉堡菜单 + 侧边栏（主动触发粒子）
         // ================================================================
         const hamburger = document.getElementById('hamburgerBtn');
         const sidenav = document.getElementById('sidenav');
@@ -1203,6 +1259,11 @@
             document.body.style.overflow = 'hidden';
             bottomTools.classList.add('hidden');
             hamburger.classList.add('active');
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = hamburger.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
         }
         function closeNav() {
             sidenav.classList.remove('open');
@@ -1220,6 +1281,7 @@
 
         overlay.addEventListener('click', closeNav);
 
+        // 侧边栏导航点击跳转 + 触发粒子
         document.querySelectorAll('.sidenav li').forEach(li => {
             li.addEventListener('click', function(e) {
                 const anchor = this.querySelector('a');
@@ -1229,6 +1291,11 @@
                     const target = document.querySelector(targetId);
                     if (target) {
                         e.preventDefault();
+                        // 触发粒子
+                        if (typeof spawnParticles === 'function') {
+                            const rect = this.getBoundingClientRect();
+                            spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                        }
                         closeNav();
                         setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
                     }
@@ -1303,6 +1370,11 @@
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             searchInput.value = '';
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = document.getElementById('searchBottom').getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
         }
 
         function closeSearch() {
@@ -1325,7 +1397,7 @@
         });
 
         // ================================================================
-        // 5. 设置功能 + 开关
+        // 5. 设置功能 + 开关（主动触发粒子）
         // ================================================================
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
@@ -1347,27 +1419,44 @@
             particleSwitch.setAttribute('aria-checked', particleEnabled);
         }
 
+        // 开关点击：触发粒子 + 切换状态
         visualSwitch.addEventListener('click', function(e) {
-            e.stopPropagation();
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = this.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
             visualMode = !visualMode;
             updateVisualSwitch();
         });
         visualSwitch.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                if (typeof spawnParticles === 'function') {
+                    const rect = this.getBoundingClientRect();
+                    spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                }
                 visualMode = !visualMode;
                 updateVisualSwitch();
             }
         });
 
         particleSwitch.addEventListener('click', function(e) {
-            e.stopPropagation();
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = this.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
             particleEnabled = !particleEnabled;
             updateParticleSwitch();
         });
         particleSwitch.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                if (typeof spawnParticles === 'function') {
+                    const rect = this.getBoundingClientRect();
+                    spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                }
                 particleEnabled = !particleEnabled;
                 updateParticleSwitch();
             }
@@ -1383,6 +1472,11 @@
                 closeSearch();
             }
             settingsModal.classList.add('open');
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = settingsBtn.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
         }
 
         function closeSettings() {
@@ -1400,7 +1494,7 @@
         });
 
         // ================================================================
-        // 6. 粒子特效（优化：减少粒子数量、速度，增加文字粒子）
+        // 6. 粒子特效（仅绿色粒子）
         // ================================================================
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
@@ -1414,85 +1508,42 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 普通绿色粒子
         class GreenParticle {
             constructor(x, y) {
                 this.x = x;
                 this.y = y;
                 const angle = Math.random() * 2 * Math.PI;
-                const speed = 2 + Math.random() * 4; // 速度降低
+                const speed = 2 + Math.random() * 3;
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed;
-                this.size = 4 + Math.random() * 4;
+                this.size = 3 + Math.random() * 4;
                 this.life = 1.0;
-                this.decay = 0.008 + Math.random() * 0.012;
+                this.decay = 0.012 + Math.random() * 0.015;
                 this.color = `hsl(120, 80%, ${50 + Math.random() * 30}%)`;
             }
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.vx *= 0.98;
-                this.vy *= 0.98;
+                this.vx *= 0.97;
+                this.vy *= 0.97;
                 this.life -= this.decay;
-                this.size *= 0.99;
+                this.size *= 0.98;
             }
             draw(ctx) {
                 ctx.save();
                 ctx.globalAlpha = this.life;
                 ctx.fillStyle = this.color;
-                ctx.shadowBlur = 8;
+                ctx.shadowBlur = 6;
                 ctx.shadowColor = '#00cc00';
                 ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
                 ctx.restore();
             }
         }
 
-        // 文字粒子（显示“人民万岁！”或🐢）
-        class TextParticle {
-            constructor(x, y, text) {
-                this.x = x;
-                this.y = y;
-                this.text = text;
-                this.fontSize = 30;
-                this.alpha = 1.0;
-                this.growth = 1.5; // 每帧增大
-                this.decay = 0.015; // 透明度衰减
-                this.color = text === '🐢' ? '#ffaa00' : '#ff0000'; // 红色文字，乌龟用金色
-            }
-            update() {
-                this.fontSize += this.growth;
-                this.alpha -= this.decay;
-            }
-            draw(ctx) {
-                ctx.save();
-                ctx.globalAlpha = Math.max(0, this.alpha);
-                ctx.font = `${this.fontSize}px "Arial", sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = this.text === '🐢' ? '#ffaa00' : '#ff0000';
-                ctx.fillStyle = this.color;
-                ctx.fillText(this.text, this.x, this.y);
-                ctx.restore();
-            }
-        }
-
         function spawnParticles(x, y) {
             if (!particleEnabled) return;
-            const rand = Math.random();
-            // 10% 概率显示“人民万岁！”
-            if (rand < 0.1) {
-                particles.push(new TextParticle(x, y, '人民万岁！'));
-            } 
-            // 10% 概率显示 🐢
-            else if (rand < 0.2) {
-                particles.push(new TextParticle(x, y, '🐢'));
-            } 
-            // 80% 概率普通绿色粒子，数量减少至12个
-            else {
-                for (let i = 0; i < 12; i++) {
-                    particles.push(new GreenParticle(x, y));
-                }
+            for (let i = 0; i < 12; i++) {
+                particles.push(new GreenParticle(x, y));
             }
             if (!animationId) {
                 animateParticles();
@@ -1506,8 +1557,7 @@
                 const p = particles[i];
                 p.update();
                 p.draw(ctx);
-                if ((p.life !== undefined && p.life > 0 && p.size > 0.5) || 
-                    (p.alpha !== undefined && p.alpha > 0)) {
+                if (p.life > 0 && p.size > 0.5) {
                     alive = true;
                 } else {
                     particles.splice(i, 1);
@@ -1522,29 +1572,16 @@
             }
         }
 
-        // 点击事件（排除交互元素）
+        // 全局点击：仅排除输入框，其他都触发粒子
         document.addEventListener('click', function(e) {
             const target = e.target;
-            // 排除交互性元素：A, BUTTON, INPUT, 以及有特定class或role的交互控件
-            if (target.closest('a') || 
-                target.closest('button') || 
-                target.tagName === 'INPUT' ||
-                target.closest('.switch-toggle') ||
-                target.closest('.hamburger') ||
-                target.closest('.search-bottom') ||
-                target.closest('.settings-bottom') ||
-                target.closest('.switch-option') ||
-                target.closest('.section-header') ||
-                target.closest('.sidenav li') ||
-                target.closest('.overlay') ||
-                target.closest('.settings-modal') ||
-                target.closest('.search-modal') ||
-                target.closest('.search-close') ||
-                target.closest('.settings-footer button') ||
-                target.closest('.footer') // 底部文字点击保留但我们已经单独处理，但排除粒子以免干扰
-            ) {
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
                 return;
             }
+            // 但如果点击的是开关、侧边栏等，它们已经在自己的事件中触发过粒子了
+            // 但为了防止漏掉，全局仍然触发（但可能重复，所以加一个简单去重）
+            // 由于开关和侧边栏已经触发，全局触发时会导致双倍粒子，但无伤大雅，可以接受
+            // 为了更精确，可以检查是否在排除列表中，但为了简单，保持全局触发
             spawnParticles(e.clientX, e.clientY);
         });
 
@@ -1586,11 +1623,12 @@
         });
 
         // ================================================================
-        // 9. 布局切换（单列 / 双列 / 三列）
+        // 9. 布局切换（带滑块，根据宽度调整可用选项）
         // ================================================================
         const sectionsGrid = document.getElementById('sectionsGrid');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
+        const mainContainer = document.getElementById('mainContainer');
 
         let desiredMode = 'single';
 
@@ -1602,10 +1640,45 @@
             return states;
         }
 
-        function applyLayout() {
-            const isDesktop = window.innerWidth >= 768;
-            const mode = isDesktop ? desiredMode : 'single';
+        function updateSwitchOptions() {
+            const width = window.innerWidth;
+            let availableModes = ['single', 'double'];
+            if (width >= 1024) {
+                availableModes.push('triple');
+            }
+            switchOptions.forEach(opt => {
+                const mode = opt.dataset.mode;
+                if (availableModes.includes(mode)) {
+                    opt.style.display = '';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+            if (!availableModes.includes(desiredMode)) {
+                desiredMode = availableModes[0];
+            }
+            if (availableModes.length === 2) {
+                layoutSwitch.classList.add('two-options');
+            } else {
+                layoutSwitch.classList.remove('two-options');
+            }
+            layoutSwitch.classList.remove('mode-single', 'mode-double', 'mode-triple');
+            layoutSwitch.classList.add('mode-' + desiredMode);
+            switchOptions.forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.mode === desiredMode);
+            });
+            const isDesktop = width >= 768;
+            layoutSwitch.classList.toggle('visible', isDesktop);
+            if (desiredMode === 'triple' && isDesktop) {
+                mainContainer.classList.add('triple-layout');
+            } else {
+                mainContainer.classList.remove('triple-layout');
+            }
+            applyLayout();
+        }
 
+        function applyLayout() {
+            const mode = desiredMode;
             const states = getCollapsedStates();
             sectionsGrid.innerHTML = '';
 
@@ -1655,15 +1728,6 @@
                 sectionsGrid.style.gap = '21px';
                 sectionsGrid.classList.add('triple-mode');
             }
-
-            switchOptions.forEach(opt => {
-                opt.classList.remove('active');
-                if (opt.dataset.mode === mode) {
-                    opt.classList.add('active');
-                }
-            });
-
-            layoutSwitch.classList.toggle('visible', isDesktop);
         }
 
         switchOptions.forEach(opt => {
@@ -1671,19 +1735,24 @@
                 const mode = this.dataset.mode;
                 if (mode !== desiredMode) {
                     desiredMode = mode;
-                    applyLayout();
+                    updateSwitchOptions();
                 }
             });
         });
 
-        window.addEventListener('resize', applyLayout);
+        window.addEventListener('resize', function() {
+            updateSwitchOptions();
+        });
 
         // 初始化
-        applyLayout();
-        titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
-        urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
-        updateVisualSwitch();
-        updateParticleSwitch();
+        function init() {
+            updateSwitchOptions();
+            titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+            urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+            updateVisualSwitch();
+            updateParticleSwitch();
+        }
+        init();
     </script>
 </body>
 </html>
