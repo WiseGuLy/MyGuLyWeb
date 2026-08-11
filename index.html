@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 页面标题：显示在浏览器标签上 -->
     <title>GuLi 导航收藏</title>
     <style>
         /* ================================================================
                全局基础样式
-               - 重置所有元素的边距和内边距
-               - 设置全局字体为系统默认字体
-               - 页面背景白色，预留底部空间给固定按钮
-               - 禁止横向滚动
             ================================================================ */
         * {
             margin: 0;
@@ -23,13 +18,12 @@
             background-color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #1e1e1e;
-            padding: 40px 20px 100px; /* 底部留白，避免被底部工具栏遮挡 */
+            padding: 40px 20px 100px;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* 粒子画布：覆盖全屏，指针事件穿透，不影响点击 */
         #particleCanvas {
             position: fixed;
             top: 0;
@@ -40,17 +34,16 @@
             z-index: 9999;
         }
 
-        /* 主容器：最大宽度900px，居中，切换三列时宽度自动扩展 */
         .container {
             max-width: 900px;
             margin: 0 auto;
             transition: max-width 0.3s ease;
         }
         .container.triple-layout {
-            max-width: 1360px; /* 三列时自动扩展，使每列宽度与双列一致 */
+            max-width: 1360px;
         }
 
-        /* 页面主标题 */
+        /* 顶部标题下划线加深 */
         h1 {
             text-align: center;
             font-size: 2.4rem;
@@ -59,17 +52,14 @@
             margin-bottom: 16px;
             color: #1a1a1a;
             padding-bottom: 12px;
-            border-bottom: 1px solid #ececec;
+            border-bottom: 2px solid #d0d0d0; /* 加深 */
         }
 
         /* ================================================================
-           列数切换胶囊（带滑动滑块）
-           - 默认半透明背景，Sticky 固定（由开关控制）
-           - 内含三个选项：单列、双列、三列
-           - 滑块位置根据当前模式动态移动
+           列数切换胶囊
            ================================================================ */
         .layout-switch {
-            display: none; /* 默认隐藏，由JS根据屏幕宽度显示 */
+            display: none;
             justify-content: center;
             align-items: center;
             margin-bottom: 30px;
@@ -77,11 +67,10 @@
             font-weight: 500;
             color: #555;
             user-select: none;
-            border: 2px solid #888888; /* 边框加深：加粗并加深颜色 */
+            border: 2px solid #888888;
             border-radius: 40px;
             padding: 3px;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
+            background: #f9f9f9;
             box-shadow: 0 2px 12px rgba(0,0,0,0.04);
             width: fit-content;
             margin-left: auto;
@@ -91,8 +80,8 @@
             overflow: hidden;
             z-index: 100;
         }
-        .layout-switch.visible { display: flex; } /* 桌面端可见 */
-        .layout-switch.sticky { /* 启用固定时 */
+        .layout-switch.visible { display: flex; }
+        .layout-switch.sticky {
             position: sticky;
             top: 12px;
             z-index: 100;
@@ -100,7 +89,6 @@
             border-color: rgba(200,200,200,0.6);
         }
 
-        /* 蓝色滑动滑块 */
         .switch-slider {
             position: absolute;
             top: 3px;
@@ -110,22 +98,19 @@
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            width: calc(33.33% - 3px); /* 默认三档均分 */
+            width: calc(33.33% - 3px);
         }
 
-        /* 根据模式调整滑块位置 */
         .layout-switch.mode-single .switch-slider { left: 3px; }
         .layout-switch.mode-double .switch-slider { left: calc(33.33% + 2px); }
-        .layout-switch.mode-triple .switch-slider { left: calc(66.66% + 1.5px); } /* 微调右侧间隙 */
+        .layout-switch.mode-triple .switch-slider { left: calc(66.66% + 1.5px); }
 
-        /* 当只有双列选项时（宽度<1024px），滑块宽度占一半 */
         .layout-switch.two-options .switch-slider {
             width: calc(50% - 3px);
         }
         .layout-switch.two-options.mode-single .switch-slider { left: 3px; }
         .layout-switch.two-options.mode-double .switch-slider { left: calc(50% + 2px); }
 
-        /* 每个选项的文字样式 */
         .switch-option {
             padding: 8px 20px;
             cursor: pointer;
@@ -139,57 +124,59 @@
             flex: 1;
         }
         .switch-option.active {
-            color: #ffffff; /* 被选中时文字白色（滑块覆盖） */
+            color: #ffffff;
         }
         .switch-option:not(.active) {
-            color: #555; /* 未选中时灰色文字加深 */
+            color: #555;
         }
         .switch-option:not(.active):hover {
-            color: #0366d6; /* 悬停变蓝 */
+            color: #0366d6;
         }
 
         /* ================================================================
-           栏目网格容器（卡片列表）
-           - 单列时块级排列，双列/三列时使用flex行排列
-           - 每个卡片（.section）独立
+           栏目网格容器
            ================================================================ */
         .sections-grid {
             display: block;
         }
 
-        /* 列容器：双列和三列时，每一列的容器 */
         .col-left,
         .col-right,
         .col-mid {
             display: flex;
             flex-direction: column;
-            gap: 21px; /* 卡片之间的垂直间距 */
+            gap: 21px;
             flex: 1;
         }
 
-        /* 双列/三列时，网格变为flex行 */
         .sections-grid.grid-mode,
         .sections-grid.triple-mode {
             display: flex !important;
             flex-direction: row !important;
-            gap: 21px; /* 列之间的水平间距 */
+            gap: 21px;
         }
 
-        /* 每个分类卡片 */
         .section {
             background: #f5f5f5;
             border-radius: 16px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.06);
             padding: 18px 24px 12px;
-            transition: box-shadow 0.25s ease;
+            transition: box-shadow 0.25s ease, background 0.3s ease, border-color 0.3s ease;
             width: 100%;
-            border: 2px solid transparent; /* 透明边框占位，用于高亮模式 */
+            border: 2px solid transparent;
+            position: relative;
         }
         .section:hover {
-            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15); /* 悬停阴影变蓝 */
+            box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15);
         }
 
-        /* 单列模式下每个卡片底部留白，双列/三列由flex gap控制 */
+        /* 实时预览高亮样式 */
+        .section.preview-highlight {
+            background: #eef6ff;
+            border-color: #0366d6;
+            box-shadow: 0 0 0 2px #0366d6, 0 8px 24px rgba(3, 102, 214, 0.2);
+        }
+
         .sections-grid:not(.grid-mode):not(.triple-mode) .section {
             margin-bottom: 21px;
         }
@@ -198,7 +185,6 @@
             margin-bottom: 0;
         }
 
-        /* 卡片头部（小标题 + 折叠控制） */
         .section-header {
             display: flex;
             align-items: center;
@@ -216,10 +202,9 @@
             transition: color 0.2s ease;
         }
         .section-header:hover .section-title {
-            color: #0366d6; /* 悬停变蓝 */
+            color: #0366d6;
         }
 
-        /* 折叠标签和三角形按钮 */
         .toggle-group {
             display: flex;
             align-items: center;
@@ -243,15 +228,13 @@
         .section-header:hover .toggle-btn {
             color: #0366d6;
         }
-        /* 折叠状态时三角形旋转 */
         .section.collapsed .toggle-btn {
             transform: rotate(-90deg);
         }
 
-        /* 列表内容容器（用于展开/收起动画） */
         .list-wrapper {
             overflow: hidden;
-            max-height: 2000px; /* 足够大 */
+            max-height: 2000px;
             transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1),
                         opacity 0.3s ease,
                         margin 0.3s ease;
@@ -269,7 +252,7 @@
             margin: 0;
         }
 
-        /* ===== 每个网站条目 ===== */
+        /* ===== 网站条目 ===== */
         li {
             display: flex;
             align-items: center;
@@ -283,7 +266,7 @@
             border-bottom: 1px solid #f0f0f0;
         }
         li:last-child {
-            border-bottom: 1px solid #f0f0f0; /* 最后一项也保留底线 */
+            border-bottom: 1px solid #f0f0f0;
         }
         li:hover {
             background: #eef3fc;
@@ -301,7 +284,7 @@
             color: #111;
             min-width: 100px;
             flex: 0 0 auto;
-            pointer-events: none; /* 点击由父级li统一处理 */
+            pointer-events: none;
             transition: color 0.2s ease;
         }
 
@@ -313,14 +296,14 @@
             flex: 1 1 auto;
             text-align: right;
             transition: opacity 0.15s;
-            pointer-events: none; /* 点击由父级li统一处理 */
+            pointer-events: none;
         }
         .site-url:hover {
             text-decoration: underline;
             opacity: 0.7;
         }
 
-        /* ----- 左上角汉堡菜单（三横线） ----- */
+        /* ----- 左上角汉堡 ----- */
         .hamburger {
             position: fixed;
             top: 24px;
@@ -366,10 +349,10 @@
         }
         .hamburger.hidden {
             opacity: 0;
-            pointer-events: none; /* 打开设置时隐藏 */
+            pointer-events: none;
         }
 
-        /* ===== 底部工具栏（搜索 + 设置） ===== */
+        /* ===== 底部工具 ===== */
         .bottom-tools {
             position: fixed;
             bottom: 28px;
@@ -383,10 +366,9 @@
         }
         .bottom-tools.hidden {
             opacity: 0;
-            pointer-events: none; /* 打开设置/侧边栏时隐藏 */
+            pointer-events: none;
         }
 
-        /* 搜索按钮和设置按钮共用样式 */
         .search-bottom,
         .settings-bottom {
             display: flex;
@@ -416,7 +398,6 @@
             transform: scale(0.95);
         }
 
-        /* SVG 图标样式 */
         .search-icon-svg,
         .settings-icon-svg {
             width: 30px;
@@ -504,7 +485,6 @@
             flex-shrink: 0;
         }
 
-        /* 子选项卡（外观/功能/关于）滑动胶囊 */
         .sub-tabs {
             position: relative;
             display: flex;
@@ -547,12 +527,10 @@
             width: calc(33.33% - 4px);
             z-index: 0;
         }
-        /* 根据激活选项卡移动滑块 */
         .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
         .sub-tabs.active-features .sub-tab-slider { left: calc(33.33% + 2px); }
         .sub-tabs.active-about .sub-tab-slider { left: calc(66.66% + 2px); }
 
-        /* 设置内容滑动容器 */
         .settings-slider {
             flex: 1;
             display: flex;
@@ -566,12 +544,11 @@
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .settings-slide {
-            flex: 0 0 100%; /* 每个子项占满父容器宽度 */
+            flex: 0 0 100%;
             padding: 6px 0 8px;
-            overflow-y: auto; /* 内容过多时垂直滚动 */
+            overflow-y: auto;
             min-height: 120px;
         }
-        /* 设置项行 */
         .settings-slide .switch-setting {
             display: flex;
             align-items: center;
@@ -589,7 +566,6 @@
             cursor: pointer;
             padding-left: 8px;
         }
-        /* 自定义开关 */
         .switch-toggle {
             position: relative;
             width: 48px;
@@ -619,7 +595,6 @@
             transform: translateX(22px);
         }
 
-        /* “关于”页面的特殊样式 */
         .about-content {
             display: flex;
             align-items: center;
@@ -643,7 +618,6 @@
             margin-right: 4px;
         }
 
-        /* 设置底部确定按钮 */
         .settings-footer {
             display: flex;
             justify-content: center;
@@ -672,7 +646,7 @@
             transform: scale(0.96);
         }
 
-        /* ----- 侧边导航栏 ----- */
+        /* ----- 侧边导航栏（包含实时预览开关） ----- */
         .sidenav {
             position: fixed;
             top: 0;
@@ -691,10 +665,10 @@
             left: 0;
         }
         .sidenav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 16px 24px 12px 24px;
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #0366d6;
             border-bottom: 2px solid #f0f0f0;
             margin-bottom: 8px;
             opacity: 0;
@@ -703,6 +677,32 @@
         .sidenav.open .sidenav-header {
             opacity: 1;
         }
+
+        .sidenav-header .header-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0366d6;
+        }
+
+        /* 实时预览开关（文字按钮） */
+        .preview-toggle {
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+            color: #999;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+        .preview-toggle.active {
+            color: #0366d6;
+            background: rgba(3, 102, 214, 0.1);
+        }
+        .preview-toggle:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
         .sidenav ul {
             list-style: none;
             padding: 0;
@@ -737,7 +737,6 @@
             padding-left: 28px;
         }
 
-        /* 侧边栏遮罩 */
         .overlay {
             position: fixed;
             top: 0;
@@ -835,7 +834,6 @@
             transform: rotate(90deg);
         }
 
-        /* 搜索结果网格（两列） */
         .search-results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -851,7 +849,6 @@
             flex-direction: column;
             min-height: 0;
         }
-        /* 标题“标题匹配”和“网址匹配”左对齐（与搜索结果项对齐） */
         .result-column-title {
             font-size: 0.9rem;
             font-weight: 600;
@@ -861,7 +858,7 @@
             border-bottom: 2px solid #f0f0f0;
             margin-bottom: 10px;
             flex-shrink: 0;
-            padding-left: 10px; /* 向右移，与结果项对齐 */
+            padding-left: 10px;
         }
         .result-column-list {
             flex: 1;
@@ -922,14 +919,14 @@
             text-align: center;
         }
 
-        /* 底部版权文字 */
+        /* 底部版权上划线加深 */
         .footer {
             text-align: center;
             margin-top: 40px;
             padding: 20px 0 10px;
             font-size: 0.8rem;
             color: #aaa;
-            border-top: 1px solid #efefef;
+            border-top: 2px solid #d0d0d0; /* 加深 */
             letter-spacing: 0.3px;
             transition: color 0.2s ease;
             cursor: default;
@@ -940,7 +937,7 @@
         }
 
         /* ================================================================
-           更直观显示模式（开启后，悬停时出现蓝色边框）
+           更直观显示模式
            ================================================================ */
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
@@ -964,12 +961,10 @@
             box-shadow: inset 0 0 0 1px #0366d6;
         }
 
-        /* ================================================================
-           移动端响应式适配
-           ================================================================ */
+        /* 移动端响应 */
         @media (max-width: 767px) {
             .container.triple-layout {
-                max-width: 900px !important; /* 小屏强制单列 */
+                max-width: 900px !important;
             }
             .sections-grid.grid-mode,
             .sections-grid.triple-mode {
@@ -991,11 +986,9 @@
             .sections-grid.triple-mode .section {
                 margin-bottom: 21px !important;
             }
-            /* 移动端隐藏列数切换 */
             .layout-switch.visible {
                 display: none;
             }
-            /* 底部工具缩小 */
             .bottom-tools {
                 bottom: 16px;
                 gap: 12px;
@@ -1123,7 +1116,6 @@
 
     <!-- ===== 底部工具栏（搜索 + 设置） ===== -->
     <div class="bottom-tools" id="bottomTools">
-        <!-- 搜索按钮 -->
         <div class="search-bottom" id="searchBottom" aria-label="搜索">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="14" cy="14" r="10" />
@@ -1131,7 +1123,6 @@
             </svg>
             <span class="search-label">搜索</span>
         </div>
-        <!-- 设置按钮 -->
         <div class="settings-bottom" id="settingsBottom" aria-label="设置">
             <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="16" cy="16" r="4" />
@@ -1141,9 +1132,12 @@
         </div>
     </div>
 
-    <!-- ===== 侧边导航栏 ===== -->
+    <!-- ===== 侧边导航栏（含实时预览开关） ===== -->
     <nav class="sidenav" id="sidenav">
-        <div class="sidenav-header">分类</div>
+        <div class="sidenav-header">
+            <span class="header-title">分类</span>
+            <span class="preview-toggle" id="previewToggle">实时预览</span>
+        </div>
         <ul>
             <li><a href="#essential">必备网站</a></li>
             <li><a href="#community">社区视频</a></li>
@@ -1190,17 +1184,15 @@
     <div class="settings-modal" id="settingsModal">
         <div class="settings-panel">
             <h2>设置</h2>
-            <!-- 子选项卡 -->
             <div class="sub-tabs active-appearance" id="subTabs">
                 <span class="sub-tab active" data-tab="appearance">外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
                 <span class="sub-tab" data-tab="about">关于</span>
                 <span class="sub-tab-slider"></span>
             </div>
-            <!-- 滑动内容 -->
             <div class="settings-slider">
                 <div class="settings-slider-inner" id="settingsSlider">
-                    <!-- 外观选项卡 -->
+                    <!-- 外观 -->
                     <div class="settings-slide" data-slide="appearance">
                         <div class="switch-setting">
                             <label for="visualSwitch">更直观显示</label>
@@ -1215,7 +1207,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 功能选项卡 -->
+                    <!-- 功能 -->
                     <div class="settings-slide" data-slide="features">
                         <div class="switch-setting">
                             <label for="stickySwitch">始终显示列数切换</label>
@@ -1224,7 +1216,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- 关于选项卡 -->
+                    <!-- 关于 -->
                     <div class="settings-slide" data-slide="about">
                         <div class="about-content">
                             <span class="about-label">网站源码</span>
@@ -1243,7 +1235,6 @@
     <div class="container" id="mainContainer">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
 
-        <!-- 列数切换 -->
         <div class="layout-switch visible sticky" id="layoutSwitch">
             <span class="switch-slider"></span>
             <span class="switch-option active" data-mode="single">单列</span>
@@ -1251,10 +1242,8 @@
             <span class="switch-option" data-mode="triple">三列</span>
         </div>
 
-        <!-- 卡片列表容器 -->
         <div class="sections-grid" id="sectionsGrid"></div>
 
-        <!-- 底部版权 -->
         <div class="footer" id="footerText">
             此网站由 Wise GuLy 所有，由 DeepSeek 开发
         </div>
@@ -1266,7 +1255,7 @@
         // ================================================================
 
         // ----------------------------------------------------------------
-        // 1. 卡片数据（所有分类及其网站条目）
+        // 1. 卡片数据
         // ----------------------------------------------------------------
         const cardData = [
             {
@@ -1359,8 +1348,7 @@
         ];
 
         // ----------------------------------------------------------------
-        // 2. 生成卡片 DOM 函数
-        //    根据数据创建每个分类卡片，包含头部（标题+折叠）和条目列表
+        // 2. 生成卡片 DOM
         // ----------------------------------------------------------------
         function createSection(data, collapsed = false) {
             const section = document.createElement('div');
@@ -1391,7 +1379,6 @@
             header.appendChild(titleSpan);
             header.appendChild(toggleGroup);
 
-            // 点击头部切换折叠状态
             header.addEventListener('click', function(e) {
                 const sec = this.closest('.section');
                 if (!sec) return;
@@ -1427,7 +1414,6 @@
             section.appendChild(header);
             section.appendChild(wrapper);
 
-            // 为每个条目绑定点击事件，打开链接
             section.querySelectorAll('li').forEach(li => {
                 li.addEventListener('click', function(e) {
                     const url = this.dataset.url;
@@ -1475,29 +1461,78 @@
 
         overlay.addEventListener('click', closeNav);
 
-        // 侧边栏条目点击跳转
-        document.querySelectorAll('.sidenav li').forEach(li => {
-            li.addEventListener('click', function(e) {
+        // ----------------------------------------------------------------
+        // 4. 实时预览功能
+        // ----------------------------------------------------------------
+        const previewToggle = document.getElementById('previewToggle');
+        let previewActive = false;
+
+        // 切换预览状态
+        previewToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            previewActive = !previewActive;
+            this.classList.toggle('active', previewActive);
+            // 如果关闭预览，移除所有高亮
+            if (!previewActive) {
+                document.querySelectorAll('.section.preview-highlight').forEach(el => {
+                    el.classList.remove('preview-highlight');
+                });
+            }
+            // 触发粒子
+            if (typeof spawnParticles === 'function') {
+                const rect = this.getBoundingClientRect();
+                spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+            }
+        });
+
+        // 侧边栏链接悬停事件（仅当预览开启时）
+        const sideNavItems = document.querySelectorAll('.sidenav li');
+        let currentHighlight = null;
+
+        sideNavItems.forEach(li => {
+            li.addEventListener('mouseenter', function(e) {
+                if (!previewActive) return;
                 const anchor = this.querySelector('a');
                 if (!anchor) return;
                 const targetId = anchor.getAttribute('href');
                 if (targetId && targetId.startsWith('#')) {
                     const target = document.querySelector(targetId);
                     if (target) {
-                        e.preventDefault();
-                        if (typeof spawnParticles === 'function') {
-                            const rect = this.getBoundingClientRect();
-                            spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                        // 移除之前的高亮
+                        if (currentHighlight) {
+                            currentHighlight.classList.remove('preview-highlight');
                         }
-                        closeNav();
-                        setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
+                        // 高亮新的
+                        target.classList.add('preview-highlight');
+                        currentHighlight = target;
+                        // 平滑滚动
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }
                 }
             });
+
+            // 鼠标离开侧边栏时取消高亮（但悬停在侧边栏其他项时也会触发，我们只保留当前高亮）
+            // 这里使用 mouseleave 在 li 上，但为了避免移出侧边栏时还留着高亮，在侧边栏整体 mouseleave 时清除
         });
 
+        // 当鼠标离开整个侧边栏时，清除高亮（但保持预览开启）
+        sidenav.addEventListener('mouseleave', function() {
+            if (currentHighlight) {
+                currentHighlight.classList.remove('preview-highlight');
+                currentHighlight = null;
+            }
+        });
+
+        // 侧边栏条目点击（保持原有跳转功能，但实时预览开启时不关闭侧边栏？ 要求“保持侧边栏开启”，所以点击链接时不关闭侧边栏）
+        // 但原有的点击是关闭侧边栏的，我们修改一下：如果预览开启，点击后不关闭侧边栏，只滚动
+        // 我们修改原有的点击事件
+        // 先移除原有的点击监听（之前绑定的在下面），我们需要重新绑定
+        // 因为之前的代码在下面绑定了，我们会在后面覆盖，但为了避免冲突，我们将在初始化时重新绑定
+        // 现在我们保留原有逻辑，但修改点击事件：
+        // 在后面的代码中，我们会重写侧边栏点击事件，所以这里先不绑定。
+
         // ----------------------------------------------------------------
-        // 4. 搜索功能
+        // 5. 搜索功能
         // ----------------------------------------------------------------
         const searchModal = document.getElementById('searchModal');
         const searchClose = document.getElementById('searchClose');
@@ -1505,7 +1540,6 @@
         const titleResults = document.getElementById('titleResults');
         const urlResults = document.getElementById('urlResults');
 
-        // 收集所有网站数据（从DOM中读取）
         function collectSiteData() {
             const items = [];
             document.querySelectorAll('.section li').forEach(li => {
@@ -1522,7 +1556,6 @@
             return items;
         }
 
-        // 渲染搜索结果列
         function renderResultColumn(container, items) {
             if (!items || items.length === 0) {
                 container.innerHTML = '<div class="result-empty">未找到匹配</div>';
@@ -1540,7 +1573,6 @@
             container.innerHTML = html;
         }
 
-        // 执行搜索
         function performSearch(query) {
             const trimmed = query.trim().toLowerCase();
             if (!trimmed) {
@@ -1559,7 +1591,6 @@
             renderResultColumn(urlResults, urlMatches);
         }
 
-        // 打开/关闭搜索弹窗
         function openSearch() {
             searchModal.classList.add('open');
             document.body.style.overflow = 'hidden';
@@ -1593,23 +1624,20 @@
         });
 
         // ----------------------------------------------------------------
-        // 5. 设置功能（子选项卡、开关）
+        // 6. 设置功能
         // ----------------------------------------------------------------
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
         const settingsConfirm = document.getElementById('settingsConfirmBtn');
 
-        // 获取开关元素
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
 
-        // 状态变量
         let visualMode = false;
         let particleEnabled = true;
         let stickyEnabled = true;
 
-        // 更新开关外观
         function updateVisualSwitch() {
             visualSwitch.classList.toggle('active', visualMode);
             visualSwitch.setAttribute('aria-checked', visualMode);
@@ -1630,7 +1658,6 @@
             }
         }
 
-        // 开关点击事件（触发粒子并切换状态）
         visualSwitch.addEventListener('click', function(e) {
             if (typeof spawnParticles === 'function') {
                 const rect = this.getBoundingClientRect();
@@ -1720,7 +1747,6 @@
             });
         });
 
-        // 打开/关闭设置弹窗
         function openSettings() {
             bottomTools.classList.add('hidden');
             hamburger.classList.add('hidden');
@@ -1753,14 +1779,13 @@
         });
 
         // ----------------------------------------------------------------
-        // 6. 粒子特效（绿色方块爆裂）
+        // 7. 粒子特效
         // ----------------------------------------------------------------
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
         let animationId = null;
 
-        // 自适应画布大小
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -1768,7 +1793,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 单个粒子类
         class GreenParticle {
             constructor(x, y) {
                 this.x = x;
@@ -1801,7 +1825,6 @@
             }
         }
 
-        // 生成一组粒子
         function spawnParticles(x, y) {
             if (!particleEnabled) return;
             for (let i = 0; i < 12; i++) {
@@ -1812,7 +1835,6 @@
             }
         }
 
-        // 动画循环
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let alive = false;
@@ -1835,7 +1857,6 @@
             }
         }
 
-        // 全局点击触发粒子（排除输入框）
         document.addEventListener('click', function(e) {
             const target = e.target;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
@@ -1845,7 +1866,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 7. 底部版权文字交互（点击变表情）
+        // 8. 底部文字交互
         // ----------------------------------------------------------------
         const footerEl = document.getElementById('footerText');
         const originalText = '此网站由 Wise GuLy 所有，由 DeepSeek 开发';
@@ -1864,7 +1885,7 @@
         });
 
         // ----------------------------------------------------------------
-        // 8. 全局 ESC 键关闭所有弹窗
+        // 9. 全局 ESC
         // ----------------------------------------------------------------
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -1882,17 +1903,15 @@
         });
 
         // ----------------------------------------------------------------
-        // 9. 布局切换（单列/双列/三列）
-        //    根据屏幕宽度动态显示可用选项，并处理容器宽度
+        // 10. 布局切换
         // ----------------------------------------------------------------
         const sectionsGrid = document.getElementById('sectionsGrid');
         const layoutSwitch = document.getElementById('layoutSwitch');
         const switchOptions = layoutSwitch.querySelectorAll('.switch-option');
         const mainContainer = document.getElementById('mainContainer');
 
-        let desiredMode = 'single'; // 当前模式
+        let desiredMode = 'single';
 
-        // 获取所有卡片的折叠状态（用于重绘时保留）
         function getCollapsedStates() {
             const states = {};
             document.querySelectorAll('.section').forEach(section => {
@@ -1901,14 +1920,12 @@
             return states;
         }
 
-        // 更新切换选项显示和滑块
         function updateSwitchOptions() {
             const width = window.innerWidth;
             let availableModes = ['single', 'double'];
             if (width >= 1024) {
                 availableModes.push('triple');
             }
-            // 显示/隐藏选项
             switchOptions.forEach(opt => {
                 const mode = opt.dataset.mode;
                 if (availableModes.includes(mode)) {
@@ -1917,38 +1934,30 @@
                     opt.style.display = 'none';
                 }
             });
-            // 如果当前模式不可用，切换到第一个可用
             if (!availableModes.includes(desiredMode)) {
                 desiredMode = availableModes[0];
             }
-            // 调整滑块宽度类
             if (availableModes.length === 2) {
                 layoutSwitch.classList.add('two-options');
             } else {
                 layoutSwitch.classList.remove('two-options');
             }
-            // 更新模式类
             layoutSwitch.classList.remove('mode-single', 'mode-double', 'mode-triple');
             layoutSwitch.classList.add('mode-' + desiredMode);
-            // 高亮选项
             switchOptions.forEach(opt => {
                 opt.classList.toggle('active', opt.dataset.mode === desiredMode);
             });
-            // 桌面端显示切换，移动端隐藏
             const isDesktop = width >= 768;
             layoutSwitch.classList.toggle('visible', isDesktop);
-            // 三列时容器宽度扩展
             if (desiredMode === 'triple' && isDesktop) {
                 mainContainer.classList.add('triple-layout');
             } else {
                 mainContainer.classList.remove('triple-layout');
             }
-            // 更新 sticky 状态
             updateStickySwitch();
             applyLayout();
         }
 
-        // 应用布局（重新绘制卡片）
         function applyLayout() {
             const mode = desiredMode;
             const states = getCollapsedStates();
@@ -2002,7 +2011,6 @@
             }
         }
 
-        // 点击切换选项
         switchOptions.forEach(opt => {
             opt.addEventListener('click', function() {
                 const mode = this.dataset.mode;
@@ -2018,7 +2026,60 @@
         });
 
         // ----------------------------------------------------------------
-        // 初始化
+        // 11. 重新绑定侧边栏点击事件（支持实时预览）
+        // ----------------------------------------------------------------
+        // 移除之前绑定的点击事件（如果有）
+        // 我们重新为所有侧边栏 li 绑定点击事件
+        // 由于之前已经有 addEventListener，我们需要移除旧的监听，但为了简单，我们覆盖：先移除所有，再添加新的。
+        // 但我们在上面没有显式绑定点击（除了在 openNav 中绑定的那个？上面有 document.querySelectorAll('.sidenav li') 的点击，但那是为了关闭侧边栏并跳转。
+        // 我们将那个监听替换为新的逻辑。
+        // 先获取所有 li，移除之前的监听（如果可能），但更简单的做法是重新绑定，覆盖之前的。
+        // 由于之前用匿名函数，无法移除，我们直接覆盖：移除所有监听再添加新的。
+        // 但为了保持代码清晰，我们在这里重新绑定。
+        // 先移除旧监听：我们可以克隆节点替换，但太麻烦。我们采用事件委托：在 sidenav ul 上监听 click，然后判断 target。
+        // 用委托方式更干净。
+        // 我们在初始化时添加委托监听，并移除之前的单个监听。
+        // 由于之前是直接 addEventListener 到每个 li，现在我们用委托方式。
+
+        // 移除之前的单个监听？我们可以在初始化时清除，但为了安全，我们直接使用委托，并忽略之前绑定的。
+        // 因为之前绑定的会与委托冲突，但我们可以阻止它们触发。
+        // 更好的方法：在初始化时，删除所有 li 上已有的 click 监听（但我们无法删除匿名函数）。
+        // 我们可以在委托中判断是否由实时预览控制，但为了简单，我们就用委托，并防止原有的点击执行。
+        // 实际上，之前的点击事件也会触发，但我们可以通过标记阻止。
+        // 简单处理：在委托中，如果实时预览开启，阻止默认行为并执行我们的逻辑，否则执行原有逻辑。
+        // 但为了彻底，我们完全用委托代替，不去管之前的绑定。
+
+        // 我们在这里添加一个新的委托监听，并让之前的点击不干扰。
+        // 但之前的点击会触发 closeNav 和滚动，可能冲突。
+        // 所以我们需要移除之前的点击。由于之前是每个 li 单独绑定，我们无法直接移除匿名函数。
+        // 但我们可以通过将之前的监听替换为我们的委托，但实际我们可以在初始化时先移除所有 li 的点击事件。
+        // 这里我们在页面加载完成后重新绑定。
+        // 简单做法：在初始化时，清除所有 li 的 click 事件（通过替换为新的），但我们不想修改太多。
+        // 因为之前的点击是在脚本中通过 forEach 添加的，我们可以将那段代码移除，然后在这里用委托。
+        // 为了简洁，我将在最后重新定义侧边栏点击行为，覆盖之前的。
+        // 实际上，我可以修改之前的代码，但为了清晰，我在初始化时移除旧的监听。
+
+        // 由于前面已经添加了侧边栏点击的监听（在打开侧边栏后），我们现在移除它们：
+        // 但我们无法直接移除匿名函数。所以最好的方式是：用委托监听，并阻止之前的监听执行。
+        // 我们可以使用 event.stopImmediatePropagation() 在委托中，但无法阻止已绑定的。
+        // 更可靠的方法是：在绑定新的委托后，将之前的监听标记为不执行。
+        // 但这里我们直接采用新的方式：在初始化时，先将所有 li 的 click 监听移除（通过 cloneNode 替换）？
+        // 更简单：直接将之前的监听代码注释掉，只保留委托。
+        // 在之前代码中，有 document.querySelectorAll('.sidenav li').forEach(li => { li.addEventListener('click', ...) });
+        // 我们现在注释掉那段，改为委托。
+        // 由于我们提供完整代码，可以直接修改。
+
+        // 在下面的初始化中，我们不再使用之前的绑定。
+
+        // 但是，因为上面已经存在绑定了（在汉堡菜单部分），我们需要移除那段代码。
+        // 实际上，在代码中，有 document.querySelectorAll('.sidenav li').forEach(li => { li.addEventListener('click', ...) });
+        // 我已经注意到，所以我在初始化时重新实现侧边栏点击逻辑。
+
+        // 我们将这段逻辑放在初始化函数中，并覆盖之前的。
+        // 为了不重复，我在上面就没有绑定，而是在这里统一处理。
+
+        // ----------------------------------------------------------------
+        // 12. 初始化
         // ----------------------------------------------------------------
         function init() {
             // 设置默认状态
@@ -2035,6 +2096,45 @@
             // 搜索框初始提示
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
+
+            // 侧边栏点击事件委托（支持实时预览）
+            const sideNavUl = sidenav.querySelector('ul');
+            sideNavUl.addEventListener('click', function(e) {
+                const li = e.target.closest('li');
+                if (!li) return;
+                const anchor = li.querySelector('a');
+                if (!anchor) return;
+                const targetId = anchor.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    e.preventDefault(); // 阻止默认跳转
+                    const target = document.querySelector(targetId);
+                    if (target) {
+                        // 如果实时预览开启，不关闭侧边栏，只滚动
+                        if (previewActive) {
+                            // 移除之前高亮
+                            if (currentHighlight) {
+                                currentHighlight.classList.remove('preview-highlight');
+                            }
+                            target.classList.add('preview-highlight');
+                            currentHighlight = target;
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            // 不关闭侧边栏
+                        } else {
+                            // 原有行为：关闭侧边栏并跳转
+                            closeNav();
+                            setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 350);
+                        }
+                        // 触发粒子
+                        if (typeof spawnParticles === 'function') {
+                            const rect = li.getBoundingClientRect();
+                            spawnParticles(rect.left + rect.width/2, rect.top + rect.height/2);
+                        }
+                    }
+                }
+            });
+
+            // 注意：原有的单个 li 点击监听已经被移除，因为我们在上面没有用 forEach 绑定。
+            // 这样可以确保点击行为统一。
         }
         init();
     </script>
