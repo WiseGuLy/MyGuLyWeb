@@ -22,6 +22,7 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         #particleCanvas {
@@ -52,6 +53,7 @@
             color: #1a1a1a;
             padding-bottom: 12px;
             border-bottom: 2px solid #d0d0d0;
+            transition: color 0.3s, border-color 0.3s;
         }
 
         /* ============================================================
@@ -76,7 +78,7 @@
             min-width: 200px;
             overflow: hidden;
             z-index: 100;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: opacity 0.3s, visibility 0.3s, background 0.3s, border-color 0.3s;
         }
         .layout-switch.visible { display: flex; }
         .layout-switch.sticky {
@@ -183,6 +185,7 @@
             padding: 4px 0 10px;
             border-bottom: 2px solid #d0d0d0;
             margin-bottom: 12px;
+            transition: border-color 0.3s;
         }
         .section-title {
             font-size: 1.4rem;
@@ -410,6 +413,7 @@
             z-index: 1002;
             border: 2px solid rgba(160, 160, 160, 0.4);
             width: 120px;
+            transition: background 0.3s, border-color 0.3s;
         }
         .apps-popup.show { display: flex; }
         .popup-item {
@@ -445,6 +449,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: background 0.3s;
         }
         .settings-modal.open { display: flex; }
 
@@ -460,6 +465,7 @@
             padding: 28px 24px 20px;
             animation: fadeInUp 0.25s ease;
             overflow: hidden;
+            transition: background 0.3s;
         }
         .settings-panel h2 {
             font-size: 1.5rem;
@@ -468,12 +474,14 @@
             margin-bottom: 16px;
             text-align: center;
             flex-shrink: 0;
+            transition: color 0.3s;
         }
 
         #aboutModal h2 {
             border-bottom: 2px solid #d0d0d0;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            transition: border-color 0.3s;
         }
 
         .sub-tabs {
@@ -486,6 +494,7 @@
             padding: 4px;
             margin-bottom: 20px;
             flex-shrink: 0;
+            transition: background 0.3s;
         }
         .sub-tab {
             padding: 6px 12px;
@@ -511,7 +520,7 @@
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            width: calc(33.33% - 4px); /* 适配三档 */
+            width: calc(33.33% - 4px);
         }
         .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
         .sub-tabs.active-features .sub-tab-slider { left: calc(33.33% + 2px); }
@@ -543,6 +552,7 @@
             justify-content: space-between;
             padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
+            transition: border-color 0.3s;
         }
         .settings-slide .switch-setting:last-child { border-bottom: none; }
         .settings-slide .switch-setting label {
@@ -550,6 +560,7 @@
             font-weight: 500;
             color: #333;
             cursor: pointer;
+            transition: color 0.3s;
         }
         .switch-toggle {
             position: relative;
@@ -574,6 +585,72 @@
         }
         .switch-toggle.active .slider { transform: translateX(22px); }
 
+        /* 模式切换下拉框 */
+        .custom-select {
+            position: relative;
+            width: 130px;
+            user-select: none;
+        }
+        .select-trigger {
+            padding: 5px 12px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #333;
+            transition: border-color 0.2s, background 0.3s, color 0.3s;
+        }
+        .select-trigger:hover {
+            border-color: #0366d6;
+        }
+        .select-arrow {
+            font-size: 0.8rem;
+            color: #888;
+            transition: transform 0.2s;
+        }
+        /* 修改：改为向下弹出 */
+        .select-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            list-style: none;
+            padding: 4px;
+            margin: 0;
+            display: none;
+            z-index: 20; /* 提高层级防止被遮挡 */
+            overflow: hidden;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .select-options.show {
+            display: block;
+        }
+        .select-option {
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #333;
+            text-align: center;
+            transition: background 0.2s, color 0.2s;
+        }
+        .select-option:hover {
+            background: #eef6ff;
+            color: #0366d6;
+        }
+        .select-option.active {
+            background: #0366d6;
+            color: #fff;
+        }
+
         /* 导入导出页面样式 */
         .io-note {
             font-size: 0.85rem;
@@ -581,6 +658,7 @@
             text-align: center;
             margin-bottom: 20px;
             margin-top: 5px;
+            transition: color 0.3s;
         }
         .action-btn {
             padding: 5px 15px;
@@ -607,10 +685,11 @@
             border-bottom: 1px solid #f0f0f0;
             font-size: 0.95rem;
             color: #444;
+            transition: border-color 0.3s, color 0.3s;
         }
         .update-item:last-child { border-bottom: none; }
         .update-item .date { font-weight: 600; color: #0366d6; }
-        .update-item .version { font-weight: 500; color: #222; }
+        .update-item .version { font-weight: 500; color: #222; transition: color 0.3s; }
 
         .about-content {
             display: flex;
@@ -629,6 +708,7 @@
             font-weight: 500;
             color: #222;
             margin-bottom: 16px;
+            transition: color 0.3s;
         }
         .about-line {
             display: flex;
@@ -639,9 +719,10 @@
             color: #444;
             width: 100%;
             max-width: 280px;
+            transition: border-color 0.3s, color 0.3s;
         }
-        .about-line .label { font-weight: 600; color: #222; min-width: 80px; }
-        .about-line .value { color: #555; }
+        .about-line .label { font-weight: 600; color: #222; min-width: 80px; transition: color 0.3s; }
+        .about-line .value { color: #555; transition: color 0.3s; }
         .about-line:last-child { border-bottom: none; }
 
         .about-modal-section {
@@ -674,6 +755,7 @@
             padding-top: 12px;
             border-top: 1px solid #eee;
             margin-top: 8px;
+            transition: border-color 0.3s;
         }
         .settings-footer button {
             padding: 10px 40px;
@@ -699,7 +781,7 @@
             height: 100%;
             background: #ffffff;
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08);
-            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
             z-index: 10000;
             padding: 80px 0 30px;
             overflow-y: auto;
@@ -714,7 +796,7 @@
             border-bottom: 2px solid #f0f0f0;
             margin-bottom: 8px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, border-color 0.3s;
         }
         .sidenav.open .sidenav-header { opacity: 1; }
         .sidenav-header .header-title {
@@ -796,6 +878,7 @@
             align-items: flex-start;
             justify-content: center;
             padding-top: 60px;
+            transition: background 0.3s;
         }
         .search-modal.open { display: flex; }
 
@@ -811,6 +894,7 @@
             max-height: 80vh;
             display: flex;
             flex-direction: column;
+            transition: background 0.3s, border-color 0.3s;
         }
         @keyframes fadeInUp {
             0% { opacity: 0; transform: translateY(20px); }
@@ -827,7 +911,9 @@
             border-radius: 40px;
             outline: none;
             font-family: inherit;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+            background: #ffffff;
+            color: #1e1e1e;
         }
         .search-header input:focus {
             border-color: #0366d6;
@@ -870,6 +956,7 @@
             margin-bottom: 10px;
             flex-shrink: 0;
             padding-left: 10px;
+            transition: border-color 0.3s, color 0.3s;
         }
         .result-column-list { flex: 1; overflow-y: auto; padding-right: 4px; }
         .result-column-list::-webkit-scrollbar { width: 4px; }
@@ -885,7 +972,7 @@
             flex-wrap: wrap;
             gap: 6px;
             border-bottom: 1px solid #f5f5f5;
-            transition: background 0.15s, box-shadow 0.15s;
+            transition: background 0.15s, box-shadow 0.15s, border-color 0.3s;
             border: 2px solid transparent;
             cursor: default;
         }
@@ -893,7 +980,7 @@
             background: #f0f4ff;
             box-shadow: 0 2px 8px rgba(3, 102, 214, 0.06);
         }
-        .result-name { font-weight: 500; color: #222; font-size: 0.95rem; }
+        .result-name { font-weight: 500; color: #222; font-size: 0.95rem; transition: color 0.3s; }
         .result-url {
             color: #0366d6;
             text-decoration: none;
@@ -906,6 +993,7 @@
             font-size: 0.9rem;
             padding: 12px 0;
             text-align: center;
+            transition: color 0.3s;
         }
 
         .footer {
@@ -916,7 +1004,7 @@
             color: #aaa;
             border-top: 2px solid #d0d0d0;
             letter-spacing: 0.3px;
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, border-color 0.3s;
             cursor: default;
             user-select: none;
         }
@@ -939,7 +1027,7 @@
             overflow: hidden;
             display: none;
             opacity: 0;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transition: opacity 0.25s ease, transform 0.25s ease, background 0.3s;
             pointer-events: none;
             border: 2px solid #0366d6;
         }
@@ -956,6 +1044,7 @@
             border: none;
             box-shadow: none;
             margin: 0;
+            transition: background 0.3s;
         }
         .preview-content .section .list-wrapper { max-height: 1000px !important; opacity: 1 !important; margin: 0 !important; }
         .preview-content .section .toggle-btn, .preview-content .section .toggle-label { display: none; }
@@ -963,9 +1052,10 @@
             cursor: default;
             border-bottom-color: #d0d0d0;
             margin-bottom: 10px;
+            transition: border-color 0.3s;
         }
         .preview-content .section .section-title { color: #0366d6; }
-        .preview-content .section li { padding: 6px 12px; border-bottom: 1px solid #eee; }
+        .preview-content .section li { padding: 6px 12px; border-bottom: 1px solid #eee; transition: border-color 0.3s; }
         .preview-content .section li:last-child { border-bottom: none; }
         .preview-content .section li:hover {
             background: transparent;
@@ -993,6 +1083,104 @@
         }
         body.highlight-mode .sidenav li:hover { box-shadow: inset 0 0 0 1px #0366d6; }
         body.highlight-mode .result-item:hover { box-shadow: inset 0 0 0 1px #0366d6; }
+
+        /* ============================================================
+           深色模式覆盖样式
+           ============================================================ */
+        body.dark-mode {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        body.dark-mode h1 { color: #e0e0e0; border-bottom-color: #333; }
+        body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
+        body.dark-mode .layout-switch.sticky { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
+        body.dark-mode .switch-option:not(.active) { color: #aaa; }
+        
+        body.dark-mode .section { background: #1e1e1e; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        body.dark-mode .section:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        body.dark-mode .section.preview-highlight { background: #2a2a2a; }
+        body.dark-mode .section-header { border-bottom-color: #333; }
+        body.dark-mode .section-title { color: #e0e0e0; }
+        body.dark-mode .toggle-label, body.dark-mode .toggle-btn { color: #aaa; }
+        body.dark-mode li { border-bottom-color: #2c2c2c; }
+        body.dark-mode li:hover { background: #2c2c2c; }
+        body.dark-mode .site-name { color: #e0e0e0; }
+        
+        body.dark-mode .hamburger { background: rgba(30, 30, 30, 0.8); border-color: rgba(255,255,255,0.1); color: #e0e0e0; }
+        body.dark-mode .hamburger:hover { background: rgba(50, 50, 50, 0.9); }
+        body.dark-mode .search-bottom, body.dark-mode .settings-bottom, body.dark-mode .apps-bottom, body.dark-mode .about-bottom { background: rgba(30, 30, 30, 0.8); border-color: rgba(255,255,255,0.1); }
+        body.dark-mode .search-bottom:hover, body.dark-mode .settings-bottom:hover, body.dark-mode .apps-bottom:hover, body.dark-mode .about-bottom:hover { background: rgba(50, 50, 50, 0.9); }
+        
+        body.dark-mode .search-icon-svg circle, body.dark-mode .search-icon-svg line,
+        body.dark-mode .settings-icon-svg circle, body.dark-mode .settings-icon-svg path,
+        body.dark-mode .apps-icon-svg rect, 
+        body.dark-mode .about-icon-svg circle:not(:last-child), body.dark-mode .about-icon-svg line { stroke: #e0e0e0; }
+        body.dark-mode .about-icon-svg circle:last-child { fill: #e0e0e0; }
+
+        body.dark-mode .search-bottom:hover .search-label,
+        body.dark-mode .settings-bottom:hover .settings-label,
+        body.dark-mode .apps-bottom:hover .apps-label,
+        body.dark-mode .about-bottom:hover .about-label { color: #0366d6; }
+
+        body.dark-mode .apps-popup { background: rgba(30, 30, 30, 0.95); border-color: rgba(255,255,255,0.1); }
+        body.dark-mode .popup-item { color: #e0e0e0; }
+        body.dark-mode .popup-item:hover { background: #2c2c2c; color: #0366d6; }
+
+        body.dark-mode .sidenav { background: #1e1e1e; border-right-color: #333; box-shadow: 2px 0 20px rgba(0,0,0,0.3); }
+        body.dark-mode .sidenav-header { border-bottom-color: #333; }
+        body.dark-mode .sidenav li { border-bottom-color: #2c2c2c; }
+        body.dark-mode .sidenav a { color: #e0e0e0; }
+        body.dark-mode .sidenav li:hover { background: #2c2c2c; }
+        body.dark-mode .sidenav li.preview-active { background: #2a2a2a; }
+        body.dark-mode .preview-toggle { background: #2c2c2c; border-color: #444; color: #aaa; }
+
+        body.dark-mode .overlay { background: rgba(0, 0, 0, 0.6); }
+
+        body.dark-mode .settings-modal { background: rgba(0, 0, 0, 0.6); }
+        body.dark-mode .settings-panel { background: #1e1e1e; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        body.dark-mode .settings-panel h2 { color: #e0e0e0; }
+        body.dark-mode #aboutModal h2 { border-bottom-color: #333; }
+        body.dark-mode .sub-tabs { background: #2c2c2c; }
+        body.dark-mode .sub-tab { color: #aaa; }
+        body.dark-mode .settings-slide .switch-setting { border-bottom-color: #2c2c2c; }
+        body.dark-mode .settings-slide .switch-setting label { color: #e0e0e0; }
+        body.dark-mode .switch-toggle { background: #555; }
+        
+        body.dark-mode .select-trigger { background: #2c2c2c; border-color: #444; color: #e0e0e0; }
+        body.dark-mode .select-arrow { color: #aaa; }
+        body.dark-mode .select-options { background: #2c2c2c; border-color: #444; }
+        body.dark-mode .select-option { color: #e0e0e0; }
+        body.dark-mode .select-option:hover { background: #3a3a3a; color: #0366d6; }
+
+        body.dark-mode .io-note { color: #aaa; }
+        body.dark-mode .update-item { border-bottom-color: #2c2c2c; color: #ccc; }
+        body.dark-mode .update-item .version { color: #e0e0e0; }
+        body.dark-mode .about-version { color: #e0e0e0; }
+        body.dark-mode .about-line { border-bottom-color: #2c2c2c; color: #ccc; }
+        body.dark-mode .about-line .label { color: #e0e0e0; }
+        body.dark-mode .about-line .value { color: #aaa; }
+        body.dark-mode .settings-footer { border-top-color: #333; }
+
+        body.dark-mode .search-modal { background: rgba(18, 18, 18, 0.94); }
+        body.dark-mode .search-box { background: #1e1e1e; border-color: #333; }
+        body.dark-mode .search-header input { background: #2c2c2c; border-color: #444; color: #e0e0e0; }
+        body.dark-mode .search-header input::placeholder { color: #888; }
+        body.dark-mode .result-column-title { color: #aaa; border-bottom-color: #333; }
+        body.dark-mode .result-item { border-bottom-color: #2c2c2c; }
+        body.dark-mode .result-item:hover { background: #2c2c2c; }
+        body.dark-mode .result-name { color: #e0e0e0; }
+        body.dark-mode .result-empty { color: #888; }
+        body.dark-mode .search-close { color: #aaa; }
+        body.dark-mode .result-column-list::-webkit-scrollbar-track { background: #2c2c2c; }
+        body.dark-mode .result-column-list::-webkit-scrollbar-thumb { background: #555; }
+
+        body.dark-mode .footer { color: #888; border-top-color: #333; }
+        body.dark-mode .footer:hover { color: #0366d6; }
+
+        body.dark-mode .preview-modal { background: #1e1e1e; }
+        body.dark-mode .preview-content .section { background: #2c2c2c; }
+        body.dark-mode .preview-content .section .section-header { border-bottom-color: #444; }
+        body.dark-mode .preview-content .section li { border-bottom-color: #333; }
 
         /* 移动端响应 */
         @media (max-width: 767px) {
@@ -1164,6 +1352,19 @@
             <div class="settings-slider">
                 <div class="settings-slider-inner" id="settingsSlider">
                     <div class="settings-slide" data-slide="appearance">
+                        <div class="switch-setting">
+                            <label>模式</label>
+                            <div class="custom-select" id="themeSelect">
+                                <div class="select-trigger">
+                                    <span class="select-value">浅色模式</span>
+                                    <span class="select-arrow">▾</span>
+                                </div>
+                                <ul class="select-options">
+                                    <li class="select-option active" data-value="light">浅色模式</li>
+                                    <li class="select-option" data-value="dark">深色模式</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div class="switch-setting">
                             <label for="visualSwitch">更直观显示</label>
                             <div class="switch-toggle active" id="visualSwitch" role="button" tabindex="0" aria-checked="true">
@@ -1350,6 +1551,13 @@
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
+        
+        // 模式切换器 DOM
+        const themeSelect = document.getElementById('themeSelect');
+        const selectTrigger = themeSelect.querySelector('.select-trigger');
+        const selectOptionsList = themeSelect.querySelector('.select-options');
+        const selectValue = themeSelect.querySelector('.select-value');
+        const selectOptionItems = themeSelect.querySelectorAll('.select-option');
 
         // 导入导出 DOM
         const exportBtn = document.getElementById('exportBtn');
@@ -1369,6 +1577,7 @@
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
 
+        let darkMode = false;
         let visualMode = true;
         let particleEnabled = true;
         let stickyEnabled = true;
@@ -1545,6 +1754,16 @@
         previewToggle.addEventListener('click', function(e) {
             e.stopPropagation();
             spawnParticles(e.clientX, e.clientY); 
+            
+            if (!previewActive) {
+                // 修改：与列数切换的显示逻辑完全保持一致 (width < 768)
+                const isNarrow = window.innerWidth < 768;
+                if (isNarrow) {
+                    const allow = confirm("屏幕过窄时，不建议使用实时预览；手机端不建议使用实时预览。\n仍要使用吗？(不建议)");
+                    if (!allow) return;
+                }
+            }
+
             previewActive = !previewActive;
             this.classList.toggle('active', previewActive);
             if (!previewActive) {
@@ -1666,6 +1885,19 @@
         // ================================================================
         // 8. 设置 & 关于 弹窗通用逻辑
         // ================================================================
+        function updateDarkModeUI() {
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                selectValue.textContent = '深色模式';
+            } else {
+                document.body.classList.remove('dark-mode');
+                selectValue.textContent = '浅色模式';
+            }
+            selectOptionItems.forEach(opt => {
+                opt.classList.toggle('active', (opt.dataset.value === 'dark') === darkMode);
+            });
+        }
+
         function updateVisualSwitch() {
             visualSwitch.classList.toggle('active', visualMode);
             visualSwitch.setAttribute('aria-checked', visualMode);
@@ -1699,6 +1931,31 @@
         setupSwitch(particleSwitch, () => particleEnabled, v => particleEnabled = v, updateParticleSwitch);
         setupSwitch(stickySwitch, () => stickyEnabled, v => stickyEnabled = v, updateStickySwitch);
 
+        // 下拉选择器逻辑
+        selectTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            selectOptionsList.classList.toggle('show');
+        });
+
+        selectOptionItems.forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const val = this.dataset.value;
+                selectOptionsList.classList.remove('show');
+                
+                if (val === 'dark' && !darkMode) {
+                    const confirmDark = confirm("深色模式有很多bug，不建议使用。确定要切换吗？");
+                    if (confirmDark) {
+                        darkMode = true;
+                        updateDarkModeUI();
+                    }
+                } else if (val === 'light' && darkMode) {
+                    darkMode = false;
+                    updateDarkModeUI();
+                }
+            });
+        });
+
         function setupTabs(tabContainer, sliderContainer) {
             const tabs = tabContainer.querySelectorAll('.sub-tab');
             let currentTab = tabs[0].dataset.tab;
@@ -1724,6 +1981,7 @@
             e.stopPropagation();
             spawnParticles(e.clientX, e.clientY);
             const config = {
+                darkMode: darkMode,
                 previewActive: previewActive,
                 visualMode: visualMode,
                 particleEnabled: particleEnabled,
@@ -1757,7 +2015,8 @@
                 try {
                     const config = JSON.parse(event.target.result);
                     // 校验配置合理性
-                    if (typeof config.previewActive !== 'boolean' ||
+                    if (typeof config.darkMode !== 'boolean' ||
+                        typeof config.previewActive !== 'boolean' ||
                         typeof config.visualMode !== 'boolean' ||
                         typeof config.particleEnabled !== 'boolean' ||
                         typeof config.stickyEnabled !== 'boolean') {
@@ -1765,12 +2024,14 @@
                     }
 
                     // 应用配置
+                    darkMode = config.darkMode;
                     previewActive = config.previewActive;
                     visualMode = config.visualMode;
                     particleEnabled = config.particleEnabled;
                     stickyEnabled = config.stickyEnabled;
 
                     // 更新 UI
+                    updateDarkModeUI();
                     previewToggle.classList.toggle('active', previewActive);
                     updateVisualSwitch();
                     updateParticleSwitch();
@@ -1786,7 +2047,7 @@
                 } catch (err) {
                     alert("配置文件格式错误或损坏！");
                 }
-                importFileInput.value = ''; // 重置 input 以便重复选择同一文件
+                importFileInput.value = ''; 
             };
             reader.readAsText(file);
         });
@@ -1906,11 +2167,15 @@
             spawnParticles(e.clientX, e.clientY); 
         });
 
-        // 使用 mousedown 关闭功能项气泡
         document.addEventListener('mousedown', function(e) {
             if (appsPopup.classList.contains('show')) {
                 if (!appsBtn.contains(e.target) && !appsPopup.contains(e.target)) {
                     appsPopup.classList.remove('show');
+                }
+            }
+            if (selectOptionsList.classList.contains('show')) {
+                if (!themeSelect.contains(e.target)) {
+                    selectOptionsList.classList.remove('show');
                 }
             }
         });
@@ -1985,7 +2250,6 @@
             }
         }
 
-        // 全局点击监听：仅处理粒子生成
         document.addEventListener('click', function(e) {
             const target = e.target;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
@@ -2033,6 +2297,9 @@
                     e.preventDefault();
                 } else if (appsPopup.classList.contains('show')) {
                     appsPopup.classList.remove('show');
+                    e.preventDefault();
+                } else if (selectOptionsList.classList.contains('show')) {
+                    selectOptionsList.classList.remove('show');
                     e.preventDefault();
                 }
             }
@@ -2160,9 +2427,11 @@
         // 15. 初始化
         // ================================================================
         function init() {
+            darkMode = false;
             visualMode = true;
             particleEnabled = true;
             stickyEnabled = true;
+            updateDarkModeUI();
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
