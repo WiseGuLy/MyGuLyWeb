@@ -396,7 +396,7 @@
         /* ===== 功能气泡弹窗 ===== */
         .apps-popup {
             position: absolute;
-            bottom: 74px; /* 修改：靠近一点 */
+            bottom: 74px; 
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.95);
@@ -470,7 +470,6 @@
             flex-shrink: 0;
         }
 
-        /* 修改：关于页面大标题下方加横线 */
         #aboutModal h2 {
             border-bottom: 2px solid #d0d0d0;
             padding-bottom: 10px;
@@ -512,10 +511,11 @@
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            width: calc(50% - 4px);
+            width: calc(33.33% - 4px); /* 适配三档 */
         }
         .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
-        .sub-tabs.active-features .sub-tab-slider { left: 50%; }
+        .sub-tabs.active-features .sub-tab-slider { left: calc(33.33% + 2px); }
+        .sub-tabs.active-io .sub-tab-slider { left: calc(66.66% + 1px); }
 
         .settings-slider {
             flex: 1;
@@ -574,6 +574,33 @@
         }
         .switch-toggle.active .slider { transform: translateX(22px); }
 
+        /* 导入导出页面样式 */
+        .io-note {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 5px;
+        }
+        .action-btn {
+            padding: 5px 15px;
+            border: 1px solid #0366d6;
+            background: transparent;
+            color: #0366d6;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .action-btn:hover {
+            background: #0366d6;
+            color: #fff;
+        }
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
         .update-content { padding: 8px 0; }
         .update-item {
             padding: 6px 0;
@@ -624,7 +651,6 @@
             border: none !important;
             margin-bottom: 16px;
         }
-        /* 修改：取消分割横线，字号减小 */
         .about-modal-section .section-header {
             justify-content: center;
             border-bottom: none;
@@ -634,7 +660,6 @@
             text-align: center;
             font-size: 1.2rem; 
         }
-        /* 修改：隐藏文字，显示三角 */
         .about-modal-section .toggle-group {
             display: flex;
         }
@@ -992,7 +1017,7 @@
             .search-label, .settings-label, .apps-label, .about-label { font-size: 0.6rem; }
             .settings-panel { padding: 20px 16px 16px; max-height: 95vh; }
             .settings-footer button { padding: 10px 20px; font-size: 1rem; max-width: 100%; min-width: 0; }
-            .sub-tab { padding: 4px 10px; font-size: 0.85rem; }
+            .sub-tab { padding: 4px 8px; font-size: 0.8rem; }
             .settings-slide { min-height: 0; }
             .sidenav a { padding: 8px 16px; font-size: 1.1rem; }
             .preview-modal { max-width: 95%; width: 95%; }
@@ -1027,7 +1052,7 @@
             .search-close { font-size: 1.4rem; }
             .settings-panel { padding: 16px 12px 12px; max-height: 98vh; }
             .settings-footer button { padding: 10px 16px; font-size: 0.95rem; min-width: 0; }
-            .sub-tab { padding: 4px 8px; font-size: 0.8rem; }
+            .sub-tab { padding: 4px 6px; font-size: 0.75rem; }
             .sidenav a { padding: 6px 14px; font-size: 1rem; }
         }
     </style>
@@ -1133,6 +1158,7 @@
             <div class="sub-tabs active-appearance" id="subTabs">
                 <span class="sub-tab active" data-tab="appearance">外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
+                <span class="sub-tab" data-tab="io">导入/导出</span>
                 <span class="sub-tab-slider"></span>
             </div>
             <div class="settings-slider">
@@ -1158,6 +1184,18 @@
                                 <div class="slider"></div>
                             </div>
                         </div>
+                    </div>
+                    <div class="settings-slide" data-slide="io">
+                        <div class="io-note">导入或者导出你的网站设置和喜好</div>
+                        <div class="switch-setting">
+                            <label>导出网站配置</label>
+                            <button class="action-btn" id="exportBtn">点击导出</button>
+                        </div>
+                        <div class="switch-setting">
+                            <label>导入网站配置</label>
+                            <button class="action-btn" id="importBtn">点击导入</button>
+                        </div>
+                        <input type="file" id="importFileInput" accept=".json" style="display: none;">
                     </div>
                 </div>
             </div>
@@ -1313,6 +1351,11 @@
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
 
+        // 导入导出 DOM
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFileInput = document.getElementById('importFileInput');
+
         const aboutBtn = document.getElementById('aboutBottom');
         const aboutModal = document.getElementById('aboutModal');
         const aboutConfirm = document.getElementById('aboutConfirmBtn');
@@ -1340,7 +1383,6 @@
         // ================================================================
         // 3. 辅助函数
         // ================================================================
-        // 修改：取消滚动条位移补偿，恢复最原始的处理
         function lockScroll() {
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
@@ -1677,6 +1719,78 @@
         }
         setupTabs(document.getElementById('subTabs'), document.getElementById('settingsSlider'));
 
+        // 导出配置
+        exportBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            spawnParticles(e.clientX, e.clientY);
+            const config = {
+                previewActive: previewActive,
+                visualMode: visualMode,
+                particleEnabled: particleEnabled,
+                stickyEnabled: stickyEnabled
+            };
+            const jsonStr = JSON.stringify(config, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "guli-config.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // 导入配置
+        importBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            spawnParticles(e.clientX, e.clientY);
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const config = JSON.parse(event.target.result);
+                    // 校验配置合理性
+                    if (typeof config.previewActive !== 'boolean' ||
+                        typeof config.visualMode !== 'boolean' ||
+                        typeof config.particleEnabled !== 'boolean' ||
+                        typeof config.stickyEnabled !== 'boolean') {
+                        throw new Error("配置文件格式不正确");
+                    }
+
+                    // 应用配置
+                    previewActive = config.previewActive;
+                    visualMode = config.visualMode;
+                    particleEnabled = config.particleEnabled;
+                    stickyEnabled = config.stickyEnabled;
+
+                    // 更新 UI
+                    previewToggle.classList.toggle('active', previewActive);
+                    updateVisualSwitch();
+                    updateParticleSwitch();
+                    updateStickySwitch();
+
+                    if (!previewActive) {
+                        clearHighlights();
+                        hidePreview();
+                    }
+
+                    alert("配置导入成功！");
+
+                } catch (err) {
+                    alert("配置文件格式错误或损坏！");
+                }
+                importFileInput.value = ''; // 重置 input 以便重复选择同一文件
+            };
+            reader.readAsText(file);
+        });
+
         document.querySelectorAll('#aboutModal .section-header').forEach(header => {
             header.title = '点击折叠';
             header.addEventListener('click', function() {
@@ -1792,7 +1906,7 @@
             spawnParticles(e.clientX, e.clientY); 
         });
 
-        // 修改：使用 mousedown 关闭功能项气泡
+        // 使用 mousedown 关闭功能项气泡
         document.addEventListener('mousedown', function(e) {
             if (appsPopup.classList.contains('show')) {
                 if (!appsBtn.contains(e.target) && !appsPopup.contains(e.target)) {
