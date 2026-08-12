@@ -19,7 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             color: #1e1e1e;
             padding: 40px 20px 100px;
-            min-height: 100vh; /* 修复：移除原有的 200vh 避免底部大量空白 */
+            min-height: 100vh;
             position: relative;
             overflow-x: hidden;
         }
@@ -31,7 +31,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 9999;
+            z-index: 99999; 
         }
 
         .container {
@@ -209,7 +209,6 @@
         .section-header:hover .toggle-btn { color: #0366d6; }
         .section.collapsed .toggle-btn { transform: rotate(-90deg); }
 
-        /* 修复：降低 max-height 并精确匹配过渡时间，消除折叠空隙感 */
         .list-wrapper {
             overflow: hidden;
             max-height: 1000px; 
@@ -220,7 +219,6 @@
             max-height: 0 !important;
             opacity: 0;
             margin: 0;
-            /* 折叠状态专属：高度 0.25s 收缩，文字 0.15s 淡出，完美同步无缝隙 */
             transition: max-height 0.25s ease, opacity 0.15s ease, margin 0.25s ease;
         }
 
@@ -299,7 +297,7 @@
             background: rgba(255, 255, 255, 0.75);
             color: #0366d6;
         }
-        .hamburger:active { transform: scale(0.92); }
+        .hamburger.pressed { transform: scale(0.92); }
         .hamburger.active {
             background: #0366d6;
             color: #ffffff;
@@ -327,7 +325,7 @@
         }
         .bottom-tools.hidden { opacity: 0; pointer-events: none; }
 
-        .search-bottom, .settings-bottom, .apps-bottom {
+        .search-bottom, .settings-bottom, .apps-bottom, .about-bottom {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -344,14 +342,15 @@
             border: 2px solid rgba(160, 160, 160, 0.6);
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
             transition: transform 0.2s, background 0.2s, opacity 0.3s, border-color 0.2s ease;
+            position: relative;
         }
-        .search-bottom:hover, .settings-bottom:hover, .apps-bottom:hover {
+        .search-bottom:hover, .settings-bottom:hover, .apps-bottom:hover, .about-bottom:hover {
             transform: scale(1.04);
             background: rgba(255, 255, 255, 0.75);
         }
-        .search-bottom:active, .settings-bottom:active, .apps-bottom:active { transform: scale(0.95); }
+        .search-bottom.pressed, .settings-bottom.pressed, .apps-bottom.pressed, .about-bottom.pressed { transform: scale(0.95); }
 
-        .search-icon-svg, .settings-icon-svg, .apps-icon-svg {
+        .search-icon-svg, .settings-icon-svg, .apps-icon-svg, .about-icon-svg {
             width: 30px;
             height: 30px;
             display: block;
@@ -365,14 +364,23 @@
         .apps-icon-svg rect {
             fill: none; stroke: #333; stroke-width: 2.5; stroke-linecap: round; transition: stroke 0.2s ease;
         }
+        .about-icon-svg circle, .about-icon-svg line {
+            fill: none; stroke: #333; stroke-width: 2.5; stroke-linecap: round; transition: stroke 0.2s ease;
+        }
+        .about-icon-svg circle:last-child {
+            fill: #333; stroke: none; transition: fill 0.2s ease;
+        }
 
         .search-bottom:hover .search-icon-svg circle,
         .search-bottom:hover .search-icon-svg line,
         .settings-bottom:hover .settings-icon-svg circle,
         .settings-bottom:hover .settings-icon-svg path,
-        .apps-bottom:hover .apps-icon-svg rect { stroke: #0366d6; }
+        .apps-bottom:hover .apps-icon-svg rect,
+        .about-bottom:hover .about-icon-svg circle:not(:last-child), 
+        .about-bottom:hover .about-icon-svg line { stroke: #0366d6; }
+        .about-bottom:hover .about-icon-svg circle:last-child { fill: #0366d6; }
 
-        .search-label, .settings-label, .apps-label {
+        .search-label, .settings-label, .apps-label, .about-label {
             font-size: 0.75rem;
             color: #888;
             letter-spacing: 0.5px;
@@ -382,9 +390,50 @@
         }
         .search-bottom:hover .search-label,
         .settings-bottom:hover .settings-label,
-        .apps-bottom:hover .apps-label { color: #0366d6; }
+        .apps-bottom:hover .apps-label,
+        .about-bottom:hover .about-label { color: #0366d6; }
 
-        /* ===== 设置模态框 ===== */
+        /* ===== 功能气泡弹窗 ===== */
+        .apps-popup {
+            position: absolute;
+            bottom: 74px; /* 修改：靠近一点 */
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            gap: 2px;
+            z-index: 1002;
+            border: 2px solid rgba(160, 160, 160, 0.4);
+            width: 120px;
+        }
+        .apps-popup.show { display: flex; }
+        .popup-item {
+            padding: 8px 16px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #333;
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .popup-item:hover {
+            background: #eef6ff;
+            color: #0366d6;
+        }
+        .popup-item:active {
+            transform: scale(0.95);
+        }
+        body.highlight-mode .popup-item:hover {
+            box-shadow: inset 0 0 0 1px #0366d6;
+        }
+
+        /* ===== 设置/关于 模态框通用样式 ===== */
         .settings-modal {
             position: fixed;
             top: 0; left: 0;
@@ -419,6 +468,13 @@
             margin-bottom: 16px;
             text-align: center;
             flex-shrink: 0;
+        }
+
+        /* 修改：关于页面大标题下方加横线 */
+        #aboutModal h2 {
+            border-bottom: 2px solid #d0d0d0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
         .sub-tabs {
@@ -456,12 +512,10 @@
             background: #0366d6;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 0;
-            width: calc(25% - 4px);
+            width: calc(50% - 4px);
         }
         .sub-tabs.active-appearance .sub-tab-slider { left: 4px; }
-        .sub-tabs.active-features .sub-tab-slider { left: calc(25% + 2px); }
-        .sub-tabs.active-updates .sub-tab-slider { left: calc(50% + 2px); }
-        .sub-tabs.active-about .sub-tab-slider { left: calc(75% + 2px); }
+        .sub-tabs.active-features .sub-tab-slider { left: 50%; }
 
         .settings-slider {
             flex: 1;
@@ -469,19 +523,19 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
-            min-height: 0; /* 允许在 flex 布局中收缩 */
+            min-height: 0;
         }
         .settings-slider-inner {
             display: flex;
             flex: 1;
             transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 0; /* 允许在 flex 布局中收缩 */
+            min-height: 0;
         }
         .settings-slide {
             flex: 0 0 100%;
-            padding: 6px 0 8px;
-            overflow-y: auto; /* 内容超出时竖向滚动 */
-            min-height: 0; /* 允许在 flex 布局中收缩并触发滚动 */
+            padding: 6px 12px 8px;
+            overflow-y: auto;
+            min-height: 0;
         }
         .settings-slide .switch-setting {
             display: flex;
@@ -496,7 +550,6 @@
             font-weight: 500;
             color: #333;
             cursor: pointer;
-            padding-left: 8px;
         }
         .switch-toggle {
             position: relative;
@@ -507,7 +560,6 @@
             cursor: pointer;
             transition: background 0.3s;
             flex-shrink: 0;
-            margin-right: 4px;
         }
         .switch-toggle.active { background: #0366d6; }
         .switch-toggle .slider {
@@ -564,6 +616,31 @@
         .about-line .label { font-weight: 600; color: #222; min-width: 80px; }
         .about-line .value { color: #555; }
         .about-line:last-child { border-bottom: none; }
+
+        .about-modal-section {
+            background: transparent !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            border: none !important;
+            margin-bottom: 16px;
+        }
+        /* 修改：取消分割横线，字号减小 */
+        .about-modal-section .section-header {
+            justify-content: center;
+            border-bottom: none;
+            margin-bottom: 8px;
+        }
+        .about-modal-section .section-title {
+            text-align: center;
+            font-size: 1.2rem; 
+        }
+        /* 修改：隐藏文字，显示三角 */
+        .about-modal-section .toggle-group {
+            display: flex;
+        }
+        .about-modal-section .toggle-label {
+            display: none;
+        }
 
         .settings-footer {
             display: flex;
@@ -880,7 +957,8 @@
         body.highlight-mode .hamburger:hover,
         body.highlight-mode .search-bottom:hover,
         body.highlight-mode .settings-bottom:hover,
-        body.highlight-mode .apps-bottom:hover { border-color: #0366d6; }
+        body.highlight-mode .apps-bottom:hover,
+        body.highlight-mode .about-bottom:hover { border-color: #0366d6; }
 
         body.highlight-mode .section:hover {
             box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15), inset 0 0 0 1px #0366d6;
@@ -908,10 +986,10 @@
             }
             .sections-grid.grid-mode .section, .sections-grid.triple-mode .section { margin-bottom: 21px !important; }
             .layout-switch.visible { display: none; }
-            .bottom-tools { bottom: 16px; gap: 12px; }
-            .search-bottom, .settings-bottom, .apps-bottom { width: 60px; height: 60px; }
-            .search-icon-svg, .settings-icon-svg, .apps-icon-svg { width: 26px; height: 26px; }
-            .search-label, .settings-label, .apps-label { font-size: 0.65rem; }
+            .bottom-tools { bottom: 16px; gap: 10px; }
+            .search-bottom, .settings-bottom, .apps-bottom, .about-bottom { width: 58px; height: 58px; }
+            .search-icon-svg, .settings-icon-svg, .apps-icon-svg, .about-icon-svg { width: 24px; height: 24px; }
+            .search-label, .settings-label, .apps-label, .about-label { font-size: 0.6rem; }
             .settings-panel { padding: 20px 16px 16px; max-height: 95vh; }
             .settings-footer button { padding: 10px 20px; font-size: 1rem; max-width: 100%; min-width: 0; }
             .sub-tab { padding: 4px 10px; font-size: 0.85rem; }
@@ -939,10 +1017,10 @@
             .site-url { flex-basis: 100%; text-align: left; }
             .site-name { flex: 1 1 auto; }
             .search-results-grid { grid-template-columns: 1fr; }
-            .bottom-tools { bottom: 12px; gap: 10px; }
-            .search-bottom, .settings-bottom, .apps-bottom { width: 54px; height: 54px; border-radius: 14px; }
-            .search-icon-svg, .settings-icon-svg, .apps-icon-svg { width: 22px; height: 22px; }
-            .search-label, .settings-label, .apps-label { font-size: 0.6rem; }
+            .bottom-tools { bottom: 12px; gap: 8px; }
+            .search-bottom, .settings-bottom, .apps-bottom, .about-bottom { width: 52px; height: 52px; border-radius: 12px; }
+            .search-icon-svg, .settings-icon-svg, .apps-icon-svg, .about-icon-svg { width: 22px; height: 22px; }
+            .search-label, .settings-label, .apps-label, .about-label { font-size: 0.55rem; }
             .hamburger { top: 12px; left: 12px; width: 40px; height: 40px; font-size: 1.4rem; border-radius: 10px; }
             .search-box { padding: 14px 12px 12px; }
             .search-header input { font-size: 0.95rem; padding: 10px 14px; }
@@ -962,7 +1040,7 @@
     <!-- ===== 左上角汉堡菜单 ===== -->
     <div class="hamburger" id="hamburgerBtn" aria-label="打开导航菜单">☰</div>
 
-    <!-- ===== 底部工具栏（搜索 + 设置 + 功能） ===== -->
+    <!-- ===== 底部工具栏（搜索 + 设置 + 功能 + 关于） ===== -->
     <div class="bottom-tools" id="bottomTools">
         <div class="search-bottom" id="searchBottom" aria-label="搜索">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -986,6 +1064,18 @@
                 <rect x="19" y="19" width="9" height="9" rx="1.5" />
             </svg>
             <span class="apps-label">功能</span>
+            <div class="apps-popup" id="appsPopup">
+                <div class="popup-item" id="expandAll">全部展开</div>
+                <div class="popup-item" id="collapseAll">全部折叠</div>
+            </div>
+        </div>
+        <div class="about-bottom" id="aboutBottom" aria-label="关于">
+            <svg class="about-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="12" />
+                <line x1="16" y1="15" x2="16" y2="22" />
+                <circle cx="16" cy="10" r="1.5" />
+            </svg>
+            <span class="about-label">关于</span>
         </div>
     </div>
 
@@ -1043,8 +1133,6 @@
             <div class="sub-tabs active-appearance" id="subTabs">
                 <span class="sub-tab active" data-tab="appearance">外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
-                <span class="sub-tab" data-tab="updates">更新</span>
-                <span class="sub-tab" data-tab="about">关于</span>
                 <span class="sub-tab-slider"></span>
             </div>
             <div class="settings-slider">
@@ -1071,35 +1159,66 @@
                             </div>
                         </div>
                     </div>
-                    <div class="settings-slide" data-slide="updates">
-                        <div class="update-content">
-                            <div class="update-item">
-                                <span class="date">2026-08-11</span>
-                                <span class="version">V1.0beta</span>
-                                <span>完成网站静态前端代码</span>
+                </div>
+            </div>
+            <div class="settings-footer">
+                <button id="settingsConfirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 关于弹窗 ===== -->
+    <div class="settings-modal" id="aboutModal">
+        <div class="settings-panel">
+            <h2>关于</h2>
+            <div class="settings-slider">
+                <div class="settings-slider-inner" id="aboutSlider">
+                    <div class="settings-slide" data-slide="about">
+                        <div class="section about-modal-section">
+                            <div class="section-header" title="点击折叠">
+                                <span class="section-title">GuLi 网站导航与收藏</span>
+                                <div class="toggle-group">
+                                    <span class="toggle-label">折叠</span>
+                                    <span class="toggle-btn">▾</span>
+                                </div>
                             </div>
-                            <div class="update-item" style="border-bottom: none; margin-top: 8px; font-weight: 500; color: #0366d6;">
-                                后续更新计划
-                            </div>
-                            <div class="update-item" style="border-bottom: none; color: #555;">
-                                开始研发支持用户自主上传的动态网站
+                            <div class="list-wrapper">
+                                <div style="text-align: center; margin-bottom: 12px; font-size: 1.1rem; font-weight: 500; color: #0366d6;">V1.1beta</div>
+                                <div class="about-line"><span class="label">网站制作</span><span class="value">Wise GuLy</span></div>
+                                <div class="about-line"><span class="label">代码编写</span><span class="value">DeepSeek-V4, GLM-5.2</span></div>
+                                <div class="about-line"><span class="label">开源地址</span><span class="value">暂未公布</span></div>
+                                <div class="about-line" style="border-bottom: none;"><span class="label">联系方式</span><span class="value">暂未公布</span></div>
                             </div>
                         </div>
-                    </div>
-                    <div class="settings-slide" data-slide="about">
-                        <div class="about-content">
-                            <div class="about-title">GuLi 网站导航与收藏</div>
-                            <div class="about-version">V1.0beta</div>
-                            <div class="about-line"><span class="label">网站制作</span><span class="value">Wise GuLy</span></div>
-                            <div class="about-line"><span class="label">代码编写</span><span class="value">DeepSeek</span></div>
-                            <div class="about-line"><span class="label">开源地址</span><span class="value">暂未公布</span></div>
-                            <div class="about-line" style="border-bottom: none;"><span class="label">联系方式</span><span class="value">暂无</span></div>
+
+                        <div class="section about-modal-section">
+                            <div class="section-header" title="点击折叠">
+                                <span class="section-title">更新</span>
+                                <div class="toggle-group">
+                                    <span class="toggle-label">折叠</span>
+                                    <span class="toggle-btn">▾</span>
+                                </div>
+                            </div>
+                            <div class="list-wrapper">
+                                <div class="update-item" style="border-bottom: none; margin-top: 8px; font-weight: 500; color: #0366d6;">
+                                    后续更新计划
+                                </div>
+                                <div class="update-item" style="border-bottom: 1px solid #f0f0f0; color: #555;">
+                                    开始研发支持用户自主上传的动态网站
+                                </div>
+                                <div class="update-item">
+                                    <span class="date">2026-08-12</span> <span class="version">V1.1beta</span> <span>继续增加基础功能</span>
+                                </div>
+                                <div class="update-item">
+                                    <span class="date">2026-08-11</span> <span class="version">V1.0beta</span> <span>完成网站静态前端代码</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="settings-footer">
-                <button id="settingsConfirmBtn">确定</button>
+                <button id="aboutConfirmBtn">确定</button>
             </div>
         </div>
     </div>
@@ -1135,10 +1254,12 @@
             ]},
             { id: 'ai-tools', title: 'AI 工具', items: [
                 { name: 'DeepSeek API', url: 'https://platform.deepseek.com' },
-                { name: 'DeepSeek 对话', url: 'https://chat.deepseek.com' }
+                { name: 'DeepSeek 对话', url: 'https://chat.deepseek.com' },
+                { name: '豆包', url: 'https://www.doubao.com/chat' },
+                { name: 'GLM', url: 'https://chat.z.ai' }
             ]},
             { id: 'tools', title: '实用工具', items: [
-                { name: '在线生成ICO图标', url: 'https://www.51tool.com/ico/' },
+                { name: '在线生成ICO图标', url: 'https://www.51tool.com/ico' },
                 { name: '魔方计时器CStimer', url: 'https://www.cstimer.net' }
             ]},
             { id: 'cloud', title: '网盘', items: [{ name: 'OneDrive', url: 'https://onedrive.live.com' }] },
@@ -1191,11 +1312,16 @@
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
-        const subTabs = document.getElementById('subTabs');
-        const tabItems = subTabs.querySelectorAll('.sub-tab');
-        const settingsSlider = document.getElementById('settingsSlider');
+
+        const aboutBtn = document.getElementById('aboutBottom');
+        const aboutModal = document.getElementById('aboutModal');
+        const aboutConfirm = document.getElementById('aboutConfirmBtn');
 
         const appsBtn = document.getElementById('appsBottom');
+        const appsPopup = document.getElementById('appsPopup');
+        const expandAllBtn = document.getElementById('expandAll');
+        const collapseAllBtn = document.getElementById('collapseAll');
+
         const footerEl = document.getElementById('footerText');
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
@@ -1207,36 +1333,36 @@
         let currentPreviewSection = null;
         let currentHighlight = null;
         let desiredMode = 'single';
-        let currentTab = 'appearance';
         let particles = [];
         let animationId = null;
         let restoreTimer = null;
-        let scrollbarWidth = 0;
 
         // ================================================================
         // 3. 辅助函数
         // ================================================================
-        function triggerParticlesFromEl(el) {
-            if (typeof spawnParticles === 'function' && el) {
-                const rect = el.getBoundingClientRect();
-                spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
-            }
+        // 修改：取消滚动条位移补偿，恢复最原始的处理
+        function lockScroll() {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         }
+
+        function unlockScroll() {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        }
+
+        function hideLayoutSwitch() { layoutSwitch.classList.add('hidden-switch'); }
+        function showLayoutSwitch() { layoutSwitch.classList.remove('hidden-switch'); }
 
         function expandSection(section) {
             if (section && section.classList.contains('collapsed')) {
                 section.classList.remove('collapsed');
                 const label = section.querySelector('.toggle-label');
                 if (label) label.textContent = '折叠';
+                const header = section.querySelector('.section-header');
+                if (header) header.title = '点击折叠';
             }
         }
-
-        function getScrollbarWidth() {
-            return window.innerWidth - document.documentElement.clientWidth;
-        }
-
-        function hideLayoutSwitch() { layoutSwitch.classList.add('hidden-switch'); }
-        function showLayoutSwitch() { layoutSwitch.classList.remove('hidden-switch'); }
 
         // ================================================================
         // 4. 生成卡片 DOM
@@ -1248,6 +1374,7 @@
 
             const header = document.createElement('div');
             header.className = 'section-header';
+            header.title = collapsed ? '点击展开' : '点击折叠';
             header.innerHTML = `
                 <span class="section-title">${data.title}</span>
                 <div class="toggle-group">
@@ -1260,8 +1387,10 @@
                 const sec = this.closest('.section');
                 if (!sec) return;
                 sec.classList.toggle('collapsed');
+                const isCollapsed = sec.classList.contains('collapsed');
                 const label = this.querySelector('.toggle-label');
-                if (label) label.textContent = sec.classList.contains('collapsed') ? '展开' : '折叠';
+                if (label) label.textContent = isCollapsed ? '展开' : '折叠';
+                this.title = isCollapsed ? '点击展开' : '点击折叠';
             });
 
             const wrapper = document.createElement('div');
@@ -1291,32 +1420,24 @@
         // 5. 汉堡菜单 + 侧边栏控制
         // ================================================================
         function openNav() {
-            scrollbarWidth = getScrollbarWidth();
-            if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
-            
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
+            lockScroll();
             sidenav.classList.add('open');
             overlay.classList.add('show');
             bottomTools.classList.add('hidden');
             hamburger.classList.add('active');
-            hideLayoutSwitch();
-            triggerParticlesFromEl(hamburger);
         }
 
         function closeNav() {
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            document.body.style.paddingRight = '';
+            unlockScroll();
             sidenav.classList.remove('open');
             overlay.classList.remove('show');
             bottomTools.classList.remove('hidden');
             hamburger.classList.remove('active');
-            showLayoutSwitch();
         }
 
         hamburger.addEventListener('click', function(e) {
             e.stopPropagation();
+            spawnParticles(e.clientX, e.clientY); 
             sidenav.classList.contains('open') ? closeNav() : openNav();
         });
         overlay.addEventListener('click', closeNav);
@@ -1350,21 +1471,20 @@
                 header.appendChild(titleSpan);
                 header.style.cursor = 'default';
                 header.style.borderBottom = '2px solid #0366d6';
+                header.title = '';
             }
 
             previewContent.innerHTML = '';
             previewContent.appendChild(clone);
 
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
+            lockScroll();
             previewModal.classList.add('visible');
         }
 
         function hidePreview() {
             previewModal.classList.remove('visible');
-            if (!sidenav.classList.contains('open')) {
-                document.documentElement.style.overflow = '';
-                document.body.style.overflow = '';
+            if (!sidenav.classList.contains('open') && !settingsModal.classList.contains('open') && !aboutModal.classList.contains('open') && !searchModal.classList.contains('open')) {
+                unlockScroll();
             }
             previewContent.innerHTML = '';
             currentPreviewSection = null;
@@ -1382,13 +1502,13 @@
 
         previewToggle.addEventListener('click', function(e) {
             e.stopPropagation();
+            spawnParticles(e.clientX, e.clientY); 
             previewActive = !previewActive;
             this.classList.toggle('active', previewActive);
             if (!previewActive) {
                 clearHighlights();
                 hidePreview();
             }
-            triggerParticlesFromEl(this);
         });
 
         const sideNavItems = document.querySelectorAll('.sidenav li');
@@ -1436,7 +1556,7 @@
         // ================================================================
         function collectSiteData() {
             const items = [];
-            document.querySelectorAll('.section li').forEach(li => {
+            document.querySelectorAll('#sectionsGrid .section li').forEach(li => {
                 const nameEl = li.querySelector('.site-name');
                 const urlEl = li.querySelector('.site-url');
                 if (nameEl && urlEl) {
@@ -1476,27 +1596,24 @@
         }
 
         function openSearch() {
+            lockScroll();
             searchModal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
             hideLayoutSwitch();
-            hamburger.classList.add('hidden'); // 修复：打开搜索时隐藏侧边栏按键
+            hamburger.classList.add('hidden');
             setTimeout(() => searchInput.focus(), 150);
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             searchInput.value = '';
-            triggerParticlesFromEl(searchBtn);
         }
 
         function closeSearch() {
+            unlockScroll();
             searchModal.classList.remove('open');
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
             searchInput.value = '';
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             showLayoutSwitch();
-            hamburger.classList.remove('hidden'); // 修复：关闭搜索时恢复侧边栏按键
+            hamburger.classList.remove('hidden');
         }
 
         searchBtn.addEventListener('click', openSearch);
@@ -1505,7 +1622,7 @@
         searchInput.addEventListener('input', function() { performSearch(this.value); });
 
         // ================================================================
-        // 8. 设置功能
+        // 8. 设置 & 关于 弹窗通用逻辑
         // ================================================================
         function updateVisualSwitch() {
             visualSwitch.classList.toggle('active', visualMode);
@@ -1522,11 +1639,9 @@
             layoutSwitch.classList.toggle('sticky', stickyEnabled);
         }
 
-        // 统一封装开关事件绑定
         function setupSwitch(el, getVal, setVal, updateFn) {
             const handler = () => {
                 setVal(!getVal());
-                triggerParticlesFromEl(el);
                 updateFn();
             };
             el.addEventListener('click', handler);
@@ -1542,44 +1657,55 @@
         setupSwitch(particleSwitch, () => particleEnabled, v => particleEnabled = v, updateParticleSwitch);
         setupSwitch(stickySwitch, () => stickyEnabled, v => stickyEnabled = v, updateStickySwitch);
 
-        function switchTab(tabName) {
-            const index = Array.from(tabItems).findIndex(t => t.dataset.tab === tabName);
-            if (index === -1) return;
-            tabItems.forEach(t => t.classList.remove('active'));
-            tabItems[index].classList.add('active');
-            subTabs.className = 'sub-tabs active-' + tabName;
-            settingsSlider.style.transform = `translateX(-${index * 100}%)`;
-            currentTab = tabName;
+        function setupTabs(tabContainer, sliderContainer) {
+            const tabs = tabContainer.querySelectorAll('.sub-tab');
+            let currentTab = tabs[0].dataset.tab;
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.dataset.tab;
+                    if (tabName === currentTab) return;
+                    
+                    const index = Array.from(tabs).findIndex(t => t.dataset.tab === tabName);
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabs[index].classList.add('active');
+                    tabContainer.className = 'sub-tabs active-' + tabName;
+                    sliderContainer.style.transform = `translateX(-${index * 100}%)`;
+                    currentTab = tabName;
+                });
+            });
         }
+        setupTabs(document.getElementById('subTabs'), document.getElementById('settingsSlider'));
 
-        tabItems.forEach(tab => {
-            tab.addEventListener('click', function() {
-                const tabName = this.dataset.tab;
-                if (tabName === currentTab) return;
-                switchTab(tabName);
-                triggerParticlesFromEl(this);
+        document.querySelectorAll('#aboutModal .section-header').forEach(header => {
+            header.title = '点击折叠';
+            header.addEventListener('click', function() {
+                const sec = this.closest('.section');
+                if (!sec) return;
+                sec.classList.toggle('collapsed');
+                const isCollapsed = sec.classList.contains('collapsed');
+                const label = this.querySelector('.toggle-label');
+                if (label) label.textContent = isCollapsed ? '展开' : '折叠';
+                this.title = isCollapsed ? '点击展开' : '点击折叠';
             });
         });
 
         function openSettings() {
+            lockScroll();
             bottomTools.classList.add('hidden');
             hamburger.classList.add('hidden');
-            document.body.style.overflow = 'hidden';
-            document.documentElement.style.overflow = 'hidden';
             hideLayoutSwitch();
             if (sidenav.classList.contains('open')) closeNav();
             if (searchModal.classList.contains('open')) closeSearch();
+            if (aboutModal.classList.contains('open')) closeAbout();
             settingsModal.classList.add('open');
-            switchTab(currentTab);
-            triggerParticlesFromEl(settingsBtn);
         }
 
         function closeSettings() {
+            unlockScroll();
             settingsModal.classList.remove('open');
             bottomTools.classList.remove('hidden');
             hamburger.classList.remove('hidden');
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
             showLayoutSwitch();
         }
 
@@ -1587,12 +1713,92 @@
         settingsConfirm.addEventListener('click', closeSettings);
         settingsModal.addEventListener('click', e => { if (e.target === settingsModal) closeSettings(); });
 
+        function openAbout() {
+            lockScroll();
+            bottomTools.classList.add('hidden');
+            hamburger.classList.add('hidden');
+            hideLayoutSwitch();
+            if (sidenav.classList.contains('open')) closeNav();
+            if (searchModal.classList.contains('open')) closeSearch();
+            if (settingsModal.classList.contains('open')) closeSettings();
+            
+            document.querySelectorAll('#aboutModal .about-modal-section').forEach(sec => {
+                sec.classList.remove('collapsed');
+                const label = sec.querySelector('.toggle-label');
+                if (label) label.textContent = '折叠';
+                const header = sec.querySelector('.section-header');
+                if (header) header.title = '点击折叠';
+            });
+
+            aboutModal.classList.add('open');
+        }
+
+        function closeAbout() {
+            unlockScroll();
+            aboutModal.classList.remove('open');
+            bottomTools.classList.remove('hidden');
+            hamburger.classList.remove('hidden');
+            showLayoutSwitch();
+        }
+
+        aboutBtn.addEventListener('click', openAbout);
+        aboutConfirm.addEventListener('click', closeAbout);
+        aboutModal.addEventListener('click', e => { if (e.target === aboutModal) closeAbout(); });
+
         // ================================================================
-        // 9. 功能图标点击提示
+        // 9. 功能按键气泡弹窗与动画控制
         // ================================================================
-        appsBtn.addEventListener('click', function() {
-            alert('功能开发中，敬请期待！');
-            triggerParticlesFromEl(this);
+        const toolBtns = [searchBtn, settingsBtn, appsBtn, aboutBtn, hamburger];
+        toolBtns.forEach(btn => {
+            btn.addEventListener('mousedown', function(e) {
+                if (btn === appsBtn && appsPopup.contains(e.target)) return;
+                this.classList.add('pressed');
+            });
+        });
+        
+        const removePressed = () => toolBtns.forEach(btn => btn.classList.remove('pressed'));
+        document.addEventListener('mouseup', removePressed);
+        document.addEventListener('mouseleave', removePressed);
+
+        appsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            spawnParticles(e.clientX, e.clientY); 
+            appsPopup.classList.toggle('show');
+        });
+
+        expandAllBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('#sectionsGrid .section').forEach(section => {
+                section.classList.remove('collapsed');
+                const label = section.querySelector('.toggle-label');
+                if (label) label.textContent = '折叠';
+                const header = section.querySelector('.section-header');
+                if (header) header.title = '点击折叠';
+            });
+            appsPopup.classList.remove('show');
+            spawnParticles(e.clientX, e.clientY); 
+        });
+
+        collapseAllBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.querySelectorAll('#sectionsGrid .section').forEach(section => {
+                section.classList.add('collapsed');
+                const label = section.querySelector('.toggle-label');
+                if (label) label.textContent = '展开';
+                const header = section.querySelector('.section-header');
+                if (header) header.title = '点击展开';
+            });
+            appsPopup.classList.remove('show');
+            spawnParticles(e.clientX, e.clientY); 
+        });
+
+        // 修改：使用 mousedown 关闭功能项气泡
+        document.addEventListener('mousedown', function(e) {
+            if (appsPopup.classList.contains('show')) {
+                if (!appsBtn.contains(e.target) && !appsPopup.contains(e.target)) {
+                    appsPopup.classList.remove('show');
+                }
+            }
         });
 
         // ================================================================
@@ -1665,11 +1871,18 @@
             }
         }
 
+        // 全局点击监听：仅处理粒子生成
         document.addEventListener('click', function(e) {
             const target = e.target;
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
-            spawnParticles(e.clientX, e.clientY);
+            spawnParticles(e.clientX, e.clientY); 
         });
+
+        window.addEventListener('scroll', function() {
+            if (appsPopup.classList.contains('show')) {
+                appsPopup.classList.remove('show');
+            }
+        }, true);
 
         // ================================================================
         // 11. 底部文字交互
@@ -1692,6 +1905,9 @@
                 if (settingsModal.classList.contains('open')) {
                     closeSettings();
                     e.preventDefault();
+                } else if (aboutModal.classList.contains('open')) {
+                    closeAbout();
+                    e.preventDefault();
                 } else if (searchModal.classList.contains('open')) {
                     closeSearch();
                     e.preventDefault();
@@ -1700,6 +1916,9 @@
                     e.preventDefault();
                 } else if (previewModal.classList.contains('visible')) {
                     hidePreview();
+                    e.preventDefault();
+                } else if (appsPopup.classList.contains('show')) {
+                    appsPopup.classList.remove('show');
                     e.preventDefault();
                 }
             }
@@ -1710,7 +1929,7 @@
         // ================================================================
         function getCollapsedStates() {
             const states = {};
-            document.querySelectorAll('.section').forEach(section => {
+            document.querySelectorAll('#sectionsGrid .section').forEach(section => {
                 states[section.id] = section.classList.contains('collapsed');
             });
             return states;
@@ -1819,7 +2038,6 @@
                         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         closeNav();
                     }
-                    triggerParticlesFromEl(li);
                 }
             }
         });
@@ -1834,7 +2052,6 @@
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
-            switchTab('appearance');
             updateSwitchOptions();
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
