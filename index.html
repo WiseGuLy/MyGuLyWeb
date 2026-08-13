@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuLi 导航收藏</title>
+    <title>GuLi Web首页：网站导航、收藏</title>
+    
+    <!-- 网站图标配置 -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="GuLi Web首页" />
+    <link rel="manifest" href="/site.webmanifest" />
+
     <style>
         /* ============================================================
            全局基础样式
@@ -1951,7 +1960,6 @@
             }
         }
         
-        // 修改为使用 afmax 的 API 获取图标
         function getFaviconUrl(url) {
             if (!url) return null;
             return `https://api.afmax.cn/so/ico/index.php?r=${encodeURIComponent(url)}`;
@@ -2696,7 +2704,6 @@
                 ctx.save();
                 ctx.globalAlpha = Math.max(0, this.life);
                 ctx.fillStyle = this.color;
-                // 移除耗性能的 shadowBlur，改用绘制圆形粒子
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
                 ctx.fill();
