@@ -67,7 +67,6 @@
             background: #f9f9f9;
             border: 2px solid #d0d0d0;
             border-radius: 40px;
-            overflow: hidden;
             transition: border-color 0.3s, background 0.3s;
             position: relative;
         }
@@ -82,6 +81,7 @@
             align-items: center;
             border-right: 1px solid #d0d0d0;
             transition: border-color 0.3s;
+            align-self: stretch; /* 拉伸填满高度 */
         }
         .engine-trigger {
             padding: 10px 15px;
@@ -91,6 +91,7 @@
             gap: 8px;
             user-select: none;
             transition: background 0.2s;
+            border-radius: 38px 0 0 38px; /* 匹配父级圆角 */
         }
         .engine-trigger:hover {
             background: #f0f0f0;
@@ -167,14 +168,15 @@
             color: #fff;
             border: none;
             padding: 0 25px;
-            height: 100%;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
-            align-self: stretch;
+            align-self: stretch; /* 拉伸填满高度 */
             display: flex;
             align-items: center;
+            justify-content: center;
+            border-radius: 0 38px 38px 0; /* 匹配父级圆角 */
         }
         .main-search-btn:hover {
             background: #0250a5;
@@ -1617,21 +1619,21 @@
         <div class="main-search-bar" id="mainSearchBar">
             <div class="engine-selector" id="engineSelector">
                 <div class="engine-trigger" id="engineTrigger">
-                    <img src="images/bing.svg" alt="必应" class="engine-icon" id="currentEngineIcon">
+                    <img src="images/必应.svg" alt="必应" class="engine-icon" id="currentEngineIcon">
                     <span class="engine-name" id="currentEngineName">必应</span>
                     <span class="select-arrow">▾</span>
                 </div>
                 <div class="engine-options" id="engineOptions">
                     <div class="engine-option active" data-engine="bing">
-                        <img src="images/bing.svg" alt="必应" class="engine-icon">
+                        <img src="images/必应.svg" alt="必应" class="engine-icon">
                         <span>必应</span>
                     </div>
                     <div class="engine-option" data-engine="google">
-                        <img src="images/google.svg" alt="谷歌" class="engine-icon">
+                        <img src="images/谷歌.svg" alt="谷歌" class="engine-icon">
                         <span>谷歌</span>
                     </div>
                     <div class="engine-option" data-engine="baidu">
-                        <img src="images/baidu.svg" alt="百度" class="engine-icon">
+                        <img src="images/百度.svg" alt="百度" class="engine-icon">
                         <span>百度</span>
                     </div>
                 </div>
@@ -1757,11 +1759,11 @@
         const currentEngineIcon = document.getElementById('currentEngineIcon');
         const currentEngineName = document.getElementById('currentEngineName');
 
-        // 搜索引擎配置
+        // 搜索引擎配置 (图片名称已改为汉字)
         const engines = {
-            bing: { name: '必应', icon: 'images/bing.svg', url: 'https://www.bing.com/search?q=' },
-            google: { name: '谷歌', icon: 'images/google.svg', url: 'https://www.google.com/search?q=' },
-            baidu: { name: '百度', icon: 'images/baidu.svg', url: 'https://www.baidu.com/s?wd=' }
+            bing: { name: '必应', icon: 'images/必应.svg', url: 'https://www.bing.com/search?q=' },
+            google: { name: '谷歌', icon: 'images/谷歌.svg', url: 'https://www.google.com/search?q=' },
+            baidu: { name: '百度', icon: 'images/百度.svg', url: 'https://www.baidu.com/s?wd=' }
         };
         let currentEngine = 'bing';
 
