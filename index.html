@@ -31,7 +31,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: none; /* 确保不阻挡点击 */
             z-index: 99999; 
         }
 
@@ -242,7 +242,6 @@
             border-color: #0366d6; /* 状态2：选中时蓝边框 */
             color: #0366d6; /* 状态2：选中时蓝图标 */
         }
-        /* 修复 Bug: 提升 hover 优先级，确保悬停时覆盖 focus-within 的样式 */
         .main-search-btn:hover,
         .main-search-bar:focus-within .main-search-btn:hover {
             background: #0366d6; /* 状态3：悬停时蓝底 */
@@ -453,13 +452,15 @@
         .site-icon {
             width: 20px;
             height: 20px;
-            border-radius: 50%;
-            margin-right: 4px; /* 修改：减小图标与名称间距 */
+            margin-right: 4px;
             flex-shrink: 0;
             pointer-events: none;
             object-fit: cover;
             background: #eee;
         }
+        .site-icon.shape-square { border-radius: 0; }
+        .site-icon.shape-rounded { border-radius: 4px; }
+        .site-icon.shape-circle { border-radius: 50%; }
 
         .site-name {
             font-size: 1.1rem;
@@ -1329,7 +1330,6 @@
             border-color: #0366d6;
             color: #0366d6;
         }
-        /* 深色模式修复 hover 优先级 */
         body.dark-mode .main-search-btn:hover,
         body.dark-mode .main-search-bar:focus-within .main-search-btn:hover {
             background: #0366d6;
@@ -1619,6 +1619,20 @@
                                 <div class="slider"></div>
                             </div>
                         </div>
+                        <div class="switch-setting" id="faviconShapeSetting" style="display: none; padding-left: 20px;">
+                            <label>设置图标形状</label>
+                            <div class="custom-select" id="shapeSelect" style="width: 130px;">
+                                <div class="select-trigger">
+                                    <span class="select-value">圆形</span>
+                                    <span class="select-arrow">▾</span>
+                                </div>
+                                <ul class="select-options">
+                                    <li class="select-option active" data-value="circle">圆形</li>
+                                    <li class="select-option" data-value="rounded">圆角方形</li>
+                                    <li class="select-option" data-value="square">方形</li>
+                                </ul>
+                            </div>
+                        </div>
                         <div class="switch-setting">
                             <label for="visualSwitch">更直观显示</label>
                             <div class="switch-toggle active" id="visualSwitch" role="button" tabindex="0" aria-checked="true">
@@ -1854,6 +1868,13 @@
         const selectValue = themeSelect.querySelector('.select-value');
         const selectOptionItems = themeSelect.querySelectorAll('.select-option');
 
+        // 图标形状 DOM
+        const shapeSelect = document.getElementById('shapeSelect');
+        const shapeTrigger = shapeSelect.querySelector('.select-trigger');
+        const shapeOptionsList = shapeSelect.querySelector('.select-options');
+        const shapeValue = shapeSelect.querySelector('.select-value');
+        const shapeOptionItems = shapeSelect.querySelectorAll('.select-option');
+
         // 导入导出 DOM
         const exportBtn = document.getElementById('exportBtn');
         const importBtn = document.getElementById('importBtn');
@@ -1892,6 +1913,7 @@
 
         let darkMode = false;
         let faviconEnabled = false;
+        let faviconShape = 'circle';
         let visualMode = true;
         let particleEnabled = true;
         let stickyEnabled = true;
@@ -1929,10 +1951,10 @@
             }
         }
         
-        // 修改为使用 cravatar 的 API 获取图标
+        // 修改为使用 afmax 的 API 获取图标
         function getFaviconUrl(url) {
             if (!url) return null;
-            return `https://cravatar.com/favicon/api/index.php?url=${encodeURIComponent(url)}`;
+            return `https://api.afmax.cn/so/ico/index.php?r=${encodeURIComponent(url)}`;
         }
 
         // ================================================================
@@ -1976,7 +1998,7 @@
                 if (faviconEnabled) {
                     const iconUrl = getFaviconUrl(item.url);
                     if (iconUrl) {
-                        iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon" referrerpolicy="no-referrer" onerror="this.style.display='none'">`;
+                        iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon shape-${faviconShape}" referrerpolicy="no-referrer" onerror="this.style.display='none'">`;
                     }
                 }
                 
@@ -2231,6 +2253,15 @@
         function updateFaviconSwitch() {
             faviconSwitch.classList.toggle('active', faviconEnabled);
             faviconSwitch.setAttribute('aria-checked', faviconEnabled);
+            document.getElementById('faviconShapeSetting').style.display = faviconEnabled ? 'flex' : 'none';
+        }
+
+        function updateFaviconShapeUI() {
+            const shapeNames = { square: '方形', rounded: '圆角方形', circle: '圆形' };
+            shapeValue.textContent = shapeNames[faviconShape];
+            shapeOptionItems.forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.value === faviconShape);
+            });
         }
 
         function updateVisualSwitch() {
@@ -2246,6 +2277,16 @@
             stickySwitch.classList.toggle('active', stickyEnabled);
             stickySwitch.setAttribute('aria-checked', stickyEnabled);
             layoutSwitch.classList.toggle('sticky', stickyEnabled);
+        }
+        function updateEngineUI() {
+            const engineData = engines[currentEngine];
+            if (engineData) {
+                currentEngineIcon.src = engineData.icon;
+                currentEngineName.textContent = engineData.name;
+                engineOptionItems.forEach(item => {
+                    item.classList.toggle('active', item.dataset.engine === currentEngine);
+                });
+            }
         }
 
         function setupSwitch(el, getVal, setVal, updateFn) {
@@ -2295,6 +2336,22 @@
             });
         });
 
+        // 图标形状下拉选择器逻辑
+        shapeTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            shapeOptionsList.classList.toggle('show');
+        });
+
+        shapeOptionItems.forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                faviconShape = this.dataset.value;
+                updateFaviconShapeUI();
+                shapeOptionsList.classList.remove('show');
+                applyLayout();
+            });
+        });
+
         // 主搜索栏引擎选择器逻辑
         engineTrigger.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -2305,15 +2362,8 @@
         engineOptionItems.forEach(opt => {
             opt.addEventListener('click', function(e) {
                 e.stopPropagation();
-                const engineKey = this.dataset.engine;
-                currentEngine = engineKey;
-                
-                currentEngineIcon.src = engines[engineKey].icon;
-                currentEngineName.textContent = engines[engineKey].name;
-                
-                engineOptionItems.forEach(item => item.classList.remove('active'));
-                this.classList.add('active');
-                
+                currentEngine = this.dataset.engine;
+                updateEngineUI();
                 engineOptions.classList.remove('show');
                 engineTrigger.classList.remove('open');
             });
@@ -2380,12 +2430,13 @@
             e.stopPropagation();
             spawnParticles(e.clientX, e.clientY);
             const config = {
-                darkMode: darkMode,
                 faviconEnabled: faviconEnabled,
-                previewActive: previewActive,
+                faviconShape: faviconShape,
                 visualMode: visualMode,
                 particleEnabled: particleEnabled,
-                stickyEnabled: stickyEnabled
+                stickyEnabled: stickyEnabled,
+                previewActive: previewActive,
+                currentEngine: currentEngine
             };
             const jsonStr = JSON.stringify(config, null, 2);
             const blob = new Blob([jsonStr], { type: "application/json" });
@@ -2414,28 +2465,31 @@
             reader.onload = function(event) {
                 try {
                     const config = JSON.parse(event.target.result);
-                    if (typeof config.darkMode !== 'boolean' ||
-                        typeof config.faviconEnabled !== 'boolean' ||
-                        typeof config.previewActive !== 'boolean' ||
+                    if (typeof config.faviconEnabled !== 'boolean' ||
+                        typeof config.faviconShape !== 'string' ||
                         typeof config.visualMode !== 'boolean' ||
                         typeof config.particleEnabled !== 'boolean' ||
-                        typeof config.stickyEnabled !== 'boolean') {
+                        typeof config.stickyEnabled !== 'boolean' ||
+                        typeof config.previewActive !== 'boolean' ||
+                        typeof config.currentEngine !== 'string') {
                         throw new Error("配置文件格式不正确");
                     }
 
-                    darkMode = config.darkMode;
                     faviconEnabled = config.faviconEnabled;
-                    previewActive = config.previewActive;
+                    faviconShape = config.faviconShape;
                     visualMode = config.visualMode;
                     particleEnabled = config.particleEnabled;
                     stickyEnabled = config.stickyEnabled;
+                    previewActive = config.previewActive;
+                    currentEngine = config.currentEngine;
 
-                    updateDarkModeUI();
                     updateFaviconSwitch();
-                    previewToggle.classList.toggle('active', previewActive);
+                    updateFaviconShapeUI();
                     updateVisualSwitch();
                     updateParticleSwitch();
                     updateStickySwitch();
+                    updateEngineUI();
+                    previewToggle.classList.toggle('active', previewActive);
                     applyLayout();
 
                     if (!previewActive) {
@@ -2579,6 +2633,11 @@
                     selectOptionsList.classList.remove('show');
                 }
             }
+            if (shapeOptionsList.classList.contains('show')) {
+                if (!shapeSelect.contains(e.target)) {
+                    shapeOptionsList.classList.remove('show');
+                }
+            }
             if (engineOptions.classList.contains('show')) {
                 if (!engineSelector.contains(e.target)) {
                     engineOptions.classList.remove('show');
@@ -2596,6 +2655,9 @@
                 engineOptions.classList.remove('show');
                 engineTrigger.classList.remove('open');
             }
+            if (shapeOptionsList.classList.contains('show')) {
+                shapeOptionsList.classList.remove('show');
+            }
         }, true);
 
         // ================================================================
@@ -2604,6 +2666,7 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            canvas.style.pointerEvents = 'none'; // 强制确保不阻挡点击
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
@@ -2631,11 +2694,12 @@
             }
             draw(ctx) {
                 ctx.save();
-                ctx.globalAlpha = this.life;
+                ctx.globalAlpha = Math.max(0, this.life);
                 ctx.fillStyle = this.color;
-                ctx.shadowBlur = 6;
-                ctx.shadowColor = '#00cc00';
-                ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+                // 移除耗性能的 shadowBlur，改用绘制圆形粒子
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
+                ctx.fill();
                 ctx.restore();
             }
         }
@@ -2649,7 +2713,7 @@
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let alive = false;
-            for (let i = particles.length - 1; i >= 0; i++) {
+            for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.update();
                 p.draw(ctx);
@@ -2712,6 +2776,9 @@
                     e.preventDefault();
                 } else if (selectOptionsList.classList.contains('show')) {
                     selectOptionsList.classList.remove('show');
+                    e.preventDefault();
+                } else if (shapeOptionsList.classList.contains('show')) {
+                    shapeOptionsList.classList.remove('show');
                     e.preventDefault();
                 } else if (engineOptions.classList.contains('show')) {
                     engineOptions.classList.remove('show');
@@ -2845,14 +2912,18 @@
         function init() {
             darkMode = false;
             faviconEnabled = false;
+            faviconShape = 'circle';
             visualMode = true;
             particleEnabled = true;
             stickyEnabled = true;
+            currentEngine = 'bing';
             updateDarkModeUI();
             updateFaviconSwitch();
+            updateFaviconShapeUI();
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
+            updateEngineUI();
             updateSwitchOptions();
             titleResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
             urlResults.innerHTML = '<div class="result-empty">输入关键词开始搜索</div>';
