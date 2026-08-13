@@ -57,6 +57,133 @@
         }
 
         /* ============================================================
+           主搜索栏
+           ============================================================ */
+        .main-search-bar {
+            display: flex;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            background: #f9f9f9;
+            border: 2px solid #d0d0d0;
+            border-radius: 40px;
+            overflow: hidden;
+            transition: border-color 0.3s, background 0.3s;
+            position: relative;
+        }
+        .main-search-bar:focus-within {
+            border-color: #0366d6;
+            box-shadow: 0 0 0 4px rgba(3, 102, 214, 0.08);
+        }
+
+        .engine-selector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            border-right: 1px solid #d0d0d0;
+            transition: border-color 0.3s;
+        }
+        .engine-trigger {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .engine-trigger:hover {
+            background: #f0f0f0;
+        }
+        .engine-icon {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+        .engine-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+            transition: color 0.3s;
+        }
+        .select-arrow {
+            font-size: 0.8rem;
+            color: #888;
+            transition: transform 0.2s;
+        }
+        .engine-trigger.open .select-arrow {
+            transform: rotate(180deg);
+        }
+
+        .engine-options {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            min-width: 120px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 100;
+            overflow: hidden;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .engine-options.show {
+            display: block;
+        }
+        .engine-option {
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .engine-option:hover {
+            background: #eef6ff;
+        }
+        .engine-option.active {
+            background: #eef6ff;
+            color: #0366d6;
+        }
+
+        .main-search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: transparent;
+            color: #1e1e1e;
+            transition: color 0.3s;
+        }
+        .main-search-input::placeholder {
+            color: #aaa;
+        }
+
+        .main-search-btn {
+            background: #0366d6;
+            color: #fff;
+            border: none;
+            padding: 0 25px;
+            height: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            align-self: stretch;
+            display: flex;
+            align-items: center;
+        }
+        .main-search-btn:hover {
+            background: #0250a5;
+        }
+        .main-search-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ============================================================
            列数切换胶囊
            ============================================================ */
         .layout-switch {
@@ -612,7 +739,6 @@
             color: #888;
             transition: transform 0.2s;
         }
-        /* 修改：改为向下弹出 */
         .select-options {
             position: absolute;
             top: calc(100% + 4px);
@@ -626,7 +752,7 @@
             padding: 4px;
             margin: 0;
             display: none;
-            z-index: 20; /* 提高层级防止被遮挡 */
+            z-index: 20;
             overflow: hidden;
             transition: background 0.3s, border-color 0.3s;
         }
@@ -1092,6 +1218,17 @@
             color: #e0e0e0;
         }
         body.dark-mode h1 { color: #e0e0e0; border-bottom-color: #333; }
+
+        body.dark-mode .main-search-bar { background: #1e1e1e; border-color: #444; }
+        body.dark-mode .engine-selector { border-right-color: #444; }
+        body.dark-mode .engine-trigger:hover { background: #2c2c2c; }
+        body.dark-mode .engine-name { color: #e0e0e0; }
+        body.dark-mode .engine-options { background: #2c2c2c; border-color: #444; }
+        body.dark-mode .engine-option:hover { background: #3a3a3a; }
+        body.dark-mode .engine-option.active { background: #3a3a3a; color: #0366d6; }
+        body.dark-mode .main-search-input { color: #e0e0e0; }
+        body.dark-mode .main-search-input::placeholder { color: #888; }
+
         body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
         body.dark-mode .layout-switch.sticky { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
         body.dark-mode .switch-option:not(.active) { color: #aaa; }
@@ -1209,6 +1346,10 @@
             .settings-slide { min-height: 0; }
             .sidenav a { padding: 8px 16px; font-size: 1.1rem; }
             .preview-modal { max-width: 95%; width: 95%; }
+            
+            .main-search-bar { margin: 0 10px 30px; }
+            .engine-name { display: none; }
+            .engine-trigger { padding: 10px 12px; }
         }
 
         @media (max-width: 700px) {
@@ -1242,6 +1383,7 @@
             .settings-footer button { padding: 10px 16px; font-size: 0.95rem; min-width: 0; }
             .sub-tab { padding: 4px 6px; font-size: 0.75rem; }
             .sidenav a { padding: 6px 14px; font-size: 1rem; }
+            .main-search-btn { padding: 0 15px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -1470,6 +1612,34 @@
     <!-- ===== 主容器 ===== -->
     <div class="container" id="mainContainer">
         <h1>🐢 GuLi 网站导航/收藏 🐢</h1>
+        
+        <!-- 主搜索栏 -->
+        <div class="main-search-bar" id="mainSearchBar">
+            <div class="engine-selector" id="engineSelector">
+                <div class="engine-trigger" id="engineTrigger">
+                    <img src="images/bing.svg" alt="必应" class="engine-icon" id="currentEngineIcon">
+                    <span class="engine-name" id="currentEngineName">必应</span>
+                    <span class="select-arrow">▾</span>
+                </div>
+                <div class="engine-options" id="engineOptions">
+                    <div class="engine-option active" data-engine="bing">
+                        <img src="images/bing.svg" alt="必应" class="engine-icon">
+                        <span>必应</span>
+                    </div>
+                    <div class="engine-option" data-engine="google">
+                        <img src="images/google.svg" alt="谷歌" class="engine-icon">
+                        <span>谷歌</span>
+                    </div>
+                    <div class="engine-option" data-engine="baidu">
+                        <img src="images/baidu.svg" alt="百度" class="engine-icon">
+                        <span>百度</span>
+                    </div>
+                </div>
+            </div>
+            <input type="text" id="mainSearchInput" class="main-search-input" placeholder="输入并搜索...">
+            <button id="mainSearchBtn" class="main-search-btn">搜索</button>
+        </div>
+
         <div class="layout-switch visible sticky" id="layoutSwitch">
             <span class="switch-slider"></span>
             <span class="switch-option active" data-mode="single">单列</span>
@@ -1576,6 +1746,24 @@
         const footerEl = document.getElementById('footerText');
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
+
+        // 主搜索栏 DOM
+        const mainSearchInput = document.getElementById('mainSearchInput');
+        const mainSearchBtn = document.getElementById('mainSearchBtn');
+        const engineSelector = document.getElementById('engineSelector');
+        const engineTrigger = document.getElementById('engineTrigger');
+        const engineOptions = document.getElementById('engineOptions');
+        const engineOptionItems = engineOptions.querySelectorAll('.engine-option');
+        const currentEngineIcon = document.getElementById('currentEngineIcon');
+        const currentEngineName = document.getElementById('currentEngineName');
+
+        // 搜索引擎配置
+        const engines = {
+            bing: { name: '必应', icon: 'images/bing.svg', url: 'https://www.bing.com/search?q=' },
+            google: { name: '谷歌', icon: 'images/google.svg', url: 'https://www.google.com/search?q=' },
+            baidu: { name: '百度', icon: 'images/baidu.svg', url: 'https://www.baidu.com/s?wd=' }
+        };
+        let currentEngine = 'bing';
 
         let darkMode = false;
         let visualMode = true;
@@ -1756,7 +1944,6 @@
             spawnParticles(e.clientX, e.clientY); 
             
             if (!previewActive) {
-                // 修改：与列数切换的显示逻辑完全保持一致 (width < 768)
                 const isNarrow = window.innerWidth < 768;
                 if (isNarrow) {
                     const allow = confirm("屏幕过窄时，不建议使用实时预览；手机端不建议使用实时预览。\n仍要使用吗？(不建议)");
@@ -1931,7 +2118,7 @@
         setupSwitch(particleSwitch, () => particleEnabled, v => particleEnabled = v, updateParticleSwitch);
         setupSwitch(stickySwitch, () => stickyEnabled, v => stickyEnabled = v, updateStickySwitch);
 
-        // 下拉选择器逻辑
+        // 设置弹窗下拉选择器逻辑
         selectTrigger.addEventListener('click', function(e) {
             e.stopPropagation();
             selectOptionsList.classList.toggle('show');
@@ -1954,6 +2141,51 @@
                     updateDarkModeUI();
                 }
             });
+        });
+
+        // 主搜索栏引擎选择器逻辑
+        engineTrigger.addEventListener('click', function(e) {
+            e.stopPropagation();
+            engineOptions.classList.toggle('show');
+            engineTrigger.classList.toggle('open');
+        });
+
+        engineOptionItems.forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const engineKey = this.dataset.engine;
+                currentEngine = engineKey;
+                
+                currentEngineIcon.src = engines[engineKey].icon;
+                currentEngineName.textContent = engines[engineKey].name;
+                
+                engineOptionItems.forEach(item => item.classList.remove('active'));
+                this.classList.add('active');
+                
+                engineOptions.classList.remove('show');
+                engineTrigger.classList.remove('open');
+            });
+        });
+
+        // 执行主搜索
+        function performMainSearch() {
+            const query = mainSearchInput.value.trim();
+            if (query) {
+                const url = engines[currentEngine].url + encodeURIComponent(query);
+                window.open(url, '_blank');
+            }
+        }
+
+        mainSearchBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            performMainSearch();
+        });
+
+        mainSearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performMainSearch();
+            }
         });
 
         function setupTabs(tabContainer, sliderContainer) {
@@ -2014,7 +2246,6 @@
             reader.onload = function(event) {
                 try {
                     const config = JSON.parse(event.target.result);
-                    // 校验配置合理性
                     if (typeof config.darkMode !== 'boolean' ||
                         typeof config.previewActive !== 'boolean' ||
                         typeof config.visualMode !== 'boolean' ||
@@ -2023,14 +2254,12 @@
                         throw new Error("配置文件格式不正确");
                     }
 
-                    // 应用配置
                     darkMode = config.darkMode;
                     previewActive = config.previewActive;
                     visualMode = config.visualMode;
                     particleEnabled = config.particleEnabled;
                     stickyEnabled = config.stickyEnabled;
 
-                    // 更新 UI
                     updateDarkModeUI();
                     previewToggle.classList.toggle('active', previewActive);
                     updateVisualSwitch();
@@ -2043,7 +2272,6 @@
                     }
 
                     alert("配置导入成功！");
-
                 } catch (err) {
                     alert("配置文件格式错误或损坏！");
                 }
@@ -2167,6 +2395,7 @@
             spawnParticles(e.clientX, e.clientY); 
         });
 
+        // 全局点击关闭弹出层
         document.addEventListener('mousedown', function(e) {
             if (appsPopup.classList.contains('show')) {
                 if (!appsBtn.contains(e.target) && !appsPopup.contains(e.target)) {
@@ -2176,6 +2405,12 @@
             if (selectOptionsList.classList.contains('show')) {
                 if (!themeSelect.contains(e.target)) {
                     selectOptionsList.classList.remove('show');
+                }
+            }
+            if (engineOptions.classList.contains('show')) {
+                if (!engineSelector.contains(e.target)) {
+                    engineOptions.classList.remove('show');
+                    engineTrigger.classList.remove('open');
                 }
             }
         });
@@ -2300,6 +2535,10 @@
                     e.preventDefault();
                 } else if (selectOptionsList.classList.contains('show')) {
                     selectOptionsList.classList.remove('show');
+                    e.preventDefault();
+                } else if (engineOptions.classList.contains('show')) {
+                    engineOptions.classList.remove('show');
+                    engineTrigger.classList.remove('open');
                     e.preventDefault();
                 }
             }
