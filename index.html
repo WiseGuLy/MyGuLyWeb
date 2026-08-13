@@ -242,7 +242,9 @@
             border-color: #0366d6; /* 状态2：选中时蓝边框 */
             color: #0366d6; /* 状态2：选中时蓝图标 */
         }
-        .main-search-btn:hover {
+        /* 修复 Bug: 提升 hover 优先级，确保悬停时覆盖 focus-within 的样式 */
+        .main-search-btn:hover,
+        .main-search-bar:focus-within .main-search-btn:hover {
             background: #0366d6; /* 状态3：悬停时蓝底 */
             border-color: #0366d6; /* 状态3：悬停时蓝边框 */
             color: #fff; /* 状态3：悬停时白图标 */
@@ -452,11 +454,11 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            margin-right: 8px;
+            margin-right: 4px; /* 修改：减小图标与名称间距 */
             flex-shrink: 0;
             pointer-events: none;
             object-fit: cover;
-            background: #eee; /* 加载中默认底色 */
+            background: #eee;
         }
 
         .site-name {
@@ -1327,7 +1329,9 @@
             border-color: #0366d6;
             color: #0366d6;
         }
-        body.dark-mode .main-search-btn:hover {
+        /* 深色模式修复 hover 优先级 */
+        body.dark-mode .main-search-btn:hover,
+        body.dark-mode .main-search-bar:focus-within .main-search-btn:hover {
             background: #0366d6;
             border-color: #0366d6;
             color: #fff;
@@ -1925,18 +1929,10 @@
             }
         }
         
-        function getDomain(url) {
-            try {
-                return new URL(url).hostname;
-            } catch (e) {
-                return null;
-            }
-        }
-
+        // 修改为使用 cravatar 的 API 获取图标
         function getFaviconUrl(url) {
-            const domain = getDomain(url);
-            if (!domain) return null;
-            return `https://api-favicon.tinkerspace.tech/${domain}`;
+            if (!url) return null;
+            return `https://cravatar.com/favicon/api/index.php?url=${encodeURIComponent(url)}`;
         }
 
         // ================================================================
@@ -1980,7 +1976,6 @@
                 if (faviconEnabled) {
                     const iconUrl = getFaviconUrl(item.url);
                     if (iconUrl) {
-                        // 使用新的 API 直接作为图片 src，添加 referrerpolicy 提高成功率，并处理加载失败隐藏
                         iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon" referrerpolicy="no-referrer" onerror="this.style.display='none'">`;
                     }
                 }
@@ -2654,7 +2649,7 @@
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             let alive = false;
-            for (let i = particles.length - 1; i >= 0; i--) {
+            for (let i = particles.length - 1; i >= 0; i++) {
                 const p = particles[i];
                 p.update();
                 p.draw(ctx);
