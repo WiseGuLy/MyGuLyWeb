@@ -117,12 +117,12 @@
             display: none; 
         }
         .select-arrow {
-            font-size: 1rem; /* 增大三角 */
+            font-size: 1rem;
             color: #888;
             transition: transform 0.2s, color 0.2s;
         }
         .engine-trigger:hover .select-arrow {
-            color: #0366d6; /* 悬停变蓝 */
+            color: #0366d6;
         }
         .engine-trigger.open .select-arrow {
             transform: rotate(180deg);
@@ -214,7 +214,7 @@
             display: flex;
         }
         .clear-search-btn svg {
-            width: 14px; /* 叉号变大 */
+            width: 14px;
             height: 14px;
             fill: #fff;
         }
@@ -225,7 +225,7 @@
         .main-search-btn {
             background: #fff;
             color: #ccc;
-            border: 2px solid #ccc; /* 未选中时为灰色 */
+            border: 2px solid #ccc;
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -238,13 +238,13 @@
             margin-left: 5px;
         }
         .main-search-bar:focus-within .main-search-btn {
-            border-color: #0366d6; /* 选中时变蓝 */
+            border-color: #0366d6;
             color: #0366d6;
         }
+        /* 修复 Bug: 悬停时不再全部变成蓝色实心，仅边框和图标变蓝 */
         .main-search-btn:hover {
-            background: #0366d6;
             border-color: #0366d6;
-            color: #fff;
+            color: #0366d6;
         }
         .main-search-btn:active {
             transform: scale(0.95);
@@ -1284,7 +1284,7 @@
         body.highlight-mode .about-bottom:hover { border-color: #0366d6; }
 
         body.highlight-mode .engine-trigger:hover {
-            box-shadow: inset 0 0 0 1px #0366d6; /* 直观模式下的蓝色细边框 */
+            box-shadow: inset 0 0 0 1px #0366d6;
         }
 
         body.highlight-mode .section:hover {
@@ -1326,9 +1326,8 @@
             color: #0366d6;
         }
         body.dark-mode .main-search-btn:hover {
-            background: #0366d6;
             border-color: #0366d6;
-            color: #fff;
+            color: #0366d6;
         }
 
         body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
@@ -1669,7 +1668,7 @@
                                 </div>
                             </div>
                             <div class="list-wrapper">
-                                <div style="text-align: center; margin-bottom: 12px; font-size: 1.1rem; font-weight: 500; color: #0366d6;">V1.1beta</div>
+                                <div style="text-align: center; margin-bottom: 12px; font-size: 1.1rem; font-weight: 500; color: #0366d6;">V1.2beta</div>
                                 <div class="about-line"><span class="label">网站制作</span><span class="value">Wise GuLy</span></div>
                                 <div class="about-line"><span class="label">代码编写</span><span class="value">DeepSeek-V4, GLM-5.2</span></div>
                                 <div class="about-line"><span class="label">开源地址</span><span class="value">暂未公布</span></div>
@@ -1691,6 +1690,9 @@
                                 </div>
                                 <div class="update-item" style="border-bottom: 1px solid #f0f0f0; color: #555;">
                                     开始研发支持用户自主上传的动态网站
+                                </div>
+                                <div class="update-item">
+                                    <span class="date">2026-08-13</span> <span class="version">V1.2beta</span> <span>增加搜索功能；现在可以预览网站图标</span>
                                 </div>
                                 <div class="update-item">
                                     <span class="date">2026-08-12</span> <span class="version">V1.1beta</span> <span>继续增加基础功能</span>
@@ -1873,7 +1875,6 @@
         const currentEngineIcon = document.getElementById('currentEngineIcon');
         const currentEngineName = document.getElementById('currentEngineName');
 
-        // 搜索引擎配置 (图片名称已改为汉字)
         const engines = {
             bing: { name: '必应', icon: 'images/必应.svg', url: 'https://www.bing.com/search?q=' },
             google: { name: '谷歌', icon: 'images/谷歌.svg', url: 'https://www.google.com/search?q=' },
@@ -1928,6 +1929,34 @@
             }
         }
 
+        // 使用 Favicon Grabber API 获取图标
+        async function fetchFavicon(url) {
+            const domain = getDomain(url);
+            if (!domain) return null;
+            try {
+                const response = await fetch(`https://favicongrabber.com/api/v1/${domain}`);
+                if (!response.ok) return null;
+                const data = await response.json();
+                if (data.icons && data.icons.length > 0) {
+                    let bestIcon = data.icons[0];
+                    for (let icon of data.icons) {
+                        if (icon.sizes && icon.sizes.includes('32')) {
+                            bestIcon = icon;
+                            break;
+                        }
+                    }
+                    let src = bestIcon.src;
+                    if (src.startsWith('http://')) {
+                        src = 'https://' + src.substring(7);
+                    }
+                    return src;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        }
+
         // ================================================================
         // 4. 生成卡片 DOM
         // ================================================================
@@ -1967,9 +1996,7 @@
                 
                 let iconHtml = '';
                 if (faviconEnabled) {
-                    const domain = getDomain(item.url);
-                    const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-                    iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon" onerror="this.style.display='none'">`;
+                    iconHtml = `<img alt="${item.name}" class="site-icon" style="visibility: hidden;">`;
                 }
                 
                 li.innerHTML = `
@@ -1977,6 +2004,20 @@
                     <span class="site-name">${item.name}</span>
                     <span class="site-url">${item.url}</span>
                 `;
+                
+                if (faviconEnabled) {
+                    const imgEl = li.querySelector('.site-icon');
+                    fetchFavicon(item.url).then(iconUrl => {
+                        if (iconUrl) {
+                            imgEl.src = iconUrl;
+                            imgEl.style.visibility = 'visible';
+                            imgEl.onerror = () => imgEl.remove();
+                        } else {
+                            imgEl.remove();
+                        }
+                    });
+                }
+                
                 li.addEventListener('click', function() {
                     if (this.dataset.url) window.open(this.dataset.url, '_blank');
                 });
