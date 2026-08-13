@@ -67,6 +67,7 @@
             background: #f9f9f9;
             border: 2px solid #d0d0d0;
             border-radius: 40px;
+            padding: 5px;
             transition: border-color 0.3s, background 0.3s;
             position: relative;
         }
@@ -81,17 +82,17 @@
             align-items: center;
             border-right: 1px solid #d0d0d0;
             transition: border-color 0.3s;
-            align-self: stretch; /* 拉伸填满高度 */
+            padding-left: 5px;
         }
         .engine-trigger {
-            padding: 10px 15px;
+            padding: 8px 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 5px;
             user-select: none;
             transition: background 0.2s;
-            border-radius: 38px 0 0 38px; /* 匹配父级圆角 */
+            border-radius: 30px;
         }
         .engine-trigger:hover {
             background: #f0f0f0;
@@ -101,11 +102,9 @@
             height: 20px;
             display: block;
         }
+        /* 隐藏主搜索框的引擎文字 */
         .engine-name {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #333;
-            transition: color 0.3s;
+            display: none; 
         }
         .select-arrow {
             font-size: 0.8rem;
@@ -120,7 +119,8 @@
             position: absolute;
             top: calc(100% + 5px);
             left: 0;
-            min-width: 120px;
+            width: auto; /* 宽度自适应内容 */
+            white-space: nowrap; /* 防止换行 */
             background: #fff;
             border: 1px solid #ccc;
             border-radius: 10px;
@@ -149,11 +149,18 @@
             color: #0366d6;
         }
 
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
         .main-search-input {
             flex: 1;
             border: none;
             outline: none;
-            padding: 10px 20px;
+            padding: 10px 40px 10px 20px; /* 右侧留出叉号空间 */
             font-size: 1rem;
             background: transparent;
             color: #1e1e1e;
@@ -163,26 +170,57 @@
             color: #aaa;
         }
 
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            display: none;
+            padding: 5px;
+            line-height: 0;
+        }
+        .clear-search-btn.show {
+            display: block;
+        }
+        .clear-search-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #888;
+            transition: fill 0.2s;
+        }
+        .clear-search-btn:hover svg {
+            fill: #e74c3c;
+        }
+
         .main-search-btn {
             background: #0366d6;
             color: #fff;
             border: none;
-            padding: 0 25px;
-            font-size: 1rem;
-            font-weight: 500;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
-            align-self: stretch; /* 拉伸填满高度 */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0 38px 38px 0; /* 匹配父级圆角 */
+            flex-shrink: 0;
+            margin-left: 5px;
         }
         .main-search-btn:hover {
             background: #0250a5;
         }
         .main-search-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
+        }
+        .search-action-icon {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
         }
 
         /* ============================================================
@@ -1230,6 +1268,8 @@
         body.dark-mode .engine-option.active { background: #3a3a3a; color: #0366d6; }
         body.dark-mode .main-search-input { color: #e0e0e0; }
         body.dark-mode .main-search-input::placeholder { color: #888; }
+        body.dark-mode .clear-search-btn svg { fill: #aaa; }
+        body.dark-mode .clear-search-btn:hover svg { fill: #e74c3c; }
 
         body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
         body.dark-mode .layout-switch.sticky { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
@@ -1350,8 +1390,6 @@
             .preview-modal { max-width: 95%; width: 95%; }
             
             .main-search-bar { margin: 0 10px 30px; }
-            .engine-name { display: none; }
-            .engine-trigger { padding: 10px 12px; }
         }
 
         @media (max-width: 700px) {
@@ -1385,7 +1423,6 @@
             .settings-footer button { padding: 10px 16px; font-size: 0.95rem; min-width: 0; }
             .sub-tab { padding: 4px 6px; font-size: 0.75rem; }
             .sidenav a { padding: 6px 14px; font-size: 1rem; }
-            .main-search-btn { padding: 0 15px; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -1399,12 +1436,12 @@
 
     <!-- ===== 底部工具栏（搜索 + 设置 + 功能 + 关于） ===== -->
     <div class="bottom-tools" id="bottomTools">
-        <div class="search-bottom" id="searchBottom" aria-label="搜索">
+        <div class="search-bottom" id="searchBottom" aria-label="搜索收藏">
             <svg class="search-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="14" cy="14" r="10" />
                 <line x1="21" y1="21" x2="28" y2="28" />
             </svg>
-            <span class="search-label">搜索</span>
+            <span class="search-label">搜索收藏</span>
         </div>
         <div class="settings-bottom" id="settingsBottom" aria-label="设置">
             <svg class="settings-icon-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -1463,7 +1500,7 @@
     <div class="search-modal" id="searchModal">
         <div class="search-box">
             <div class="search-header">
-                <input type="text" id="searchInput" placeholder="搜索网站..." autofocus>
+                <input type="text" id="searchInput" placeholder="输入并搜索网址收藏…" autofocus maxlength="100">
                 <button class="search-close" id="searchClose">✕</button>
             </div>
             <div class="search-results-grid">
@@ -1638,8 +1675,17 @@
                     </div>
                 </div>
             </div>
-            <input type="text" id="mainSearchInput" class="main-search-input" placeholder="输入并搜索...">
-            <button id="mainSearchBtn" class="main-search-btn">搜索</button>
+            <div class="input-wrapper">
+                <input type="text" id="mainSearchInput" class="main-search-input" placeholder="输入并搜索..." maxlength="200">
+                <button id="clearMainSearchBtn" class="clear-search-btn">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+            <button id="mainSearchBtn" class="main-search-btn">
+                <svg viewBox="0 0 24 24" class="search-action-icon">
+                    <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 1 0-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1 1 14 9.5 4.5 4.5 0 0 1 9.5 14z"/>
+                </svg>
+            </button>
         </div>
 
         <div class="layout-switch visible sticky" id="layoutSwitch">
@@ -1752,6 +1798,7 @@
         // 主搜索栏 DOM
         const mainSearchInput = document.getElementById('mainSearchInput');
         const mainSearchBtn = document.getElementById('mainSearchBtn');
+        const clearMainSearchBtn = document.getElementById('clearMainSearchBtn');
         const engineSelector = document.getElementById('engineSelector');
         const engineTrigger = document.getElementById('engineTrigger');
         const engineOptions = document.getElementById('engineOptions');
@@ -2167,6 +2214,21 @@
                 engineOptions.classList.remove('show');
                 engineTrigger.classList.remove('open');
             });
+        });
+
+        // 主搜索栏清空按钮逻辑
+        mainSearchInput.addEventListener('input', function() {
+            if (this.value.length > 0) {
+                clearMainSearchBtn.classList.add('show');
+            } else {
+                clearMainSearchBtn.classList.remove('show');
+            }
+        });
+
+        clearMainSearchBtn.addEventListener('click', function() {
+            mainSearchInput.value = '';
+            clearMainSearchBtn.classList.remove('show');
+            mainSearchInput.focus();
         });
 
         // 执行主搜索
