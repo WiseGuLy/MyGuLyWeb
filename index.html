@@ -222,10 +222,11 @@
             background: #e74c3c;
         }
 
+        /* 搜索按钮三种状态 */
         .main-search-btn {
             background: #fff;
-            color: #ccc;
-            border: 2px solid #ccc;
+            color: #ccc; /* 状态1：未选中灰图标 */
+            border: 2px solid #ccc; /* 状态1：未选中灰边框 */
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -238,13 +239,13 @@
             margin-left: 5px;
         }
         .main-search-bar:focus-within .main-search-btn {
-            border-color: #0366d6;
-            color: #0366d6;
+            border-color: #0366d6; /* 状态2：选中时蓝边框 */
+            color: #0366d6; /* 状态2：选中时蓝图标 */
         }
-        /* 修复 Bug: 悬停时不再全部变成蓝色实心，仅边框和图标变蓝 */
         .main-search-btn:hover {
-            border-color: #0366d6;
-            color: #0366d6;
+            background: #0366d6; /* 状态3：悬停时蓝底 */
+            border-color: #0366d6; /* 状态3：悬停时蓝边框 */
+            color: #fff; /* 状态3：悬停时白图标 */
         }
         .main-search-btn:active {
             transform: scale(0.95);
@@ -455,6 +456,7 @@
             flex-shrink: 0;
             pointer-events: none;
             object-fit: cover;
+            background: #eee; /* 加载中默认底色 */
         }
 
         .site-name {
@@ -1326,9 +1328,11 @@
             color: #0366d6;
         }
         body.dark-mode .main-search-btn:hover {
+            background: #0366d6;
             border-color: #0366d6;
-            color: #0366d6;
+            color: #fff;
         }
+        body.dark-mode .site-icon { background: #333; }
 
         body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
         body.dark-mode .layout-switch.sticky { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
@@ -1925,36 +1929,14 @@
             try {
                 return new URL(url).hostname;
             } catch (e) {
-                return url;
+                return null;
             }
         }
 
-        // 使用 Favicon Grabber API 获取图标
-        async function fetchFavicon(url) {
+        function getFaviconUrl(url) {
             const domain = getDomain(url);
             if (!domain) return null;
-            try {
-                const response = await fetch(`https://favicongrabber.com/api/v1/${domain}`);
-                if (!response.ok) return null;
-                const data = await response.json();
-                if (data.icons && data.icons.length > 0) {
-                    let bestIcon = data.icons[0];
-                    for (let icon of data.icons) {
-                        if (icon.sizes && icon.sizes.includes('32')) {
-                            bestIcon = icon;
-                            break;
-                        }
-                    }
-                    let src = bestIcon.src;
-                    if (src.startsWith('http://')) {
-                        src = 'https://' + src.substring(7);
-                    }
-                    return src;
-                }
-            } catch (e) {
-                return null;
-            }
-            return null;
+            return `https://api-favicon.tinkerspace.tech/${domain}`;
         }
 
         // ================================================================
@@ -1996,7 +1978,11 @@
                 
                 let iconHtml = '';
                 if (faviconEnabled) {
-                    iconHtml = `<img alt="${item.name}" class="site-icon" style="visibility: hidden;">`;
+                    const iconUrl = getFaviconUrl(item.url);
+                    if (iconUrl) {
+                        // 使用新的 API 直接作为图片 src，添加 referrerpolicy 提高成功率，并处理加载失败隐藏
+                        iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon" referrerpolicy="no-referrer" onerror="this.style.display='none'">`;
+                    }
                 }
                 
                 li.innerHTML = `
@@ -2004,19 +1990,6 @@
                     <span class="site-name">${item.name}</span>
                     <span class="site-url">${item.url}</span>
                 `;
-                
-                if (faviconEnabled) {
-                    const imgEl = li.querySelector('.site-icon');
-                    fetchFavicon(item.url).then(iconUrl => {
-                        if (iconUrl) {
-                            imgEl.src = iconUrl;
-                            imgEl.style.visibility = 'visible';
-                            imgEl.onerror = () => imgEl.remove();
-                        } else {
-                            imgEl.remove();
-                        }
-                    });
-                }
                 
                 li.addEventListener('click', function() {
                     if (this.dataset.url) window.open(this.dataset.url, '_blank');
