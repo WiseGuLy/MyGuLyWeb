@@ -80,9 +80,19 @@
             position: relative;
             display: flex;
             align-items: center;
-            border-right: 1px solid #d0d0d0;
-            transition: border-color 0.3s;
             padding-left: 5px;
+            margin-right: 12px;
+            transition: border-color 0.3s;
+        }
+        .engine-selector::after {
+            content: '';
+            position: absolute;
+            right: -8px;
+            top: 25%;
+            bottom: 25%;
+            width: 1px;
+            background: #d0d0d0;
+            transition: background 0.3s;
         }
         .engine-trigger {
             padding: 8px 10px;
@@ -91,8 +101,9 @@
             align-items: center;
             gap: 5px;
             user-select: none;
-            transition: background 0.2s;
+            transition: background 0.2s, box-shadow 0.2s;
             border-radius: 30px;
+            border: 1px solid transparent;
         }
         .engine-trigger:hover {
             background: #f0f0f0;
@@ -102,14 +113,16 @@
             height: 20px;
             display: block;
         }
-        /* 隐藏主搜索框的引擎文字 */
         .engine-name {
             display: none; 
         }
         .select-arrow {
-            font-size: 0.8rem;
+            font-size: 1rem; /* 增大三角 */
             color: #888;
-            transition: transform 0.2s;
+            transition: transform 0.2s, color 0.2s;
+        }
+        .engine-trigger:hover .select-arrow {
+            color: #0366d6; /* 悬停变蓝 */
         }
         .engine-trigger.open .select-arrow {
             transform: rotate(180deg);
@@ -119,19 +132,27 @@
             position: absolute;
             top: calc(100% + 5px);
             left: 0;
-            width: auto; /* 宽度自适应内容 */
-            white-space: nowrap; /* 防止换行 */
+            width: auto;
+            white-space: nowrap;
             background: #fff;
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: none;
             z-index: 100;
             overflow: hidden;
             transition: background 0.3s, border-color 0.3s;
+            
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transform-origin: top left;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
         }
         .engine-options.show {
-            display: block;
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
         }
         .engine-option {
             padding: 8px 15px;
@@ -154,13 +175,14 @@
             display: flex;
             align-items: center;
             position: relative;
+            margin-left: -12px;
         }
 
         .main-search-input {
             flex: 1;
             border: none;
             outline: none;
-            padding: 10px 40px 10px 20px; /* 右侧留出叉号空间 */
+            padding: 10px 30px 10px 20px;
             font-size: 1rem;
             background: transparent;
             color: #1e1e1e;
@@ -172,47 +194,57 @@
 
         .clear-search-btn {
             position: absolute;
-            right: 10px;
+            right: 4px;
             top: 50%;
             transform: translateY(-50%);
-            background: transparent;
+            background: #ccc;
             border: none;
-            color: #888;
             cursor: pointer;
             display: none;
-            padding: 5px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            padding: 0;
+            align-items: center;
+            justify-content: center;
             line-height: 0;
+            transition: background 0.2s;
         }
         .clear-search-btn.show {
-            display: block;
+            display: flex;
         }
         .clear-search-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: #888;
-            transition: fill 0.2s;
+            width: 14px; /* 叉号变大 */
+            height: 14px;
+            fill: #fff;
         }
-        .clear-search-btn:hover svg {
-            fill: #e74c3c;
+        .clear-search-btn:hover {
+            background: #e74c3c;
         }
 
         .main-search-btn {
-            background: #0366d6;
-            color: #fff;
-            border: none;
+            background: #fff;
+            color: #ccc;
+            border: 2px solid #ccc; /* 未选中时为灰色 */
             width: 40px;
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
+            transition: background 0.2s, color 0.2s, transform 0.1s, border-color 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             margin-left: 5px;
         }
+        .main-search-bar:focus-within .main-search-btn {
+            border-color: #0366d6; /* 选中时变蓝 */
+            color: #0366d6;
+        }
         .main-search-btn:hover {
-            background: #0250a5;
+            background: #0366d6;
+            border-color: #0366d6;
+            color: #fff;
         }
         .main-search-btn:active {
             transform: scale(0.95);
@@ -220,7 +252,7 @@
         .search-action-icon {
             width: 20px;
             height: 20px;
-            fill: #fff;
+            fill: currentColor;
         }
 
         /* ============================================================
@@ -414,6 +446,16 @@
             padding-left: 18px;
         }
         li:hover .site-name { color: #0366d6; }
+
+        .site-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+            flex-shrink: 0;
+            pointer-events: none;
+            object-fit: cover;
+        }
 
         .site-name {
             font-size: 1.1rem;
@@ -1241,6 +1283,10 @@
         body.highlight-mode .apps-bottom:hover,
         body.highlight-mode .about-bottom:hover { border-color: #0366d6; }
 
+        body.highlight-mode .engine-trigger:hover {
+            box-shadow: inset 0 0 0 1px #0366d6; /* 直观模式下的蓝色细边框 */
+        }
+
         body.highlight-mode .section:hover {
             box-shadow: 0 8px 24px rgba(3, 102, 214, 0.15), inset 0 0 0 1px #0366d6;
         }
@@ -1260,7 +1306,7 @@
         body.dark-mode h1 { color: #e0e0e0; border-bottom-color: #333; }
 
         body.dark-mode .main-search-bar { background: #1e1e1e; border-color: #444; }
-        body.dark-mode .engine-selector { border-right-color: #444; }
+        body.dark-mode .engine-selector::after { background: #444; }
         body.dark-mode .engine-trigger:hover { background: #2c2c2c; }
         body.dark-mode .engine-name { color: #e0e0e0; }
         body.dark-mode .engine-options { background: #2c2c2c; border-color: #444; }
@@ -1268,8 +1314,22 @@
         body.dark-mode .engine-option.active { background: #3a3a3a; color: #0366d6; }
         body.dark-mode .main-search-input { color: #e0e0e0; }
         body.dark-mode .main-search-input::placeholder { color: #888; }
-        body.dark-mode .clear-search-btn svg { fill: #aaa; }
-        body.dark-mode .clear-search-btn:hover svg { fill: #e74c3c; }
+        body.dark-mode .clear-search-btn { background: #555; }
+        body.dark-mode .clear-search-btn:hover { background: #e74c3c; }
+        body.dark-mode .main-search-btn {
+            background: transparent;
+            border-color: #555;
+            color: #555;
+        }
+        body.dark-mode .main-search-bar:focus-within .main-search-btn {
+            border-color: #0366d6;
+            color: #0366d6;
+        }
+        body.dark-mode .main-search-btn:hover {
+            background: #0366d6;
+            border-color: #0366d6;
+            color: #fff;
+        }
 
         body.dark-mode .layout-switch { background: #1e1e1e; border-color: #444; box-shadow: 0 2px 12px rgba(0,0,0,0.2); }
         body.dark-mode .layout-switch.sticky { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
@@ -1525,7 +1585,7 @@
         <div class="settings-panel">
             <h2>设置</h2>
             <div class="sub-tabs active-appearance" id="subTabs">
-                <span class="sub-tab active" data-tab="appearance">外观</span>
+                <span class="sub-tab active" data-tab="appearance">显示与外观</span>
                 <span class="sub-tab" data-tab="features">功能</span>
                 <span class="sub-tab" data-tab="io">导入/导出</span>
                 <span class="sub-tab-slider"></span>
@@ -1544,6 +1604,12 @@
                                     <li class="select-option active" data-value="light">浅色模式</li>
                                     <li class="select-option" data-value="dark">深色模式</li>
                                 </ul>
+                            </div>
+                        </div>
+                        <div class="switch-setting">
+                            <label for="faviconSwitch">获取并显示网站图标</label>
+                            <div class="switch-toggle" id="faviconSwitch" role="button" tabindex="0" aria-checked="false">
+                                <div class="slider"></div>
                             </div>
                         </div>
                         <div class="switch-setting">
@@ -1766,6 +1832,7 @@
         const settingsBtn = document.getElementById('settingsBottom');
         const settingsModal = document.getElementById('settingsModal');
         const settingsConfirm = document.getElementById('settingsConfirmBtn');
+        const faviconSwitch = document.getElementById('faviconSwitch');
         const visualSwitch = document.getElementById('visualSwitch');
         const particleSwitch = document.getElementById('particleSwitch');
         const stickySwitch = document.getElementById('stickySwitch');
@@ -1815,6 +1882,7 @@
         let currentEngine = 'bing';
 
         let darkMode = false;
+        let faviconEnabled = false;
         let visualMode = true;
         let particleEnabled = true;
         let stickyEnabled = true;
@@ -1849,6 +1917,14 @@
                 if (label) label.textContent = '折叠';
                 const header = section.querySelector('.section-header');
                 if (header) header.title = '点击折叠';
+            }
+        }
+        
+        function getDomain(url) {
+            try {
+                return new URL(url).hostname;
+            } catch (e) {
+                return url;
             }
         }
 
@@ -1888,7 +1964,16 @@
             data.items.forEach(item => {
                 const li = document.createElement('li');
                 li.dataset.url = item.url;
+                
+                let iconHtml = '';
+                if (faviconEnabled) {
+                    const domain = getDomain(item.url);
+                    const iconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+                    iconHtml = `<img src="${iconUrl}" alt="${item.name}" class="site-icon" onerror="this.style.display='none'">`;
+                }
+                
                 li.innerHTML = `
+                    ${iconHtml}
                     <span class="site-name">${item.name}</span>
                     <span class="site-url">${item.url}</span>
                 `;
@@ -2134,6 +2219,11 @@
             });
         }
 
+        function updateFaviconSwitch() {
+            faviconSwitch.classList.toggle('active', faviconEnabled);
+            faviconSwitch.setAttribute('aria-checked', faviconEnabled);
+        }
+
         function updateVisualSwitch() {
             visualSwitch.classList.toggle('active', visualMode);
             visualSwitch.setAttribute('aria-checked', visualMode);
@@ -2163,6 +2253,10 @@
             });
         }
 
+        setupSwitch(faviconSwitch, () => faviconEnabled, v => {
+            faviconEnabled = v;
+            applyLayout();
+        }, updateFaviconSwitch);
         setupSwitch(visualSwitch, () => visualMode, v => visualMode = v, updateVisualSwitch);
         setupSwitch(particleSwitch, () => particleEnabled, v => particleEnabled = v, updateParticleSwitch);
         setupSwitch(stickySwitch, () => stickyEnabled, v => stickyEnabled = v, updateStickySwitch);
@@ -2278,6 +2372,7 @@
             spawnParticles(e.clientX, e.clientY);
             const config = {
                 darkMode: darkMode,
+                faviconEnabled: faviconEnabled,
                 previewActive: previewActive,
                 visualMode: visualMode,
                 particleEnabled: particleEnabled,
@@ -2311,6 +2406,7 @@
                 try {
                     const config = JSON.parse(event.target.result);
                     if (typeof config.darkMode !== 'boolean' ||
+                        typeof config.faviconEnabled !== 'boolean' ||
                         typeof config.previewActive !== 'boolean' ||
                         typeof config.visualMode !== 'boolean' ||
                         typeof config.particleEnabled !== 'boolean' ||
@@ -2319,16 +2415,19 @@
                     }
 
                     darkMode = config.darkMode;
+                    faviconEnabled = config.faviconEnabled;
                     previewActive = config.previewActive;
                     visualMode = config.visualMode;
                     particleEnabled = config.particleEnabled;
                     stickyEnabled = config.stickyEnabled;
 
                     updateDarkModeUI();
+                    updateFaviconSwitch();
                     previewToggle.classList.toggle('active', previewActive);
                     updateVisualSwitch();
                     updateParticleSwitch();
                     updateStickySwitch();
+                    applyLayout();
 
                     if (!previewActive) {
                         clearHighlights();
@@ -2479,6 +2578,17 @@
             }
         });
 
+        // 滚动时关闭弹出层
+        window.addEventListener('scroll', function() {
+            if (appsPopup.classList.contains('show')) {
+                appsPopup.classList.remove('show');
+            }
+            if (engineOptions.classList.contains('show')) {
+                engineOptions.classList.remove('show');
+                engineTrigger.classList.remove('open');
+            }
+        }, true);
+
         // ================================================================
         // 10. 粒子特效
         // ================================================================
@@ -2554,12 +2664,6 @@
             if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
             spawnParticles(e.clientX, e.clientY); 
         });
-
-        window.addEventListener('scroll', function() {
-            if (appsPopup.classList.contains('show')) {
-                appsPopup.classList.remove('show');
-            }
-        }, true);
 
         // ================================================================
         // 11. 底部文字交互
@@ -2731,10 +2835,12 @@
         // ================================================================
         function init() {
             darkMode = false;
+            faviconEnabled = false;
             visualMode = true;
             particleEnabled = true;
             stickyEnabled = true;
             updateDarkModeUI();
+            updateFaviconSwitch();
             updateVisualSwitch();
             updateParticleSwitch();
             updateStickySwitch();
