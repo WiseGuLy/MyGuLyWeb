@@ -137,14 +137,15 @@
             transform: rotate(180deg);
         }
 
-        .engine-options {
+        /* 通用下拉列表样式（搜索引擎 & 设置页） */
+        .engine-options, .custom-select .select-options {
             position: absolute;
             top: calc(100% + 5px);
             left: 0;
             width: auto;
             white-space: nowrap;
             background: #fff;
-            border: 1px solid #ccc;
+            border: 1px solid rgba(0,0,0,0.1);
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             z-index: 100;
@@ -157,24 +158,26 @@
             transform-origin: top left;
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
         }
-        .engine-options.show {
+        .engine-options.show, .custom-select .select-options.show {
             visibility: visible;
             opacity: 1;
             transform: translateY(0) scale(1);
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s;
         }
-        .engine-option {
+        .engine-option, .custom-select .select-option {
             padding: 8px 15px;
             display: flex;
             align-items: center;
             gap: 8px;
             cursor: pointer;
             transition: background 0.2s, color 0.2s;
+            color: #333;
         }
-        .engine-option:hover {
+        .engine-option:hover, .custom-select .select-option:hover {
             background: #eef6ff;
+            color: #0366d6;
         }
-        .engine-option.active {
+        .engine-option.active, .custom-select .select-option.active {
             background: #eef6ff;
             color: #0366d6;
         }
@@ -808,70 +811,38 @@
         }
         .switch-toggle.active .slider { transform: translateX(22px); }
 
-        /* 模式切换下拉框 */
+        /* 通用下拉框容器 */
         .custom-select {
             position: relative;
             width: 130px;
             user-select: none;
         }
-        .select-trigger {
+        /* 通用下拉框触发器 */
+        .custom-select .select-trigger {
             padding: 5px 12px;
-            border: 1px solid #ccc;
+            border: 1px solid transparent;
             border-radius: 20px;
-            background: #fff;
+            background: transparent;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.85rem;
             color: #333;
-            transition: border-color 0.2s, background 0.3s, color 0.3s;
+            transition: background 0.2s, color 0.3s;
         }
-        .select-trigger:hover {
-            border-color: #0366d6;
+        .custom-select .select-trigger:hover {
+            background: #f0f0f0;
         }
-        .select-arrow {
+        .custom-select .select-arrow {
             font-size: 0.8rem;
             color: #888;
-            transition: transform 0.2s;
+            transition: transform 0.2s, color 0.2s;
         }
-        .select-options {
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            width: 100%;
-            background: #fff;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            list-style: none;
-            padding: 4px;
-            margin: 0;
-            display: none;
-            z-index: 20;
-            overflow: hidden;
-            transition: background 0.3s, border-color 0.3s;
-        }
-        .select-options.show {
-            display: block;
-        }
-        .select-option {
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: #333;
-            text-align: center;
-            transition: background 0.2s, color 0.2s;
-        }
-        .select-option:hover {
-            background: #eef6ff;
+        .custom-select .select-trigger:hover .select-arrow {
             color: #0366d6;
         }
-        .select-option.active {
-            background: #0366d6;
-            color: #fff;
-        }
+        /* 由于 .select-options 已在上方统一定义，这里无需重复 */
 
         /* 导入导出页面样式 */
         .io-note {
@@ -1297,7 +1268,8 @@
         body.highlight-mode .apps-bottom:hover,
         body.highlight-mode .about-bottom:hover { border-color: #0366d6; }
 
-        body.highlight-mode .engine-trigger:hover {
+        body.highlight-mode .engine-trigger:hover,
+        body.highlight-mode .custom-select .select-trigger:hover {
             box-shadow: inset 0 0 0 1px #0366d6;
         }
 
@@ -1321,11 +1293,15 @@
 
         body.dark-mode .main-search-bar { background: #1e1e1e; border-color: #444; }
         body.dark-mode .engine-selector::after { background: #444; }
-        body.dark-mode .engine-trigger:hover { background: #2c2c2c; }
+        body.dark-mode .engine-trigger:hover, body.dark-mode .custom-select .select-trigger:hover { background: #2c2c2c; }
         body.dark-mode .engine-name { color: #e0e0e0; }
-        body.dark-mode .engine-options { background: #2c2c2c; border-color: #444; }
-        body.dark-mode .engine-option:hover { background: #3a3a3a; }
-        body.dark-mode .engine-option.active { background: #3a3a3a; color: #0366d6; }
+        body.dark-mode .engine-options, body.dark-mode .custom-select .select-options { background: #2c2c2c; border-color: #444; }
+        body.dark-mode .engine-option, body.dark-mode .custom-select .select-option { color: #e0e0e0; }
+        body.dark-mode .engine-option:hover, body.dark-mode .custom-select .select-option:hover { background: #3a3a3a; color: #0366d6; }
+        body.dark-mode .engine-option.active, body.dark-mode .custom-select .select-option.active { background: #3a3a3a; color: #0366d6; }
+        body.dark-mode .custom-select .select-trigger { color: #e0e0e0; }
+        body.dark-mode .custom-select .select-arrow { color: #aaa; }
+        
         body.dark-mode .main-search-input { color: #e0e0e0; }
         body.dark-mode .main-search-input::placeholder { color: #888; }
         body.dark-mode .clear-search-btn { background: #555; }
@@ -1400,12 +1376,6 @@
         body.dark-mode .settings-slide .switch-setting { border-bottom-color: #2c2c2c; }
         body.dark-mode .settings-slide .switch-setting label { color: #e0e0e0; }
         body.dark-mode .switch-toggle { background: #555; }
-        
-        body.dark-mode .select-trigger { background: #2c2c2c; border-color: #444; color: #e0e0e0; }
-        body.dark-mode .select-arrow { color: #aaa; }
-        body.dark-mode .select-options { background: #2c2c2c; border-color: #444; }
-        body.dark-mode .select-option { color: #e0e0e0; }
-        body.dark-mode .select-option:hover { background: #3a3a3a; color: #0366d6; }
 
         body.dark-mode .io-note { color: #aaa; }
         body.dark-mode .update-item { border-bottom-color: #2c2c2c; color: #ccc; }
@@ -1960,9 +1930,10 @@
             }
         }
         
+        // 修改为使用 xinac 的 API 获取图标
         function getFaviconUrl(url) {
             if (!url) return null;
-            return `https://api.afmax.cn/so/ico/index.php?r=${encodeURIComponent(url)}`;
+            return `https://api.xinac.net/icon/?url=${encodeURIComponent(url)}`;
         }
 
         // ================================================================
@@ -2665,6 +2636,9 @@
             }
             if (shapeOptionsList.classList.contains('show')) {
                 shapeOptionsList.classList.remove('show');
+            }
+            if (selectOptionsList.classList.contains('show')) {
+                selectOptionsList.classList.remove('show');
             }
         }, true);
 
